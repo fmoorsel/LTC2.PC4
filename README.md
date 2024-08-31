@@ -10,10 +10,10 @@ Zorg dat je voor je begint voor het volgende:
 
 Doorloop de volgende stappen voor het bouwen en starten van de challenge applicatie:
 
-- Stap 1: download vervolgens deze file: https://whitemill20studios.nl/longtermnlpostcodechallenge/v1.0.11/LTC2.PC4.zip
+- Stap 1: download deze file: https://whitemill20studios.nl/longtermnlpostcodechallenge/v1.0.11/LTC2.PC4.zip
 - Stap 2: unzip deze file naar een folder op je file system
 - Stap 3: open een command line prompt (cmd.exe) en ga naar de folder waar je de zip file hebt uitgepakt
-- Stap 4: in deze folder vind je een subfolder "scripts" en ga vanuit je command line prompt naar deze "scripts" folder
+- Stap 4: hier vind je een subfolder "scripts" en ga vanuit je command line prompt naar deze "scripts" folder
 - Stap 5: start in deze folder eerst het batch bestand: "cloneFromGitHub.cmd"
 - Stap 6: vervolgens start je vanuit dezelfde folder: "buildAllDebug.cmd"
 - Stap 7: is het bouwen gelukt dan kan je de applicatie starten, lees eerst de "ReadMe.pdf" uit de documents folder
