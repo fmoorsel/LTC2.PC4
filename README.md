@@ -16,7 +16,7 @@ Doorloop de volgende stappen voor het bouwen en starten van de challenge applica
 - Stap 4: hier vind je een subfolder "scripts" en ga vanuit je command line prompt naar deze "scripts" folder
 - Stap 5: start in deze folder eerst het batch bestand: "cloneFromGitHub.cmd"
 - Stap 6: vervolgens start je vanuit dezelfde folder: "buildAllDebug.cmd"
-- Stap 7: is het bouwen gelukt dan kan je de applicatie starten, lees eerst de "ReadMe.pdf" uit de documents folder
+- Stap 7: is het bouwen gelukt dan kun je de applicatie starten, lees eerst de "ReadMe.pdf" uit de documents folder
 - Stap 8: het starten van de gebouwde applicatie kan met het script: "runApplication.cmd"
 
 Optioneel:
