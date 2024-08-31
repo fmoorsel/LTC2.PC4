@@ -8,22 +8,17 @@ Zorg dat je voor je begint voor het volgende:
 - dat je de command line tools voor het builden van een dotnet 8 applicatie hebt geinstalleerd op deze computer
 - dat je node.js hebt geinstalleerd op deze computer
 
-Download vervolgense deze file: 
+Doorloop de volgende stappen voor het bouwen en starten van de challenge applicatie:
 
-https://whitemill20studios.nl/longtermnlpostcodechallenge/v1.0.11/LTC2.PC4.zip
+- Stap 1: download vervolgens deze file: https://whitemill20studios.nl/longtermnlpostcodechallenge/v1.0.11/LTC2.PC4.zip
+- Stap 2: unzip deze file naar een folder op je file system
+- Stap 3: open een command line prompt (cmd.exe) en ga naar de folder waar je de zip file hebt uitgepakt
+- Stap 4: in deze folder vind je een subfolder "scripts" en ga vanuit je command line prompt naar deze "scripts" folder
+- Stap 5: start in deze folder eerst het batch bestand: "cloneFromGitHub.cmd"
+- Stap 6: vervolgens start je vanuit dezelfde folder: "buildAllDebug.cmd"
+- Stap 7: is het bouwen gelukt dan kan je de applicatie starten, lees eerst de "ReadMe.pdf" uit de documents folder
+- Stap 8: het starten van de gebouwde applicatie kan met het script: "runApplication.cmd"
 
-Unzip deze file naar een folder op je file system
+Optioneel:
 
-Open een command line prompt (cmd.exe) en ga naar de folder waar je de zip file hebt uitgepakt.
-
-In deze folder vind je een subfolder "scripts" en ga vanuit je command line prompt naar deze "scripts" folder
-
-Start in deze folder eerst het batch bestand: "cloneFromGitHub.cmd"
-
-Vervolgens start je vanuit dezelfde folder: "buildAllDebug.cmd"
-
-Als het bouwen van de applicatie is gelukt dan kan je de applicatie starten. Lees daarvoor eerst de "ReadMe.pdf" uit de documents folder.
-
-Het starten van de gebouwde applicatie kan met het script: "runApplication.cmd"
-
-Het Archive Importer Tool is te starten met: "runArchiveImporter.cmd"
+- Stap 9: het Archive Importer Tool is te starten met: "runArchiveImporter.cmd"
