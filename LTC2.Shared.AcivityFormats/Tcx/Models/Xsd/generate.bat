@@ -1,0 +1,1 @@
+"C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\x64\xsd" TrainingCenterDatabasev2.xsd /classes /out:..\generated /namespace:LTC2.Shared.ActivityFormats.Tcx.Models.Generated /language:CS 

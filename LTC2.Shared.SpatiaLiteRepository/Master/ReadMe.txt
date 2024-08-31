@@ -1,0 +1,1 @@
+﻿Don't edit sqlite file, edit in support project and copy it to here

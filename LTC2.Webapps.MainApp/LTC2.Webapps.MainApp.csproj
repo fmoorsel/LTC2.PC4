@@ -1,0 +1,72 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+        <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <OutputType>Exe</OutputType>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <WarningLevel>4</WarningLevel>
+        <NoWarn>1701;1702;8618;8604;8603;8602;8625</NoWarn>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <WarningLevel>4</WarningLevel>
+        <NoWarn>1701;1702;8618;8604;8603;8602;8625</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Content Remove="serlilogsettings.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="serlilogsettings.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.6" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Serilog" Version="4.0.0" />
+
+    <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.2" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\LTC2.Shared.Secrets\LTC2.Shared.Secrets.csproj" />
+      <ProjectReference Include="..\LTC2.Shared.BaseMessages\LTC2.Shared.BaseMessages.csproj" />
+      <ProjectReference Include="..\LTC2.Shared.Messaging\LTC2.Shared.Messaging.csproj" />
+      <ProjectReference Include="..\LTC2.Shared.Repositories\LTC2.Shared.Repositories.csproj" />
+      <ProjectReference Include="..\LTC2.Shared.SpatiaLiteRepository\LTC2.Shared.SpatiaLiteRepository.csproj" />
+      <ProjectReference Include="..\LTC2.Shared.StravaConnector\LTC2.Shared.StravaConnector.csproj" />
+    </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettingsPL.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Resources\messages.nl.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\tiles.sqlite">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

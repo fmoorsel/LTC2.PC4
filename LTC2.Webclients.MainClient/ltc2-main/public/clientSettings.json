@@ -1,0 +1,17 @@
+{
+  "mainApplicationEntryPoint": "http://localhost:50000/Home",
+  "mainApplicationErrorPage": "http://localhost:50000/Home/Error",
+  "mainApplicationForcedLogoutPage": "http://localhost:5000/Home?forceLogout=true",
+  "settingsUrl": "http://localhost:50000",
+  "requestTimeout": 5000,
+  "urlGeoJsonMap": "./maps/PC4smallgeojson2024.1.0.json",
+  "urlGeoJsonDistrictsMap": "./maps/PL-districtsborders2022-1.0.json",
+  "urlPbfGeoJsonMap": "./maps/PLsmallgeojson2022-1.0.pbf",
+  "urlPbdfGeoJsonAcurateMap": "./maps/PLallgeojson2022-1.0.pbf",
+  "mapCenter": [ 5.277420, 52.1 ],
+  "mapZoom": 7.5,
+  "mapZoomMobile": 6.5,
+  "messageTimeout": 2000,
+  "urlTiles": "http://localhost:50000/api/Tiles/tile/{z}/{x}/{y}.pbf",
+  "standaloneVersion": true
+}

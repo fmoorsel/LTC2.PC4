@@ -1,0 +1,31 @@
+{
+    "form.manage.profiles": "Beheer profielen...",
+
+    "groupbox.profiles": "Profielen",
+    "button.edit.profile": "Bewerk profiel",
+    "button.new.profile": "Nieuw profiel",
+    "button.delete.profile": "Verwijder profiel",
+
+    "groupbox.profile.details": "Profiel details",
+    "button.test.profiel": "Test profiel",
+    "button.show.secret": "Toon Secret",
+    "button.hide.secret": "Verberg Secret",
+    "label.profile.name": "Profiel naam:",
+    "label.strava.client.id": "Strava Client ID:",
+    "label.strava.client.secret": "Strava Client Secret:",
+    "label.error.client.id": "alleen cijfers zijn toegestaan",
+
+    "component.webapp": "Landkaart Manager",
+    "messagebox.fatal.component.exit": "De %0% is uit de lucht.\n\nDe application kan niet verder werken zonder deze component. Herstart de applicatie.",
+    "messagebox.fatal.component.exit.header": "Probleempje...",
+    "messagebox.confirm.other.account": "Wil je dit profiel aan een ander Strava account koppelen? (huidig %0%, nieuw %1%)",
+    "messagebox.confirm.other.account.header": "Bevestig",
+    "messagebox.error.profile": "Er is fout gegaan bij het aanmaken van het profile.",
+    "messagebox.error.profile.header": "Probleempje",
+    "messagebox.confirm.delete": "Wil je profiel %0% (%1%) verwijderen?",
+    "messagebox.confirm.delete.header": "Bevestig",
+
+    "button.link.profile": "Profiel koppelen"
+  
+
+}

@@ -1,0 +1,44 @@
+{
+  "settings": {
+    "index": {
+      "number_of_shards": "1",
+      "number_of_replicas": "0"
+    }
+  },
+  "mappings": {
+    "properties": {
+      "name": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "ignore_above": 256.0,
+            "type": "keyword"
+          }
+        }
+      },
+      "id": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "ignore_above": 256.0,
+            "type": "keyword"
+          }
+        }
+      },
+      "athleteId": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "ignore_above": 256.0,
+            "type": "keyword"
+          }
+        }
+      },
+      "track": {
+        "type": "geo_shape"
+      }
+    }
+
+    }
+  }
+}

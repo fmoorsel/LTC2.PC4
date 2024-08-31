@@ -1,0 +1,34 @@
+{
+  "form.importer": "Strava Archive Importer",
+
+  "label.explanation.1": "Met dit tool kun je een '.zip' bestand met een Strava Archive importeren.",
+  "label.explanation.2": "In 'Readme.pdf' kun je lezen hoe je je Strava Archive bij Strava kunt ophalen.",
+
+  "group.selectfile": "Selecteer het Strava Archive bestand",
+  "text.chooseafile": "<selecteer je archive bestand met 'Open bestand...'>",
+  "button.chooseafile": "Open bestand...",
+
+  "group.import": "Importeer het Strava Archive",
+  "button.import": "Start importeren...",
+  "status.choosefile": "Selecteer eerst een Strava Archive bestand...",
+
+  "import.success.header": "Succes!",
+  "import.success": "De geimporteerde activiteiten worden gebruikt bij een volgende challenge update.",
+  "import.failed.header": "Probleempje...",
+  "import.failed": "Het importeren is MISLUKT, helaas kan dit bestand niet worden verwerkt!",
+  "message.processing": "Wil je dit afbreken?",
+  "message.processing.header": "Bezig met het verwerken...",
+
+  "group.found.archives": "Reeds ingelezen Strava Archive bestanden",
+  "button.remove": "Verwijder Archive",
+
+  "move.file": "Copieer archief bestand",
+  "moved.file": "Archief bestand gecopieerd",
+  "unzip.file": "Uitpakken archief bestand",
+  "unzip.file.progress": "Voortgang uitpakken bestand: ",
+  "unzipped.file": "Archief bestand uitgepakt",
+  "process.activity": "Verwerken activiteiten: ",
+  "write.to.cache": "Schrijven naar cache: ",
+  "write.to.cache.done": "Schrijven naar cache voltooid, succes ratio: ",
+  "write.to.cache.done.nothing": "Geen geschikte activiteiten gevonden"
+}

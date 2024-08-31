@@ -1,0 +1,85 @@
+﻿@{
+}
+@using LTC2.Shared.BaseMessages.Interfaces;
+@inject IBaseTranslationService _translationService;
+<!DOCTYPE html>
+<html>
+
+<head>
+</head>
+
+<body style="margin: auto;padding: 50px;">
+
+    <div style="display: none">
+        @Html.ActionLink("CallBackConnect", "CallBackConnect", "Home", new { language = "" }, new { @id = "callbackupconnect" })
+    </div>
+
+    <script>
+        var callbackConnect = document.getElementById("callbackupconnect").href;
+        var stravaUrlConnect = "https://www.strava.com/oauth/authorize?client_id=@ViewBag.StravaAppId&response_type=code&approval_prompt=@ViewBag.ApprovalPrompt&scope=read,activity:read_all,profile:read_all&state=@ViewBag.State&redirect_uri=" + callbackConnect;
+
+        function ConnectToStrava(doRefresh) {
+            location.href = stravaUrlConnect;
+        }
+
+        function getCookie(cname) {
+            var name = cname + "=";
+            var decodedCookie = decodeURIComponent(document.cookie);
+            var ca = decodedCookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+
+        function checkedLoggedIn() {
+            var token = getCookie("token");
+
+            if (token && token != "") {
+                var jwt = JSON.parse(atob(token.split('.')[1]));
+
+                var expDateWithHourMargin = new Date((jwt.exp - 3600) * 1000);
+                var itIsNow = new Date();
+
+                if (itIsNow < expDateWithHourMargin) {
+                    window.location = "@ViewBag.AppEntryPoint"
+                }            
+            }
+        }
+
+        function docReady(fn) {
+            if (document.readyState === "complete" || document.readyState === "interactive") {
+                setTimeout(fn, 1);
+            } else {
+                document.addEventListener("DOMContentLoaded", fn);
+            }
+        }
+    </script>   
+
+    <div style="display:flex;justify-content:center;align-items:center;height:650px">
+
+       
+        @if (ViewBag.TestProfile)
+        {
+            <p>@_translationService.GetMessage("index.login.prompt")</p>
+        }
+
+        <a href="#" onclick="ConnectToStrava();return false;">
+            <img style="max-width:200px;" src="./resources/connect-with-strava.png" />
+        </a>
+    </div>
+
+    <script>
+        docReady(function () {
+            checkedLoggedIn();
+        });
+    </script>
+
+</body>
+</html>

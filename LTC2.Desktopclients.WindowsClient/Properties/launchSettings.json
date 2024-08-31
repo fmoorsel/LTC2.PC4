@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "LTC2.Desktopclients.WindowsClient": {
+      "commandName": "Project",
+      "commandLineArgs": "pipe:calculator"
+    }
+  }
+}

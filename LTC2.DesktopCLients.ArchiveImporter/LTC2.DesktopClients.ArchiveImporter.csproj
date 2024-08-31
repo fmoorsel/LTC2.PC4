@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>disable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
+    <ForceDesignerDpiUnaware>true</ForceDesignerDpiUnaware>
+    <ApplicationIcon>Resources\Long Term Challenge Logo3.ico</ApplicationIcon>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Long Term Challenge Logo3.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\Long Term Challenge Logo3.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LTC2.Shared.AcivityFormats\LTC2.Shared.ActivityFormats.csproj" />
+    <ProjectReference Include="..\LTC2.Shared.Messages\LTC2.Shared.Messages.csproj" />
+    <ProjectReference Include="..\LTC2.Shared.Models\LTC2.Shared.Models.csproj" />
+    <ProjectReference Include="..\LTC2.Shared.StravaConnector\LTC2.Shared.StravaConnector.csproj" />
+    <ProjectReference Include="..\LTC2.Shared.Utils\LTC2.Shared.Utils.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\messages.nl.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

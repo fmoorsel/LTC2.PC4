@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "LTC2.Shared.Messaging": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:53935;http://localhost:53936"
+    }
+  }
+}

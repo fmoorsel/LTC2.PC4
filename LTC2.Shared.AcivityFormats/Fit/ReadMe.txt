@@ -1,0 +1,1 @@
+﻿Using Nuget Garmin.FIT.Sdk from Garmin

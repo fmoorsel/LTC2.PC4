@@ -1,0 +1,32 @@
+﻿@{
+    var parameters = new List<string>()
+    {
+        ViewBag.AthleteId.ToString(),
+        ViewBag.Name.ToString()
+    };
+}
+@using LTC2.Shared.BaseMessages.Interfaces;
+@inject IBaseTranslationService _translationService;
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script>
+        function StravaAthleteId() {
+            return "@ViewBag.AthleteId";
+        }
+
+        function StravaAthleteName() {
+            return "@ViewBag.Name";
+        }
+    </script>
+</head>
+
+<body style="margin: auto;padding: 50px;">
+
+    <div style="display:flex;justify-content:center;align-items:center;height:650px">
+        <p>@_translationService.GetMessage("login.link.prompt", parameters)</p>
+    </div>
+
+</body>
+</html>

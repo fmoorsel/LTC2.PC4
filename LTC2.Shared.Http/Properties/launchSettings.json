@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "LTC2.Shared.Http": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:53939;http://localhost:53940"
+    }
+  }
+}
