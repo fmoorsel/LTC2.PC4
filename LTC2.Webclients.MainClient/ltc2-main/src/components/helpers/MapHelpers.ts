@@ -79,7 +79,7 @@ export class MapStyleHelper {
             const widthToUse = multiplier * (stroke?.getWidth() ?? 0.5);
     
             const styletoUse = new Style({
-                fill: fill ?? undefined,
+                fill: fill || undefined,
                 stroke: new Stroke({
                     color: stroke?.getColor() ?? '#000000',
                     width: widthToUse
