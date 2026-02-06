@@ -2,12 +2,14 @@
 using LTC2.Desktopclients.WindowsClient.Services;
 using LTC2.Shared.Messages.Interfaces;
 using LTC2.Shared.Models.Desktop;
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace LTC2.Desktopclients.WindowsClient.Forms
 {
     public partial class SelectProfileForm : Form
     {
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool ShouldProgress { get; set; }
 
         private readonly ProfileManager _profileManager;
