@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="Garmin.FIT.Sdk" Version="21.158.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
   <ItemGroup>
