@@ -1,15 +1,19 @@
 ﻿using LTC2.Desktopclients.ProfileManager.Models;
 using LTC2.Shared.Messages.Interfaces;
 using Microsoft.Web.WebView2.Core;
+using System.ComponentModel;
 
 namespace LTC2.Desktopclients.ProfileManager.Forms
 {
     public partial class TesterForm : Form
     {
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool IsTestSuccessFull { get; set; }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string ProfileToTest { get; set; }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string AthleteId { get; set; }
 
 
