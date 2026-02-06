@@ -3,9 +3,9 @@ Long Term NL Postcode Challenge
 
 Zorg voor je begint voor het volgende:
 
-- een computer met Windows 10 of Windows 11 met minimaal 16 GByte intern geheugen
+- een computer met Windows 11 met minimaal 16 GByte intern geheugen
 - de command line git client moeten zijn geinstalleerd op deze computer
-- de command line build tools van dotnet 8 moeten zijn geinstalleerd op deze computer
+- de command line build tools van dotnet 10 moeten zijn geinstalleerd op deze computer
 - node.js moet geinstalleerd zijn op deze computer
 
 Doorloop de volgende stappen voor het bouwen en starten van de challenge applicatie:
