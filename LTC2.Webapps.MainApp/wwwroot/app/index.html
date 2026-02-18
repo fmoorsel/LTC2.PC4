@@ -8,8 +8,16 @@
 <body>
     <script>
         const now = new Date();
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
 
-        window.location = "../ltc2-main/index.html?t=" + now.getTime();
+        const t = urlParams.get('t'); 
+        const strava = urlParams.get('strava');
+        const ridewithgps = urlParams.get('ridewithgps');
+
+        const parameter = (ridewithgps ? "ridewithgps" : strava ? "strava" : "t") + '=' + now.getTime();
+
+        window.location = "../ltc2-main/index.html?" + parameter;
     </script>
 </body>
 </html>

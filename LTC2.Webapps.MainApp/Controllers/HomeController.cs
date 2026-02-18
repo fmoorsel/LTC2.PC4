@@ -1,15 +1,16 @@
 ﻿using LTC2.Shared.BaseMessages.Interfaces;
 using LTC2.Shared.Models.Settings;
 using LTC2.Shared.StravaConnector.Interfaces;
+using LTC2.Webapps.MainApp.Models;
 using LTC2.Webapps.MainApp.Services;
 using LTC2.Webapps.MainApp.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using LTC2.Webapps.MainApp.Models;
-using Microsoft.Extensions.Logging;
+using System.Web;
 
 namespace LTC2.Webapps.MainApp.Controllers
 {
@@ -93,7 +94,7 @@ namespace LTC2.Webapps.MainApp.Controllers
 
                     if (validUntil >= DateTime.UtcNow.AddHours(1))
                     {
-                        return Redirect(_appEntrypoint + $"?t={DateTime.UtcNow.Ticks}");
+                        return Redirect(_appEntrypoint + $"?strava={DateTime.UtcNow.Ticks}strava");
                     }
                 }
             }
@@ -108,7 +109,7 @@ namespace LTC2.Webapps.MainApp.Controllers
             HttpContext.Response.Cookies.Append(_languageCookieName, language ?? _baseTranslationService.CurrentLanguage);
             HttpContext.Response.Cookies.Append(MULTI_COOKIE_NAME, multi ? MULTI_COOKIE_VALUE : string.Empty);
 
-            ViewBag.AppEntryPoint = _appEntrypoint + $"?t={DateTime.UtcNow.Ticks}";
+            ViewBag.AppEntryPoint = _appEntrypoint + $"?strava={DateTime.UtcNow.Ticks}";
 
             return View();
         }
@@ -249,11 +250,11 @@ namespace LTC2.Webapps.MainApp.Controllers
 
             if (_appSettings.UseRedirectDuringLogin)
             {
-                return Redirect(_appEntrypoint + $"?t={DateTime.UtcNow.Ticks}");
+                return Redirect(_appEntrypoint + $"?strava={DateTime.UtcNow.Ticks}");
             }
             else
             {
-                ViewBag.Entrypoint = _appEntrypoint + $"?t={DateTime.UtcNow.Ticks}";
+                ViewBag.Entrypoint = _appEntrypoint + $"?strava={DateTime.UtcNow.Ticks}";
                 
                 return View("CompleteLogin");
             }

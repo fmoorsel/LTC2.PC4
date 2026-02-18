@@ -84,7 +84,7 @@ namespace LTC2.Webapps.MainApp.Controllers
 
                     if (validUntil >= DateTime.UtcNow.AddHours(1))
                     {
-                        return Redirect(_appEntrypoint + $"?t={DateTime.UtcNow.Ticks}");
+                        return Redirect(_appEntrypoint + $"?ridewithgps={DateTime.UtcNow.Ticks}");
                     }
                 }
             }
@@ -97,7 +97,7 @@ namespace LTC2.Webapps.MainApp.Controllers
             ViewBag.State = testProfile ? $"{state},true" : state;
             ViewBag.ApprovalPrompt = approvalPrompt;
             ViewBag.Language = language;
-            ViewBag.AppEntryPoint = _appEntrypoint + $"?t={DateTime.UtcNow.Ticks}";
+            ViewBag.AppEntryPoint = _appEntrypoint + $"?ridewithgps={DateTime.UtcNow.Ticks}";
 
             return View();
         }
@@ -198,11 +198,11 @@ namespace LTC2.Webapps.MainApp.Controllers
 
             if (_appSettings.UseRedirectDuringLogin)
             {
-                return Redirect(_appEntrypoint + $"?t={DateTime.UtcNow.Ticks}");
+                return Redirect(_appEntrypoint + $"?ridewithgps={DateTime.UtcNow.Ticks}");
             }
             else
             {
-                ViewBag.Entrypoint = _appEntrypoint + $"?t={DateTime.UtcNow.Ticks}";
+                ViewBag.Entrypoint = _appEntrypoint + $"?ridewithgps={DateTime.UtcNow.Ticks}";
 
                 return View("CompleteLogin");
             }
