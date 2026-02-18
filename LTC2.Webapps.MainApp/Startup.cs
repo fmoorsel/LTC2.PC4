@@ -196,9 +196,12 @@ namespace LTC2.Webapps.MainApp
         {
             var processModule = Process.GetCurrentProcess().MainModule;
             var appSettingsFolder = Path.GetDirectoryName(processModule?.FileName);
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
 
-            var configuration = new ConfigurationBuilder().SetBasePath(appSettingsFolder)
-                        .AddJsonFile("appsettings.json", true, true)
+            var configuration = new ConfigurationBuilder()
+                        .SetBasePath(appSettingsFolder)
+                        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                        .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
                         .Build();
 
             return configuration.GetSection("AppSettings").Get<AppSettings>();
