@@ -9,6 +9,7 @@ using LTC2.Shared.Repositories.Repositories;
 using LTC2.Shared.Secrets.Interfaces;
 using LTC2.Shared.Secrets.Vaults;
 using LTC2.Shared.SpatiaLiteRepository.Repositories;
+using LTC2.Shared.RideWithGpsConnector.Bootstrap.Extensions;
 using LTC2.Shared.StravaConnector.Bootstrap.Extensions;
 using LTC2.Shared.Utils.Bootstrap.Extensions;
 using LTC2.Shared.Utils.Bootstrap.Interfaces;
@@ -60,6 +61,7 @@ namespace LTC2.Webapps.MainApp
             services.AddSettings(settingsService);
 
             services.AddStravaConnector();
+            services.AddRideWithGpsConnector();
             services.AddFileBasedBroker();
 
             services.AddControllers().AddNewtonsoftJson();

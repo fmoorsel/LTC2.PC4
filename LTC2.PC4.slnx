@@ -16,6 +16,7 @@
     <Project Path="LTC2.Shared.Secrets/LTC2.Shared.Secrets.csproj"/>
     <Project Path="LTC2.Shared.SpatiaLiteRepository/LTC2.Shared.SpatiaLiteRepository.csproj"/>
     <Project Path="LTC2.Shared.StravaConnector/LTC2.Shared.StravaConnector.csproj"/>
+    <Project Path="LTC2.Shared.RideWithGpsConnector/LTC2.Shared.RideWithGpsConnector.csproj"/>
     <Project Path="LTC2.Shared.Utils/LTC2.Shared.Utils.csproj"/>
   </Folder>
   <Folder Name="/LTC2.Windows/">
