@@ -19,37 +19,23 @@ namespace LTC2.Shared.RideWithGpsConnector.Connector
             _proxy = proxy;
         }
 
-        public async Task<Session> GetSession(string code)
+        public async Task<Session> GetSession(string code, string redirectUri)
         {
-            var response = await _proxy.GetToken(new AuthorizeRequest { Code = code });
+            var tokenResponse = await _proxy.GetToken(new AuthorizeRequest { Code = code, RedirectUri = redirectUri });
+            var userResponse = await _proxy.GetCurrentUser(tokenResponse.Access_token);
 
-            var firstname = string.Empty;
-            var lastname = string.Empty;
-
-            if (!string.IsNullOrEmpty(response.User?.Name))
-            {
-                var spaceIndex = response.User.Name.IndexOf(' ');
-                if (spaceIndex > 0)
-                {
-                    firstname = response.User.Name.Substring(0, spaceIndex);
-                    lastname = response.User.Name.Substring(spaceIndex + 1);
-                }
-                else
-                {
-                    firstname = response.User.Name;
-                }
-            }
+            var user = userResponse?.User;
 
             var session = new Session
             {
-                AccessToken = response.Access_token,
+                AccessToken = tokenResponse.Access_token,
                 RefreshToken = null,
                 ExpiresAt = 0,
                 Athlete = new Athlete
                 {
-                    Id = response.User?.Id ?? 0,
-                    Firstname = firstname,
-                    Lastname = lastname
+                    Id = user?.Id ?? 0,
+                    Firstname = user?.Name ?? string.Empty,
+                    Lastname = string.Empty
                 }
             };
 

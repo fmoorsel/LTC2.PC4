@@ -5,6 +5,6 @@ namespace LTC2.Shared.RideWithGpsConnector.Interfaces
 {
     public interface IRideWithGpsConnector
     {
-        Task<Session> GetSession(string code);
+        Task<Session> GetSession(string code, string redirectUri);
     }
 }

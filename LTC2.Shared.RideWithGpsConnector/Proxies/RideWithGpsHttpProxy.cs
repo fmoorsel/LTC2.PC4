@@ -29,7 +29,14 @@ namespace LTC2.Shared.RideWithGpsConnector.Proxies
             parameters.Add(new KeyValuePair<string, string>("client_secret", _settings.ClientSecret));
             parameters.Add(new KeyValuePair<string, string>("grant_type", "authorization_code"));
             parameters.Add(new KeyValuePair<string, string>("code", request.Code));
+            parameters.Add(new KeyValuePair<string, string>("redirect_uri", request.RedirectUri));
             return await ExecuteFormUrlEncodedRequest<AuthorizeResponse>("/oauth/token", null, parameters);
+        }
+
+        public async Task<CurrentUserResponse> GetCurrentUser(string accessToken)
+        {
+            var authHeader = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+            return await ExecuteGetRequest<CurrentUserResponse>("/api/v1/users/current", authHeader);
         }
     }
 }
