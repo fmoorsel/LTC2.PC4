@@ -51,8 +51,13 @@ namespace LTC2.Webapps.MainApp.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index(bool forceLogout, string profile, string language, bool multi)
+        public IActionResult Index(bool forceLogout, string profile, string language, bool multi, string source)
         {
+            if (source == "ridewithgps")
+            {
+                return RedirectToAction("Index", "HomeRideWithGps", new { language, multi });
+            }
+
             var state = Guid.NewGuid().ToString();
             var testProfile = false;
             var approvalPrompt = "auto";

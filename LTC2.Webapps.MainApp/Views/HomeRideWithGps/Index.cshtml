@@ -1,0 +1,77 @@
+@{
+}
+<!DOCTYPE html>
+<html>
+
+<head>
+</head>
+
+<body style="margin: auto;padding: 50px;">
+
+    <div style="display: none">
+        @Html.ActionLink("CallbackConnect", "CallbackConnect", "HomeRideWithGps", new { language = "" }, new { @id = "callbackconnect" })
+    </div>
+
+    <script>
+        var callbackConnect = document.getElementById("callbackconnect").href;
+        var rwGpsUrlConnect = "https://ridewithgps.com/oauth/authorize?client_id=@ViewBag.RwGpsClientId&response_type=code&state=@ViewBag.State&redirect_uri=" + callbackConnect;
+
+        function ConnectToRideWithGps() {
+            location.href = rwGpsUrlConnect;
+        }
+
+        function getCookie(cname) {
+            var name = cname + "=";
+            var decodedCookie = decodeURIComponent(document.cookie);
+            var ca = decodedCookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+
+        function checkedLoggedIn() {
+            var token = getCookie("token");
+
+            if (token && token != "") {
+                var jwt = JSON.parse(atob(token.split('.')[1]));
+
+                var expDateWithHourMargin = new Date((jwt.exp - 3600) * 1000);
+                var itIsNow = new Date();
+
+                if (itIsNow < expDateWithHourMargin) {
+                    window.location = "@ViewBag.AppEntryPoint"
+                }
+            }
+        }
+
+        function docReady(fn) {
+            if (document.readyState === "complete" || document.readyState === "interactive") {
+                setTimeout(fn, 1);
+            } else {
+                document.addEventListener("DOMContentLoaded", fn);
+            }
+        }
+    </script>
+
+    <div style="display:flex;justify-content:center;align-items:center;height:650px">
+
+        <a href="#" onclick="ConnectToRideWithGps();return false;">
+            <img style="max-width:200px;" src="./resources/connect-with-rwgps.png" />
+        </a>
+    </div>
+
+    <script>
+        docReady(function () {
+            checkedLoggedIn();
+        });
+    </script>
+
+</body>
+</html>

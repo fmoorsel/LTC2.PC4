@@ -26,6 +26,7 @@ namespace LTC2.Webapps.MainApp.Services
 
             GetSettingsFromConfig<GenericSettings>("GenericSettings", result);
             GetSettingsFromConfig<StravaHttpProxySettings>("StravaHttpProxySettings", result);
+            GetSettingsFromConfig<RideWithGpsHttpProxySettings>("RideWithGpsHttpProxySettings", result);
             GetSettingsFromConfig<AuthorizationSettings>("AuthorizationSettings", result);
             GetSettingsFromConfig<CalculatorSettings>("CalculatorSettings", result);
             GetSettingsFromConfig<MainClientSettings>("MainClientSettings", result);

@@ -363,6 +363,7 @@ MigrationBackup/
 FodyWeavers.xsd
 tiles
 Output
+appsettings.Development.json
 /LTC2.Resources/materdata/PC4/Input/nlplaatsen.geojson
 /LTC2.Resources/places-PC4-2024.json
 /LTC2.Resources/materdata/PC4/Input/pc4.geojson
