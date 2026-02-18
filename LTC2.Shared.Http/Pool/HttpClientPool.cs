@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
 
 namespace LTC2.Shared.Http.Pool
@@ -14,8 +13,6 @@ namespace LTC2.Shared.Http.Pool
         private HttpClientPool()
         {
             _httpClients = new Dictionary<string, HttpClient>();
-
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
         }
 
         public HttpClient GetHttpClient(string baseUrl, int timeoutInMS, bool httpClientPoolEnabled)
@@ -43,7 +40,16 @@ namespace LTC2.Shared.Http.Pool
 
         private HttpClient CreateHttpClient(string baseUrl, int timeoutInMS)
         {
-            var httpClient = new HttpClient();
+            var handler = new SocketsHttpHandler
+            {
+                SslOptions = new System.Net.Security.SslClientAuthenticationOptions
+                {
+                    EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12 |
+                                          System.Security.Authentication.SslProtocols.Tls13
+                }
+            };
+
+            var httpClient = new HttpClient(handler);
             httpClient.BaseAddress = new Uri(baseUrl);
 
             if (timeoutInMS != -1)
