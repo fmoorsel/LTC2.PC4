@@ -1,9 +1,9 @@
-﻿using LTC2.Shared.Database.Extensions;
+using LTC2.Shared.Database.Extensions;
 using LTC2.Shared.Database.Interfaces;
 using LTC2.Shared.Models.Dtos.SqlServer;
 using System.Data;
 
-namespace LTC2.Shared.StravaConnector.Stores.RowMappers
+namespace LTC2.Shared.Stores.Stores.RowMappers
 {
     public class DtoSessionStoreRowMapper : IRowMapper<DtoSessionStore>
     {
@@ -16,7 +16,6 @@ namespace LTC2.Shared.StravaConnector.Stores.RowMappers
             dto.sessSessionInfo = sqlreader.GetValue<string>("sessSessionInfo");
 
             return dto;
-
         }
     }
 }

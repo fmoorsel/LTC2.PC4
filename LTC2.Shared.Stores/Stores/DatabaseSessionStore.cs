@@ -1,23 +1,23 @@
-﻿using LTC2.Shared.Database.Respositories;
+using LTC2.Shared.Database.Respositories;
 using LTC2.Shared.Models.Domain;
 using LTC2.Shared.Models.Dtos.SqlServer;
 using LTC2.Shared.Models.Settings;
-using LTC2.Shared.StravaConnector.Interfaces;
-using LTC2.Shared.StravaConnector.Stores.RowMappers;
+using LTC2.Shared.Stores.Interfaces;
+using LTC2.Shared.Stores.Stores.RowMappers;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace LTC2.Shared.StravaConnector.Stores
+namespace LTC2.Shared.Stores.Stores
 {
-    public class DatabaseSesionStore : AbstractSqlRepository, ISessionStore
+    public class DatabaseSessionStore : AbstractSqlRepository, ISessionStore
     {
-        private readonly ILogger<DatabaseSesionStore> _logger;
+        private readonly ILogger<DatabaseSessionStore> _logger;
         private readonly GenericSettings _genericSettings;
 
-        public DatabaseSesionStore(ILogger<DatabaseSesionStore> logger, GenericSettings genericSettings)
+        public DatabaseSessionStore(ILogger<DatabaseSessionStore> logger, GenericSettings genericSettings)
         {
             _logger = logger;
             _genericSettings = genericSettings;
@@ -50,7 +50,6 @@ namespace LTC2.Shared.StravaConnector.Stores
                 {
                     _logger.LogWarning($"Missing athlete ID, not retrieving refresh token");
                 }
-
             }
             catch (Exception e)
             {
@@ -85,7 +84,6 @@ namespace LTC2.Shared.StravaConnector.Stores
                 {
                     _logger.LogWarning($"Missing athlete ID, not retrieving refresh token");
                 }
-
             }
             catch (Exception e)
             {

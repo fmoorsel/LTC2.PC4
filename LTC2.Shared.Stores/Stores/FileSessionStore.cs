@@ -1,13 +1,13 @@
-﻿using LTC2.Shared.Models.Domain;
+using LTC2.Shared.Models.Domain;
 using LTC2.Shared.Models.Settings;
-using LTC2.Shared.StravaConnector.Interfaces;
+using LTC2.Shared.Stores.Interfaces;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace LTC2.Shared.StravaConnector.Stores
+namespace LTC2.Shared.Stores.Stores
 {
     public class FileSessionStore : ISessionStore
     {
@@ -18,7 +18,6 @@ namespace LTC2.Shared.StravaConnector.Stores
         {
             _logger = logger;
             _genericSettings = genericSettings;
-
         }
 
         public async Task<Session> RetrieveAsync(long athleteId, Session currentSession = null)
@@ -46,7 +45,6 @@ namespace LTC2.Shared.StravaConnector.Stores
                 {
                     _logger.LogWarning($"Missing athlete ID, not retrieving refresh token");
                 }
-
             }
             catch (Exception e)
             {
@@ -55,6 +53,7 @@ namespace LTC2.Shared.StravaConnector.Stores
 
             return result;
         }
+
         public Session Retrieve(long athleteId, Session currentSession = null)
         {
             var result = currentSession ?? new Session();
@@ -73,7 +72,6 @@ namespace LTC2.Shared.StravaConnector.Stores
                 {
                     _logger.LogWarning($"Missing athlete ID, not retrieving refresh token");
                 }
-
             }
             catch (Exception e)
             {
@@ -91,10 +89,10 @@ namespace LTC2.Shared.StravaConnector.Stores
             {
                 try
                 {
-                    if (session.AthleteId > 0 && session.RefreshToken != null)
+                    if (session.AthleteId > 0 && session.AccessToken != null)
                     {
                         var serializer = new JsonSerializer();
-                        var fileName = Path.Combine(_genericSettings.SessionsFolder, $"s{session.AthleteId}");
+                        var fileName = Path.Combine(_genericSettings.SessionsFolder, $"{session.Origin}{session.AthleteId}");
 
                         if (!Directory.Exists(_genericSettings.SessionsFolder))
                         {
@@ -109,7 +107,7 @@ namespace LTC2.Shared.StravaConnector.Stores
                     }
                     else
                     {
-                        _logger.LogInformation($"Missing refresh token or athlete ID, not storing refresh token for {session.AthleteId}");
+                        _logger.LogInformation($"Missing access token or athlete ID, not storing session for {session.AthleteId}");
                     }
 
                     break;
@@ -124,7 +122,6 @@ namespace LTC2.Shared.StravaConnector.Stores
                     {
                         _logger.LogWarning(e, $"Unable to store refresh token for {session.AthleteId} but a retry is performaned: {e.Message}");
                     }
-
                 }
             }
         }

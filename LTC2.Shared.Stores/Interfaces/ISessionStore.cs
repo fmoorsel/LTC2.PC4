@@ -1,7 +1,7 @@
-﻿using LTC2.Shared.Models.Domain;
+using LTC2.Shared.Models.Domain;
 using System.Threading.Tasks;
 
-namespace LTC2.Shared.StravaConnector.Interfaces
+namespace LTC2.Shared.Stores.Interfaces
 {
     public interface ISessionStore
     {

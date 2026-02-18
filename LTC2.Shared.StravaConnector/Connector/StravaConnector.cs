@@ -1,5 +1,6 @@
 ﻿using LTC2.Shared.Models.Domain;
 using LTC2.Shared.Models.Settings;
+using LTC2.Shared.Stores.Interfaces;
 using LTC2.Shared.StravaConnector.Exceptions;
 using LTC2.Shared.StravaConnector.Interfaces;
 using LTC2.Shared.StravaConnector.Models;
@@ -86,6 +87,7 @@ namespace LTC2.Shared.StravaConnector.Connector
                 AccessToken = authorizeResponse.Access_token,
                 RefreshToken = authorizeResponse.Refresh_token,
                 ExpiresAt = authorizeResponse.Expires_at,
+                Origin = Session.StravaSession,
                 Athlete = authorizeResponse.Athlete ?? oldSession?.Athlete
             };
 

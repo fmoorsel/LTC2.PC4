@@ -1,5 +1,6 @@
 using LTC2.Shared.RideWithGpsConnector.Interfaces;
 using LTC2.Shared.RideWithGpsConnector.Proxies;
+using LTC2.Shared.Stores.Bootstrap.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LTC2.Shared.RideWithGpsConnector.Bootstrap.Extensions
@@ -10,6 +11,7 @@ namespace LTC2.Shared.RideWithGpsConnector.Bootstrap.Extensions
         {
             services.AddSingleton<IRideWithGpsConnector, Connector.RideWithGpsConnector>();
             services.AddSingleton<IRideWithGpsHttpProxy, RideWithGpsHttpProxy>();
+            services.AddStores();
             return services;
         }
     }
