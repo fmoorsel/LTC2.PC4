@@ -467,5 +467,33 @@ namespace LTC2.Shared.StravaConnector.Connector
         {
             return new DateTime((dt.Ticks + d.Ticks - 1) / d.Ticks * d.Ticks, dt.Kind);
         }
+
+        // Explicit IConnector implementations that bridge the generic delegates to the
+        // Strava-specific (single type parameter) overloads above.
+        async Task LTC2.Shared.Common.Interfaces.IConnector<StravaActivity, GetActivitiesRequest, GetActivitiesResponse,
+            GetActivityCoordinateStreamRequest, GetActivityCoordinateStreamResponse,
+            GetRoutesRequest, GetRoutesResponse,
+            GetRouteDetailsAsGpxRequest, GetRouteDetailsAsGpxReponse>.BrowseActivities<TResultType>(
+            GetActivitiesRequest request, string accessToken, TResultType subject,
+            LTC2.Shared.Common.Interfaces.OnPreCheckActivity<StravaActivity, TResultType> onPreCheckActivity,
+            LTC2.Shared.Common.Interfaces.OnCheckActivity<StravaActivity, TResultType> onCheckActivity,
+            LTC2.Shared.Common.Interfaces.OnWaitingForSlot<TResultType> onWaitingForSlot) where TResultType : class
+        {
+            await BrowseActivities(request, accessToken, subject,
+                (a, t, s) => onPreCheckActivity(a, t, s),
+                (a, t, s) => onCheckActivity(a, t, s),
+                (dt, s) => onWaitingForSlot(dt, s));
+        }
+
+        async Task<List<List<double>>> LTC2.Shared.Common.Interfaces.IConnector<StravaActivity, GetActivitiesRequest, GetActivitiesResponse,
+            GetActivityCoordinateStreamRequest, GetActivityCoordinateStreamResponse,
+            GetRoutesRequest, GetRoutesResponse,
+            GetRouteDetailsAsGpxRequest, GetRouteDetailsAsGpxReponse>.GetTrackForActivity<TResultType>(
+            string activityId, bool bypassCache, string accessToken,
+            LTC2.Shared.Common.Interfaces.OnWaitingForSlot<TResultType> onWaitingForSlot, TResultType subject) where TResultType : class
+        {
+            return await GetTrackForActivity(activityId, bypassCache, accessToken,
+                (dt, s) => onWaitingForSlot(dt, s), subject);
+        }
     }
 }
