@@ -1,0 +1,26 @@
+<Solution>
+  <Folder Name="/LTC2.Core/">
+    <Project Path="LTC2.Services.Calculator/LTC2.Services.Calculator.csproj"/>
+    <Project Path="LTC2.Webapps.MainApp/LTC2.Webapps.MainApp.csproj"/>
+    <Project Path="LTC2.Webclients.MainClient/LTC2.Webclients.MainClient.shproj"/>
+  </Folder>
+  <Folder Name="/LTC2.Shared/">
+    <Project Path="LTC2.Shared.AcivityFormats/LTC2.Shared.ActivityFormats.csproj"/>
+    <Project Path="LTC2.Shared.BaseMessages/LTC2.Shared.BaseMessages.csproj"/>
+    <Project Path="LTC2.Shared.Database/LTC2.Shared.Database.csproj"/>
+    <Project Path="LTC2.Shared.Http/LTC2.Shared.Http.csproj"/>
+    <Project Path="LTC2.Shared.Messages/LTC2.Shared.Messages.csproj"/>
+    <Project Path="LTC2.Shared.Messaging/LTC2.Shared.Messaging.csproj"/>
+    <Project Path="LTC2.Shared.Models/LTC2.Shared.Models.csproj"/>
+    <Project Path="LTC2.Shared.Repositories/LTC2.Shared.Repositories.csproj"/>
+    <Project Path="LTC2.Shared.Secrets/LTC2.Shared.Secrets.csproj"/>
+    <Project Path="LTC2.Shared.SpatiaLiteRepository/LTC2.Shared.SpatiaLiteRepository.csproj"/>
+    <Project Path="LTC2.Shared.StravaConnector/LTC2.Shared.StravaConnector.csproj"/>
+    <Project Path="LTC2.Shared.Utils/LTC2.Shared.Utils.csproj"/>
+  </Folder>
+  <Folder Name="/LTC2.Windows/">
+    <Project Path="LTC2.DesktopCLients.ArchiveImporter/LTC2.DesktopClients.ArchiveImporter.csproj"/>
+    <Project Path="LTC2.Desktopclients.ProfileManager/LTC2.Desktopclients.ProfileManager.csproj"/>
+    <Project Path="LTC2.Desktopclients.WindowsClient/LTC2.Desktopclients.WindowsClient.csproj"/>
+  </Folder>
+</Solution>
