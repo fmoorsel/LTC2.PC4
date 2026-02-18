@@ -4,7 +4,9 @@ using LTC2.Shared.RideWithGpsConnector.Interfaces;
 using LTC2.Shared.RideWithGpsConnector.Models.Requests;
 using LTC2.Shared.RideWithGpsConnector.Models.Responses;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LTC2.Shared.RideWithGpsConnector.Proxies
@@ -37,6 +39,18 @@ namespace LTC2.Shared.RideWithGpsConnector.Proxies
         {
             var authHeader = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
             return await ExecuteGetRequest<CurrentUserResponse>("/api/v1/users/current", authHeader);
+        }
+
+        public async Task<List<RwGpsSyncItem>> GetActivities(GetActivitiesRequest request, string accessToken)
+        {
+            var since = Uri.EscapeDataString(request.After.ToString("o"));
+            var uri = $"/api/v1/sync.json?since={since}&assets=trip";
+            var authHeader = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+            var response = await ExecuteGetRequest<RwGpsSyncResponse>(uri, authHeader);
+
+            return response?.Items
+                ?.Where(t => t.Action == "created" || t.Action == "updated")
+                .ToList() ?? new List<RwGpsSyncItem>();
         }
     }
 }
