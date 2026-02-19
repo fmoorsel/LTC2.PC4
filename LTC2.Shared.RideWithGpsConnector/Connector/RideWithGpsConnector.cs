@@ -68,6 +68,19 @@ namespace LTC2.Shared.RideWithGpsConnector.Connector
             return await _proxy.GetActivities(request, accessToken);
         }
 
+        public async Task<List<List<double>>> GetTrackForActivity<TResultType>(string activityId, bool bypassCache, string accessToken, OnWaitingForSlot<TResultType> onWaitingForSlot, TResultType subject) where TResultType : class
+        {
+            var trip = await _proxy.GetTrip(long.Parse(activityId), bypassCache, accessToken);
+            var track = trip?.Coordinates;
+
+            if (track != null && track.Count >= 2)
+            {
+                return track;
+            }
+
+            return null;
+        }
+
         public async Task BrowseActivities<TResultType>(
             GetActivitiesRequest request,
             string accessToken,
