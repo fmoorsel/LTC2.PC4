@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace LTC2.Shared.RideWithGpsConnector.Models
+namespace LTC2.Shared.RideWithGpsConnector.Models.Responses
 {
-    public class RideWithGpsTrip
+    public class RwGpsTrip
     {
         public string ActivityType { get; set; }
         public double Distance { get; set; }

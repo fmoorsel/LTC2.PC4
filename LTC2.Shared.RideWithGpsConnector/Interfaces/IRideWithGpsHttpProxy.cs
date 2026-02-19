@@ -1,4 +1,3 @@
-using LTC2.Shared.RideWithGpsConnector.Models;
 using LTC2.Shared.RideWithGpsConnector.Models.Requests;
 using LTC2.Shared.RideWithGpsConnector.Models.Responses;
 using System.Collections.Generic;
@@ -11,6 +10,6 @@ namespace LTC2.Shared.RideWithGpsConnector.Interfaces
         Task<AuthorizeResponse> GetToken(AuthorizeRequest request);
         Task<CurrentUserResponse> GetCurrentUser(string accessToken);
         Task<List<RwGpsSyncItem>> GetActivities(GetActivitiesRequest request, string accessToken);
-        Task<RideWithGpsTrip> GetTrip(long id, string accessToken);
+        Task<RwGpsTrip> GetTrip(long id, string accessToken);
     }
 }

@@ -1,8 +1,12 @@
+using LTC2.Shared.Common.Interfaces;
 using LTC2.Shared.Models.Domain;
 using LTC2.Shared.RideWithGpsConnector.Interfaces;
 using LTC2.Shared.RideWithGpsConnector.Models.Requests;
+using LTC2.Shared.RideWithGpsConnector.Models.Responses;
 using LTC2.Shared.Stores.Interfaces;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace LTC2.Shared.RideWithGpsConnector.Connector
@@ -57,6 +61,44 @@ namespace LTC2.Shared.RideWithGpsConnector.Connector
         public Task<Session> GetSession(Session session)
         {
             return Task.FromResult(session);
+        }
+
+        public async Task<List<RwGpsSyncItem>> GetActivities(GetActivitiesRequest request, string accessToken)
+        {
+            return await _proxy.GetActivities(request, accessToken);
+        }
+
+        public async Task BrowseActivities<TResultType>(
+            GetActivitiesRequest request,
+            string accessToken,
+            TResultType subject,
+            OnPreCheckActivity<RwGpsTrip, TResultType> onPreCheckActivity,
+            OnCheckActivity<RwGpsTrip, TResultType> onCheckActivity,
+            OnWaitingForSlot<TResultType> onWaitingForSlot) where TResultType : class
+        {
+            var syncItems = await _proxy.GetActivities(request, accessToken);
+
+            foreach (var item in syncItems)
+            {
+                try
+                {
+                    var trip = await _proxy.GetTrip(item.Item_id, accessToken);
+                    if (trip == null)
+                        continue;
+
+                    var track = trip.Coordinates ?? new List<List<double>>();
+                    var shouldCheck = onPreCheckActivity(trip, track, subject);
+
+                    if (shouldCheck && track.Count >= 2)
+                    {
+                        onCheckActivity(trip, track, subject);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, $"Unable to process trip {item.Item_id} due to {ex.Message}");
+                }
+            }
         }
     }
 }

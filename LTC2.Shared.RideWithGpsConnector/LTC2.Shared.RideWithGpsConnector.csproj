@@ -8,6 +8,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.2" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LTC2.Shared.Common\LTC2.Shared.Common.csproj" />
     <ProjectReference Include="..\LTC2.Shared.Http\LTC2.Shared.Http.csproj" />
     <ProjectReference Include="..\LTC2.Shared.Models\LTC2.Shared.Models.csproj" />
     <ProjectReference Include="..\LTC2.Shared.Stores\LTC2.Shared.Stores.csproj" />
