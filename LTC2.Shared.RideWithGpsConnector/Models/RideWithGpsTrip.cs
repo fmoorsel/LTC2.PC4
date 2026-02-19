@@ -1,0 +1,14 @@
+using System;
+using System.Collections.Generic;
+
+namespace LTC2.Shared.RideWithGpsConnector.Models
+{
+    public class RideWithGpsTrip
+    {
+        public string ActivityType { get; set; }
+        public double Distance { get; set; }
+        public DateTime? StartTime { get; set; }
+        public double MovingTime { get; set; }
+        public List<List<double>> Coordinates { get; set; }
+    }
+}

@@ -1,6 +1,7 @@
 using LTC2.Shared.Http.Proxies;
 using LTC2.Shared.Models.Settings;
 using LTC2.Shared.RideWithGpsConnector.Interfaces;
+using LTC2.Shared.RideWithGpsConnector.Models;
 using LTC2.Shared.RideWithGpsConnector.Models.Requests;
 using LTC2.Shared.RideWithGpsConnector.Models.Responses;
 using Microsoft.Extensions.Logging;
@@ -51,6 +52,27 @@ namespace LTC2.Shared.RideWithGpsConnector.Proxies
             return response?.Items
                 ?.Where(t => t.Action == "created" || t.Action == "updated")
                 .ToList() ?? new List<RwGpsSyncItem>();
+        }
+
+        public async Task<RideWithGpsTrip> GetTrip(long id, string accessToken)
+        {
+            var authHeader = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+            var response = await ExecuteGetRequest<RwGpsTripResponse>($"/api/v1/trips/{id}.json", authHeader);
+
+            var trip = response?.Trip;
+            if (trip == null)
+                return null;
+
+            return new RideWithGpsTrip
+            {
+                ActivityType = trip.Activity_type,
+                Distance = trip.Distance,
+                StartTime = trip.Departed_at,
+                MovingTime = trip.Moving_time,
+                Coordinates = trip.Track_points
+                    ?.Select(p => new List<double> { p.Y, p.X })
+                    .ToList() ?? new List<List<double>>()
+            };
         }
     }
 }
