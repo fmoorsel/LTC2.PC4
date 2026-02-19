@@ -5,8 +5,10 @@ using LTC2.Shared.RideWithGpsConnector.Interfaces;
 using LTC2.Shared.RideWithGpsConnector.Models.Requests;
 using LTC2.Shared.RideWithGpsConnector.Models.Responses;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -17,13 +19,16 @@ namespace LTC2.Shared.RideWithGpsConnector.Proxies
     {
         private readonly ILogger<RideWithGpsHttpProxy> _logger;
         private readonly RideWithGpsHttpProxySettings _settings;
+        private readonly GenericSettings _genericSettings;
 
         public RideWithGpsHttpProxy(
             ILogger<RideWithGpsHttpProxy> logger,
-            RideWithGpsHttpProxySettings settings) : base(logger, settings)
+            RideWithGpsHttpProxySettings settings,
+            GenericSettings genericSettings) : base(logger, settings)
         {
             _logger = logger;
             _settings = settings;
+            _genericSettings = genericSettings;
         }
 
         public async Task<AuthorizeResponse> GetToken(AuthorizeRequest request)
@@ -55,8 +60,29 @@ namespace LTC2.Shared.RideWithGpsConnector.Proxies
                 .ToList() ?? new List<RwGpsSyncItem>();
         }
 
-        public async Task<RwGpsTrip> GetTrip(long id, string accessToken)
+        public async Task<RwGpsTrip> GetTrip(long id, bool bypassCache, string accessToken)
         {
+            var cacheFolder = Path.Combine(_genericSettings.CacheFolder, "Trips");
+            var fileName = Path.Combine(cacheFolder, $"r{id}");
+
+            if (!Directory.Exists(cacheFolder))
+            {
+                Directory.CreateDirectory(cacheFolder);
+            }
+
+            if (!bypassCache && File.Exists(fileName))
+            {
+                try
+                {
+                    var json = File.ReadAllText(fileName);
+                    return JsonConvert.DeserializeObject<RwGpsTrip>(json);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, $"Unable to read trip {id} from cache {fileName} due to {ex.Message}");
+                }
+            }
+
             var authHeader = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
             var retryCount = 0;
 
@@ -70,7 +96,7 @@ namespace LTC2.Shared.RideWithGpsConnector.Proxies
                     if (trip == null)
                         return null;
 
-                    return new RwGpsTrip
+                    var result = new RwGpsTrip
                     {
                         ActivityType = trip.Activity_type,
                         Distance = trip.Distance,
@@ -80,6 +106,17 @@ namespace LTC2.Shared.RideWithGpsConnector.Proxies
                             ?.Select(p => new List<double> { p.Y, p.X })
                             .ToList() ?? new List<List<double>>()
                     };
+
+                    try
+                    {
+                        File.WriteAllText(fileName, JsonConvert.SerializeObject(result));
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, $"Unable to cache trip {id} in {fileName} due to {ex.Message}");
+                    }
+
+                    return result;
                 }
                 catch (HttpProxyException hpe)
                 {

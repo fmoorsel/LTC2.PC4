@@ -82,7 +82,7 @@ namespace LTC2.Shared.RideWithGpsConnector.Connector
             {
                 try
                 {
-                    var trip = await _proxy.GetTrip(item.Item_id, accessToken);
+                    var trip = await _proxy.GetTrip(item.Item_id, request.BypassCache, accessToken);
                     if (trip == null)
                         continue;
 

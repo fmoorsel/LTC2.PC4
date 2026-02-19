@@ -10,6 +10,6 @@ namespace LTC2.Shared.RideWithGpsConnector.Interfaces
         Task<AuthorizeResponse> GetToken(AuthorizeRequest request);
         Task<CurrentUserResponse> GetCurrentUser(string accessToken);
         Task<List<RwGpsSyncItem>> GetActivities(GetActivitiesRequest request, string accessToken);
-        Task<RwGpsTrip> GetTrip(long id, string accessToken);
+        Task<RwGpsTrip> GetTrip(long id, bool bypassCache, string accessToken);
     }
 }
