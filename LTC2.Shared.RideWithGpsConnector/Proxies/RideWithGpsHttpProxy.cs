@@ -1,3 +1,4 @@
+using LTC2.Shared.Http.Exceptions;
 using LTC2.Shared.Http.Proxies;
 using LTC2.Shared.Models.Settings;
 using LTC2.Shared.RideWithGpsConnector.Interfaces;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace LTC2.Shared.RideWithGpsConnector.Proxies
@@ -56,22 +58,46 @@ namespace LTC2.Shared.RideWithGpsConnector.Proxies
         public async Task<RwGpsTrip> GetTrip(long id, string accessToken)
         {
             var authHeader = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
-            var response = await ExecuteGetRequest<RwGpsTripResponse>($"/api/v1/trips/{id}.json", authHeader);
+            var retryCount = 0;
 
-            var trip = response?.Trip;
-            if (trip == null)
-                return null;
-
-            return new RwGpsTrip
+            while (retryCount < 3)
             {
-                ActivityType = trip.Activity_type,
-                Distance = trip.Distance,
-                StartTime = trip.Departed_at,
-                MovingTime = trip.Moving_time,
-                Coordinates = trip.Track_points
-                    ?.Select(p => new List<double> { p.Y, p.X })
-                    .ToList() ?? new List<List<double>>()
-            };
+                try
+                {
+                    var response = await ExecuteGetRequest<RwGpsTripResponse>($"/api/v1/trips/{id}.json", authHeader);
+
+                    var trip = response?.Trip;
+                    if (trip == null)
+                        return null;
+
+                    return new RwGpsTrip
+                    {
+                        ActivityType = trip.Activity_type,
+                        Distance = trip.Distance,
+                        StartTime = trip.Departed_at,
+                        MovingTime = trip.Moving_time,
+                        Coordinates = trip.Track_points
+                            ?.Select(p => new List<double> { p.Y, p.X })
+                            .ToList() ?? new List<List<double>>()
+                    };
+                }
+                catch (HttpProxyException hpe)
+                {
+                    if (hpe.Code < (int)HttpStatusCode.InternalServerError)
+                    {
+                        throw;
+                    }
+
+                    retryCount++;
+
+                    if (retryCount >= 3)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }
