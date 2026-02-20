@@ -5,6 +5,7 @@ namespace LTC2.Shared.RideWithGpsConnector.Models.Responses
 {
     internal class RwGpsTripDetail
     {
+        public string Name { get; set; }
         public string Activity_type { get; set; }
         public double Distance { get; set; }
         public DateTime? Departed_at { get; set; }

@@ -98,6 +98,7 @@ namespace LTC2.Shared.RideWithGpsConnector.Proxies
 
                     var result = new RwGpsTrip
                     {
+                        Name = trip.Name,
                         ActivityType = trip.Activity_type,
                         Distance = trip.Distance,
                         StartTime = trip.Departed_at,
