@@ -103,6 +103,8 @@ namespace LTC2.Shared.RideWithGpsConnector.Proxies
                         Distance = trip.Distance,
                         StartTime = trip.Departed_at,
                         MovingTime = trip.Moving_time,
+                        Duration = trip.Duration,
+                        Stationary = trip.Stationary,
                         Coordinates = trip.Track_points
                             ?.Select(p => new List<double> { p.Y, p.X })
                             .ToList() ?? new List<List<double>>()
