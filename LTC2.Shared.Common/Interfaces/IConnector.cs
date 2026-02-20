@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace LTC2.Shared.Common.Interfaces
 {
-    public delegate void OnCheckActivity<TActivity, TResultType>(TActivity activity, List<List<double>> track, TResultType subject) where TResultType : class;
-    public delegate bool OnPreCheckActivity<TActivity, TResultType>(TActivity activity, List<List<double>> track, TResultType subject) where TResultType : class;
+    public delegate void OnCheckActivity<TResultType>(SourceActivity activity, List<List<double>> track, TResultType subject) where TResultType : class;
+    public delegate bool OnPreCheckActivity<TResultType>(SourceActivity activity, List<List<double>> track, TResultType subject) where TResultType : class;
     public delegate void OnWaitingForSlot<TResultType>(DateTime waitUntil, TResultType subject) where TResultType : class;
 
-    public interface IConnector<TActivity, TGetActivitiesRequest, TGetActivitiesResponse,
+    public interface IConnector<TGetActivitiesRequest, TGetActivitiesResponse,
         TStreamRequest, TStreamResponse, TRoutesRequest, TRoutesResponse,
         TRouteGpxRequest, TRouteGpxResponse>
     {
@@ -21,7 +21,7 @@ namespace LTC2.Shared.Common.Interfaces
 
         public Task<TGetActivitiesResponse> GetActivities(TGetActivitiesRequest request, string code);
 
-        public Task BrowseActivities<TResultType>(TGetActivitiesRequest request, string accessToken, TResultType subject, OnPreCheckActivity<TActivity, TResultType> onPreCheckActivity, OnCheckActivity<TActivity, TResultType> onCheckActivity, OnWaitingForSlot<TResultType> onWaitingForSlot) where TResultType : class;
+        public Task BrowseActivities<TResultType>(TGetActivitiesRequest request, string accessToken, TResultType subject, OnPreCheckActivity<TResultType> onPreCheckActivity, OnCheckActivity<TResultType> onCheckActivity, OnWaitingForSlot<TResultType> onWaitingForSlot) where TResultType : class;
 
         public Task<TStreamResponse> GetActivityCoordinateStream(TStreamRequest request, string accessToken);
 

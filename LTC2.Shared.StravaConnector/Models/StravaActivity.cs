@@ -13,6 +13,9 @@ namespace LTC2.Shared.StravaConnector.Models
         private string _type { get; set; }
 
         [JsonIgnore]
+        public string TypeString => _type;
+
+        [JsonIgnore]
         public StravaActivityType Type
         {
             get

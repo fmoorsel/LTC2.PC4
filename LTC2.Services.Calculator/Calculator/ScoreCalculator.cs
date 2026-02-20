@@ -220,9 +220,9 @@ namespace LTC2.Services.Calculator.Calculator
             _intermediateResultsRepository.StoreIntermedidateResult(subject, subject.Type == CalculationType.multi);
         }
 
-        public void OnCheckActivity(StravaActivity activity, List<List<double>> track, CalculationResult subject)
+        public void OnCheckActivity(SourceActivity activity, List<List<double>> track, CalculationResult subject)
         {
-            _logger.LogDebug($"Check {activity.Name} {activity.DateTimeStart} {activity.Distance} {activity.Type}");
+            _logger.LogDebug($"Check {activity.Name} {activity.DateTimeStart} {activity.Distance} {activity.ActivityType}");
 
             var places = _mapRepository.CheckTrack(track);
 
@@ -309,9 +309,9 @@ namespace LTC2.Services.Calculator.Calculator
             _statusNotifier.SetNotification(StatusMessage.STATUS_RESULT, $"calculated in: {seconds} seconds");
         }
 
-        private void NotifyActivityCheck(StravaActivity activity)
+        private void NotifyActivityCheck(SourceActivity activity)
         {
-            _logger.LogDebug($"Precheck {activity.Name} {activity.DateTimeStart} {activity.Distance} {activity.Type}");
+            _logger.LogDebug($"Precheck {activity.Name} {activity.DateTimeStart} {activity.Distance} {activity.ActivityType}");
 
             _statusNotifier.SetNotification(StatusMessage.STATUS_CHECK, $"{activity.DateTimeStart} {activity.Name}");
         }
@@ -336,21 +336,39 @@ namespace LTC2.Services.Calculator.Calculator
             return false;
         }
 
-        public bool OnPreCheckActivity(StravaActivity activity, List<List<double>> track, CalculationResult subject)
+        private bool IsAllowedActivityType(SourceActivity activity, CalculationType calculationType, List<int> types)
+        {
+            if (activity.Source == ActivitySource.RideWithGps)
+            {
+                return activity.ActivityType != null
+                    && activity.ActivityType.StartsWith("cycling:")
+                    && !activity.ActivityType.EndsWith(":virtual")
+                    && !activity.ActivityType.EndsWith(":recumbent");
+            }
+
+            if (!Enum.TryParse<StravaActivityType>(activity.ActivityType, out var activityType))
+            {
+                return false;
+            }
+
+            if (calculationType == CalculationType.multi)
+            {
+                return types.Select(t => (StravaActivityType)t).Contains(activityType);
+            }
+
+            return _activityTypes.Contains(activityType);
+        }
+
+        public bool OnPreCheckActivity(SourceActivity activity, List<List<double>> track, CalculationResult subject)
         {
             var whiteListed = IsWhiteListedActivity(activity.Id);
             var notExcedingElapsedTime = whiteListed || (activity.ElapsedTime <= _maxDuration);
             var notExcedingDistance = whiteListed || activity.Distance <= _maxDistance;
             var blackListed = IsBlackListedActivity(activity.Id);
 
-            var allowedActivities = _activityTypes;
+            var isAllowedType = IsAllowedActivityType(activity, subject.Type, subject.Types);
 
-            if (subject.Type == CalculationType.multi)
-            {
-                allowedActivities = subject.Types.Select(t => (StravaActivityType)t).ToList();
-            }
-
-            var result = allowedActivities.Contains(activity.Type) && !activity.IsManual && notExcedingDistance && notExcedingElapsedTime && !blackListed;
+            var result = isAllowedType && !activity.IsManual && notExcedingDistance && notExcedingElapsedTime && !blackListed;
 
             NotifyActivityCheck(activity);
 
@@ -367,7 +385,7 @@ namespace LTC2.Services.Calculator.Calculator
 
                 var newPlacesCount = places.Where(p => IsPlaceRelevant(activity, p, subject)).Count();
 
-                if (places.Count > 0 && allowedActivities.Contains(activity.Type) && (subject.LastRideSample == null || activity.DateTimeStart > subject.LastRideSample.VisitedOn))
+                if (places.Count > 0 && isAllowedType && (subject.LastRideSample == null || activity.DateTimeStart > subject.LastRideSample.VisitedOn))
                 {
                     var visit = new Visit();
 
@@ -387,7 +405,7 @@ namespace LTC2.Services.Calculator.Calculator
             return result;
         }
 
-        private bool IsPlaceRelevant(StravaActivity activity, Place place, CalculationResult subject)
+        private bool IsPlaceRelevant(SourceActivity activity, Place place, CalculationResult subject)
         {
             var currentYear = DateTime.Now.Year;
 

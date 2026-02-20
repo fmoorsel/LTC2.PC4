@@ -85,8 +85,8 @@ namespace LTC2.Shared.RideWithGpsConnector.Connector
             GetActivitiesRequest request,
             string accessToken,
             TResultType subject,
-            OnPreCheckActivity<RwGpsTrip, TResultType> onPreCheckActivity,
-            OnCheckActivity<RwGpsTrip, TResultType> onCheckActivity,
+            OnPreCheckActivity<TResultType> onPreCheckActivity,
+            OnCheckActivity<TResultType> onCheckActivity,
             OnWaitingForSlot<TResultType> onWaitingForSlot) where TResultType : class
         {
             var syncItems = await _proxy.GetActivities(request, accessToken);
@@ -100,11 +100,24 @@ namespace LTC2.Shared.RideWithGpsConnector.Connector
                         continue;
 
                     var track = trip.Coordinates ?? new List<List<double>>();
-                    var shouldCheck = onPreCheckActivity(trip, track, subject);
+
+                    var sourceActivity = new SourceActivity
+                    {
+                        Id = item.Item_id,
+                        Name = trip.Name,
+                        ActivityType = trip.ActivityType,
+                        Distance = trip.Distance,
+                        ElapsedTime = (long)trip.Duration,
+                        IsManual = false,
+                        DateTimeStart = trip.StartTime ?? DateTime.MinValue,
+                        Source = ActivitySource.RideWithGps
+                    };
+
+                    var shouldCheck = onPreCheckActivity(sourceActivity, track, subject);
 
                     if (shouldCheck && track.Count >= 2)
                     {
-                        onCheckActivity(trip, track, subject);
+                        onCheckActivity(sourceActivity, track, subject);
                     }
                 }
                 catch (Exception ex)

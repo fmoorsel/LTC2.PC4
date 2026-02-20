@@ -1,4 +1,5 @@
-﻿using LTC2.Shared.Models.Domain;
+﻿using LTC2.Shared.Common.Interfaces;
+using LTC2.Shared.Models.Domain;
 using LTC2.Shared.Models.Settings;
 using LTC2.Shared.Stores.Interfaces;
 using LTC2.Shared.StravaConnector.Exceptions;
@@ -152,21 +153,33 @@ namespace LTC2.Shared.StravaConnector.Connector
 
                 if (hasActivities)
                 {
-                    foreach (var activity in activities.Activities)
+                    foreach (var stravaActivity in activities.Activities)
                     {
-                        if (!activity.IsManual)
+                        if (!stravaActivity.IsManual)
                         {
                             try
                             {
-                                var proximatedTrack = GeoCoder.DecodeToTrack(activity.Map?.SummaryPolyline);
-                                var shouldCheck = onPreCheckActivity(activity, proximatedTrack, subject);
+                                var sourceActivity = new SourceActivity
+                                {
+                                    Id = stravaActivity.Id,
+                                    Name = stravaActivity.Name,
+                                    ActivityType = stravaActivity.TypeString,
+                                    Distance = stravaActivity.Distance,
+                                    ElapsedTime = stravaActivity.ElapsedTime,
+                                    IsManual = stravaActivity.IsManual,
+                                    DateTimeStart = stravaActivity.DateTimeStart,
+                                    Source = ActivitySource.Strava
+                                };
+
+                                var proximatedTrack = GeoCoder.DecodeToTrack(stravaActivity.Map?.SummaryPolyline);
+                                var shouldCheck = onPreCheckActivity(sourceActivity, proximatedTrack, subject);
 
                                 if (shouldCheck)
                                 {
                                     var coordinateStreamRequest = new GetActivityCoordinateStreamRequest()
                                     {
                                         AthleteId = request.AthleteId,
-                                        ActivityId = activity.Id,
+                                        ActivityId = stravaActivity.Id,
                                         BypassCache = request.BypassCache
                                     };
 
@@ -175,20 +188,20 @@ namespace LTC2.Shared.StravaConnector.Connector
 
                                     if (track.Count >= 2)
                                     {
-                                        onCheckActivity(activity, track, subject);
+                                        onCheckActivity(sourceActivity, track, subject);
                                     }
                                 }
                             }
                             catch (Exception ex)
                             {
-                                _logger.LogWarning(ex, $"Unable to process activity {activity.Id} due to {ex.Message}");
+                                _logger.LogWarning(ex, $"Unable to process activity {stravaActivity.Id} due to {ex.Message}");
 
                                 await Task.Delay(1000);
                             }
 
                         }
 
-                        lastActivity = activity;
+                        lastActivity = stravaActivity;
                     }
                 }
             }
@@ -468,32 +481,5 @@ namespace LTC2.Shared.StravaConnector.Connector
             return new DateTime((dt.Ticks + d.Ticks - 1) / d.Ticks * d.Ticks, dt.Kind);
         }
 
-        // Explicit IConnector implementations that bridge the generic delegates to the
-        // Strava-specific (single type parameter) overloads above.
-        async Task LTC2.Shared.Common.Interfaces.IConnector<StravaActivity, GetActivitiesRequest, GetActivitiesResponse,
-            GetActivityCoordinateStreamRequest, GetActivityCoordinateStreamResponse,
-            GetRoutesRequest, GetRoutesResponse,
-            GetRouteDetailsAsGpxRequest, GetRouteDetailsAsGpxReponse>.BrowseActivities<TResultType>(
-            GetActivitiesRequest request, string accessToken, TResultType subject,
-            LTC2.Shared.Common.Interfaces.OnPreCheckActivity<StravaActivity, TResultType> onPreCheckActivity,
-            LTC2.Shared.Common.Interfaces.OnCheckActivity<StravaActivity, TResultType> onCheckActivity,
-            LTC2.Shared.Common.Interfaces.OnWaitingForSlot<TResultType> onWaitingForSlot) where TResultType : class
-        {
-            await BrowseActivities(request, accessToken, subject,
-                (a, t, s) => onPreCheckActivity(a, t, s),
-                (a, t, s) => onCheckActivity(a, t, s),
-                (dt, s) => onWaitingForSlot(dt, s));
-        }
-
-        async Task<List<List<double>>> LTC2.Shared.Common.Interfaces.IConnector<StravaActivity, GetActivitiesRequest, GetActivitiesResponse,
-            GetActivityCoordinateStreamRequest, GetActivityCoordinateStreamResponse,
-            GetRoutesRequest, GetRoutesResponse,
-            GetRouteDetailsAsGpxRequest, GetRouteDetailsAsGpxReponse>.GetTrackForActivity<TResultType>(
-            string activityId, bool bypassCache, string accessToken,
-            LTC2.Shared.Common.Interfaces.OnWaitingForSlot<TResultType> onWaitingForSlot, TResultType subject) where TResultType : class
-        {
-            return await GetTrackForActivity(activityId, bypassCache, accessToken,
-                (dt, s) => onWaitingForSlot(dt, s), subject);
-        }
     }
 }

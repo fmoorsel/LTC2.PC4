@@ -13,7 +13,7 @@ namespace LTC2.Shared.RideWithGpsConnector.Interfaces
         Task<Session> GetSession(long athleteId);
         Task<Session> GetSession(Session session);
         Task<List<RwGpsSyncItem>> GetActivities(GetActivitiesRequest request, string accessToken);
-        Task BrowseActivities<TResultType>(GetActivitiesRequest request, string accessToken, TResultType subject, OnPreCheckActivity<RwGpsTrip, TResultType> onPreCheckActivity, OnCheckActivity<RwGpsTrip, TResultType> onCheckActivity, OnWaitingForSlot<TResultType> onWaitingForSlot) where TResultType : class;
+        Task BrowseActivities<TResultType>(GetActivitiesRequest request, string accessToken, TResultType subject, OnPreCheckActivity<TResultType> onPreCheckActivity, OnCheckActivity<TResultType> onCheckActivity, OnWaitingForSlot<TResultType> onWaitingForSlot) where TResultType : class;
         Task<List<List<double>>> GetTrackForActivity<TResultType>(string activityId, bool bypassCache, string accessToken, OnWaitingForSlot<TResultType> onWaitingForSlot, TResultType subject) where TResultType : class;
     }
 }
