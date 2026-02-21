@@ -148,6 +148,7 @@ namespace LTC2.Desktopclients.WindowsClient
 
             _multiSportManager.WriteDefaults(chkMultiSport.Checked, rdoRideWithGps.Checked ? "RideWithGps" : "Strava");
             _multiSportManager.RunInMultiSportMode = chkMultiSport.Checked;
+            _multiSportManager.RunWithSource = rdoRideWithGps.Checked ? "ridewithgps" : "strava";
 
             if (_multiSportManager.RunInMultiSportMode)
             {

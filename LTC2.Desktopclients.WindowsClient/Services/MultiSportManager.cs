@@ -22,8 +22,10 @@ namespace LTC2.Desktopclients.WindowsClient.Services
 
         public bool RunInMultiSportMode { get; set; }
 
-        public List<StravaActivityType> CurrentActivityTypes 
-        { 
+        public string RunWithSource { get; set; }
+
+        public List<StravaActivityType> CurrentActivityTypes
+        {
             get
             {
                 if (_currentActivityTypes == null)
@@ -33,14 +35,13 @@ namespace LTC2.Desktopclients.WindowsClient.Services
 
                 return _currentActivityTypes;
             }
-        
+
             set
             {
                 _currentActivityTypes = value;
-            } 
-        
-        }
+            }
 
+        }
 
         public void RefreshCurrentActivityTypes()
         {
@@ -52,10 +53,10 @@ namespace LTC2.Desktopclients.WindowsClient.Services
             var athlete = athleteId ?? AthleteId;
 
             EnsureActivtyTypes(athlete);
-            
+
             var activityTypesFile = Path.Combine(_appSettings.MultiSportFolder, $"{athlete}.json");
             var activityTypesAsJson = File.ReadAllText(activityTypesFile);
-            
+
             return JsonConvert.DeserializeObject<List<StravaActivityType>>(activityTypesAsJson);
         }
 

@@ -301,7 +301,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
         private string GetUrl()
         {
-            return $"{_appSettings.StartPage}?language={_translationService.CurrentLanguage}&multi={_multiSportManager.RunInMultiSportMode}";
+            return $"{_appSettings.StartPage}?language={_translationService.CurrentLanguage}&multi={_multiSportManager.RunInMultiSportMode}&source={_multiSportManager.RunWithSource}";
         }
     }
 }
