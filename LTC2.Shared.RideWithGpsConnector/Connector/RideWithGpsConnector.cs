@@ -1,4 +1,5 @@
 using LTC2.Shared.Common.Interfaces;
+using LTC2.Shared.Common.Models;
 using LTC2.Shared.Models.Domain;
 using LTC2.Shared.RideWithGpsConnector.Interfaces;
 using LTC2.Shared.RideWithGpsConnector.Models.Requests;
@@ -25,6 +26,11 @@ namespace LTC2.Shared.RideWithGpsConnector.Connector
             _logger = logger;
             _proxy = proxy;
             _sessionStore = sessionStore;
+        }
+
+        public Task<Session> GetSession(string code)
+        {
+            throw new NotSupportedException("Use GetSession(string code, string redirectUri) for RideWithGps.");
         }
 
         public async Task<Session> GetSession(string code, string redirectUri)
@@ -79,6 +85,22 @@ namespace LTC2.Shared.RideWithGpsConnector.Connector
             }
 
             return null;
+        }
+
+        public async Task BrowseActivities<TResultType>(
+            BrowseActivitiesRequest request,
+            string accessToken,
+            TResultType subject,
+            OnPreCheckActivity<TResultType> onPreCheckActivity,
+            OnCheckActivity<TResultType> onCheckActivity,
+            OnWaitingForSlot<TResultType> onWaitingForSlot) where TResultType : class
+        {
+            var rwgpsRequest = new GetActivitiesRequest
+            {
+                BypassCache = request.BypassCache,
+                After = request.After ?? new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+            };
+            await BrowseActivities(rwgpsRequest, accessToken, subject, onPreCheckActivity, onCheckActivity, onWaitingForSlot);
         }
 
         public async Task BrowseActivities<TResultType>(

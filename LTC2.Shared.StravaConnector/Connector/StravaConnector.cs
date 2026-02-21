@@ -1,4 +1,5 @@
 ﻿using LTC2.Shared.Common.Interfaces;
+using LTC2.Shared.Common.Models;
 using LTC2.Shared.Models.Domain;
 using LTC2.Shared.Models.Settings;
 using LTC2.Shared.Stores.Interfaces;
@@ -126,6 +127,23 @@ namespace LTC2.Shared.StravaConnector.Connector
             var response = await _stravaProxy.GetActivities(request, code);
 
             return response;
+        }
+
+        public async Task BrowseActivities<TResultType>(
+                BrowseActivitiesRequest request,
+                string accessToken,
+                TResultType subject,
+                OnPreCheckActivity<TResultType> onPreCheckActivity,
+                OnCheckActivity<TResultType> onCheckActivity,
+                OnWaitingForSlot<TResultType> onWaitingForSlot) where TResultType : class
+        {
+            var stravaRequest = new GetActivitiesRequest
+            {
+                AthleteId = request.AthleteId,
+                BypassCache = request.BypassCache,
+                After = request.After
+            };
+            await BrowseActivities(stravaRequest, accessToken, subject, onPreCheckActivity, onCheckActivity, onWaitingForSlot);
         }
 
         public async Task BrowseActivities<TResultType>(

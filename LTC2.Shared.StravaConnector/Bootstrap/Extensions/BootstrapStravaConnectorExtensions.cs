@@ -1,3 +1,5 @@
+using LTC2.Shared.Common.Interfaces;
+using LTC2.Shared.Models.Domain;
 using LTC2.Shared.Stores.Bootstrap.Extensions;
 using LTC2.Shared.Stores.Interfaces;
 using LTC2.Shared.Stores.Stores;
@@ -12,6 +14,8 @@ namespace LTC2.Shared.StravaConnector.Bootstrap.Extensions
         public static IServiceCollection AddStravaConnector<TStore>(this IServiceCollection services) where TStore : class, ISessionStore
         {
             services.AddSingleton<IStravaConnector, Connector.StravaConnector>();
+            services.AddKeyedSingleton<IConnector>(ConnectorSource.Strava,
+                (sp, _) => sp.GetRequiredService<IStravaConnector>());
             services.AddSingleton<IStravaHttpProxy, StravaHttpProxy>();
             services.AddStores<TStore>();
 

@@ -3,7 +3,9 @@ using LTC2.Services.Calculator.Interfaces;
 using LTC2.Services.Calculator.Models;
 using LTC2.Services.Calculator.Services;
 using LTC2.Services.Calculator.ServiceTasks;
+using LTC2.Shared.Common.Bootstrap.Extensions;
 using LTC2.Shared.Messaging.Implementations.FileBasedBroker.Extensions;
+using LTC2.Shared.RideWithGpsConnector.Bootstrap.Extensions;
 using LTC2.Shared.Repositories.Interfaces;
 using LTC2.Shared.Repositories.Mapdefinitions;
 using LTC2.Shared.Repositories.Repositories;
@@ -83,6 +85,8 @@ namespace LTC2.Services.Calculator
                 services.AddSingleton<ISessionStore, FileSessionStore>();
 
                 services.AddStravaConnector();
+                services.AddRideWithGpsConnector();
+                services.AddConnectorFactory();
                 services.AddFileBasedBroker();
             });
 

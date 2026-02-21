@@ -7,13 +7,10 @@ using System.Threading.Tasks;
 
 namespace LTC2.Shared.RideWithGpsConnector.Interfaces
 {
-    public interface IRideWithGpsConnector
+    public interface IRideWithGpsConnector : IConnector
     {
         Task<Session> GetSession(string code, string redirectUri);
-        Task<Session> GetSession(long athleteId);
-        Task<Session> GetSession(Session session);
         Task<List<RwGpsSyncItem>> GetActivities(GetActivitiesRequest request, string accessToken);
         Task BrowseActivities<TResultType>(GetActivitiesRequest request, string accessToken, TResultType subject, OnPreCheckActivity<TResultType> onPreCheckActivity, OnCheckActivity<TResultType> onCheckActivity, OnWaitingForSlot<TResultType> onWaitingForSlot) where TResultType : class;
-        Task<List<List<double>>> GetTrackForActivity<TResultType>(string activityId, bool bypassCache, string accessToken, OnWaitingForSlot<TResultType> onWaitingForSlot, TResultType subject) where TResultType : class;
     }
 }

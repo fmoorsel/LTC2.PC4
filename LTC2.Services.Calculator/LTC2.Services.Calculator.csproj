@@ -45,6 +45,7 @@
     <ProjectReference Include="..\LTC2.Shared.Models\LTC2.Shared.Models.csproj" />
     <ProjectReference Include="..\LTC2.Shared.Repositories\LTC2.Shared.Repositories.csproj" />
     <ProjectReference Include="..\LTC2.Shared.SpatiaLiteRepository\LTC2.Shared.SpatiaLiteRepository.csproj" />
+    <ProjectReference Include="..\LTC2.Shared.RideWithGpsConnector\LTC2.Shared.RideWithGpsConnector.csproj" />
     <ProjectReference Include="..\LTC2.Shared.StravaConnector\LTC2.Shared.StravaConnector.csproj" />
     <ProjectReference Include="..\LTC2.Shared.Utils\LTC2.Shared.Utils.csproj" />
   </ItemGroup>

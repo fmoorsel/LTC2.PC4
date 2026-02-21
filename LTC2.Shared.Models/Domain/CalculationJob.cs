@@ -6,6 +6,7 @@ namespace LTC2.Shared.Models.Domain
 
     public class CalculationJob
     {
+        public ConnectorSource ConnectorSource { get; set; }
 
         public long AthleteId { get; set; }
 

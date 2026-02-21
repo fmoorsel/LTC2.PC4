@@ -1,14 +1,14 @@
 ﻿using LTC2.Services.Calculator.Interfaces;
 using LTC2.Services.Calculator.Models;
 using LTC2.Services.Calculator.Services;
+using LTC2.Shared.Common.Interfaces;
+using LTC2.Shared.Common.Models;
 using LTC2.Shared.Models.Domain;
 using LTC2.Shared.Models.Interprocess;
 using LTC2.Shared.Models.Settings;
 using LTC2.Shared.Repositories.Interfaces;
 using LTC2.Shared.StravaConnector.Exceptions;
-using LTC2.Shared.StravaConnector.Interfaces;
 using LTC2.Shared.StravaConnector.Models;
-using LTC2.Shared.StravaConnector.Models.Requests;
 using LTC2.Shared.Utils.Utils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -25,7 +25,7 @@ namespace LTC2.Services.Calculator.Calculator
         private readonly CalculatorSettings _calculatorSettings;
         private readonly ILogger<ScoreCalculator> _logger;
         private readonly IMapRepository _mapRepository;
-        private readonly IStravaConnector _stravaConnector;
+        private readonly IConnectorFactory _connectorFactory;
         private readonly IScoresRepository _scoresRepository;
         private readonly StatusNotifier _statusNotifier;
         private readonly IIntermediateResultsRepository _intermediateResultsRepository;
@@ -42,7 +42,7 @@ namespace LTC2.Services.Calculator.Calculator
                 CalculatorSettings calculatorSettings,
                 IMapRepository mapRepository,
                 IScoresRepository scoresRepository,
-                IStravaConnector stravaConnector,
+                IConnectorFactory connectorFactory,
                 IIntermediateResultsRepository intermediateResultsRepository,
                 StatusNotifier statusNotifier,
                 ILogger<ScoreCalculator> logger
@@ -53,7 +53,7 @@ namespace LTC2.Services.Calculator.Calculator
             _mapRepository = mapRepository;
             _scoresRepository = scoresRepository;
             _intermediateResultsRepository = intermediateResultsRepository;
-            _stravaConnector = stravaConnector;
+            _connectorFactory = connectorFactory;
             _statusNotifier = statusNotifier;
             _appSettings = appSettings;
 
@@ -90,10 +90,11 @@ namespace LTC2.Services.Calculator.Calculator
             _logger.LogInformation($"Calclation job received for: {job.AthleteId} of type {job.Type}");
 
             var dayLimitDetect = false;
-            var stravaSession = await GetSession(job);
+            var connector = _connectorFactory.Create(job.ConnectorSource);
+            var session = await GetSession(job, connector);
             var isMulti = job.Type == CalculationType.multi;
 
-            var request = new GetActivitiesRequest()
+            var request = new BrowseActivitiesRequest()
             {
                 AthleteId = job.AthleteId,
                 BypassCache = job.BypassCache
@@ -149,7 +150,7 @@ namespace LTC2.Services.Calculator.Calculator
             {
                 try
                 {
-                    await _stravaConnector.BrowseActivities(request, stravaSession.AccessToken, calculationResult, OnPreCheckActivity, OnCheckActivity, OnWaitingForSlot);
+                    await connector.BrowseActivities(request, session.AccessToken, calculationResult, OnPreCheckActivity, OnCheckActivity, OnWaitingForSlot);
                 }
                 catch (StravaTooManyDailyRequestsException)
                 {
@@ -163,7 +164,7 @@ namespace LTC2.Services.Calculator.Calculator
             {
                 var lastRide = calculationResult.LastRideSample;
 
-                var preciseTrack = await _stravaConnector.GetTrackForActivity(calculationResult.LastRideSample.ExternalId, request.BypassCache, stravaSession.AccessToken, OnWaitingForSlot, calculationResult);
+                var preciseTrack = await connector.GetTrackForActivity(calculationResult.LastRideSample.ExternalId, request.BypassCache, session.AccessToken, OnWaitingForSlot, calculationResult);
 
                 lastRide.Track = preciseTrack ?? lastRide.Track;
 
@@ -424,19 +425,19 @@ namespace LTC2.Services.Calculator.Calculator
             _logger.LogInformation($"Score calculator initialised: {places.Count} places");
         }
 
-        private async Task<Session> GetSession(CalculationJob job)
+        private async Task<Session> GetSession(CalculationJob job, IConnector connector)
         {
             if (job.Code != null)
             {
-                return await _stravaConnector.GetSession(job.Code);
+                return await connector.GetSession(job.Code);
             }
             else if (job.Session != null)
             {
-                return await _stravaConnector.GetSession(job.Session);
+                return await connector.GetSession(job.Session);
             }
             else
             {
-                return await _stravaConnector.GetSession(job.AthleteId);
+                return await connector.GetSession(job.AthleteId);
             }
         }
 
