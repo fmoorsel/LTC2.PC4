@@ -37,6 +37,8 @@
             btnProfileManager = new Button();
             grpStatus = new GroupBox();
             grpAction = new GroupBox();
+            rdoStrava = new RadioButton();
+            rdoRideWithGps = new RadioButton();
             chkMultiSport = new CheckBox();
             grpStatus.SuspendLayout();
             grpAction.SuspendLayout();
@@ -114,6 +116,8 @@
             // 
             // grpAction
             // 
+            grpAction.Controls.Add(rdoStrava);
+            grpAction.Controls.Add(rdoRideWithGps);
             grpAction.Controls.Add(chkMultiSport);
             grpAction.Controls.Add(btnProfileManager);
             grpAction.Controls.Add(btnStart);
@@ -123,10 +127,33 @@
             grpAction.TabIndex = 9;
             grpAction.TabStop = false;
             // 
+            // rdoStrava
+            // 
+            rdoStrava.AutoSize = true;
+            rdoStrava.Checked = true;
+            rdoStrava.Location = new Point(129, 74);
+            rdoStrava.Name = "rdoStrava";
+            rdoStrava.Size = new Size(57, 19);
+            rdoStrava.TabIndex = 9;
+            rdoStrava.TabStop = true;
+            rdoStrava.Text = "Strava";
+            rdoStrava.UseVisualStyleBackColor = true;
+            // 
+            // rdoRideWithGps
+            // 
+            rdoRideWithGps.AutoSize = true;
+            rdoRideWithGps.Location = new Point(204, 74);
+            rdoRideWithGps.Name = "rdoRideWithGps";
+            rdoRideWithGps.Size = new Size(100, 19);
+            rdoRideWithGps.TabIndex = 10;
+            rdoRideWithGps.Text = "Ride With GPS";
+            rdoRideWithGps.UseVisualStyleBackColor = true;
+            rdoRideWithGps.CheckedChanged += rdoRideWithGps_CheckedChanged;
+            // 
             // chkMultiSport
             // 
             chkMultiSport.AutoSize = true;
-            chkMultiSport.Location = new Point(226, 75);
+            chkMultiSport.Location = new Point(343, 74);
             chkMultiSport.Name = "chkMultiSport";
             chkMultiSport.Size = new Size(108, 19);
             chkMultiSport.TabIndex = 8;
@@ -165,6 +192,8 @@
         private Button btnProfileManager;
         private GroupBox grpStatus;
         private GroupBox grpAction;
+        private RadioButton rdoStrava;
+        private RadioButton rdoRideWithGps;
         private CheckBox chkMultiSport;
     }
 }

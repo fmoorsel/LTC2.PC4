@@ -160,6 +160,19 @@ namespace LTC2.Desktopclients.WindowsClient
             }
         }
 
+        private void rdoRideWithGps_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rdoRideWithGps.Checked)
+            {
+                chkMultiSport.Checked = false;
+                chkMultiSport.Enabled = false;
+            }
+            else
+            {
+                chkMultiSport.Enabled = true;
+            }
+        }
+
         protected override bool ProcessDialogKey(Keys keyData)
         {
             if (ModifierKeys == Keys.None && keyData == Keys.Escape)
