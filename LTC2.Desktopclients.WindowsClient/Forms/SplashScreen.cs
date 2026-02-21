@@ -45,7 +45,18 @@ namespace LTC2.Desktopclients.WindowsClient
         {
             _mainForm = mainForm;
 
-            chkMultiSport.Checked = _multiSportManager.IsMultiSportDefault;
+            if (_multiSportManager.IsSourceDefault("RideWithGps"))
+            {
+                rdoRideWithGps.Checked = true;
+                chkMultiSport.Checked = false;
+                chkMultiSport.Enabled = false;
+            }
+            else
+            {
+                rdoStrava.Checked = true;
+                chkMultiSport.Enabled = true;
+                chkMultiSport.Checked = _multiSportManager.IsMultiSportDefault;
+            }
 
             ShowDialog();
         }
@@ -135,7 +146,7 @@ namespace LTC2.Desktopclients.WindowsClient
         {
             _statusNotifier.OnStatusNotification -= OnStatusNotification;
 
-            _multiSportManager.WriteDefaults(chkMultiSport.Checked);
+            _multiSportManager.WriteDefaults(chkMultiSport.Checked, rdoRideWithGps.Checked ? "RideWithGps" : "Strava");
             _multiSportManager.RunInMultiSportMode = chkMultiSport.Checked;
 
             if (_multiSportManager.RunInMultiSportMode)
