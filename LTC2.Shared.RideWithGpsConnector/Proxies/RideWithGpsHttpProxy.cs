@@ -55,10 +55,13 @@ namespace LTC2.Shared.RideWithGpsConnector.Proxies
             var authHeader = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
             var response = await ExecuteGetRequest<RwGpsSyncResponse>(uri, authHeader);
 
-            return response?.Items
-                ?.Where(t => t.Action == "created" || t.Action == "updated")
-                .OrderBy(i => i.Datetime)
-                .ToList() ?? new List<RwGpsSyncItem>();
+            var deletedItems = response?.Items?.Where(t => t.Action == "deleted");
+            var updatedItems = response?.Items?.Where(t => t.Action == "updated" && !deletedItems.Any(d => d.Item_id == t.Item_id));
+            var createdItems = response?.Items?.Where(t => t.Action == "created" && !deletedItems.Any(d => d.Item_id == t.Item_id) && !updatedItems.Any(d => d.Item_id == t.Item_id));
+
+            var resultItems = updatedItems?.Concat(createdItems);
+
+            return resultItems.OrderBy(i => i.Datetime).ToList() ?? new List<RwGpsSyncItem>();
         }
 
         public async Task<RwGpsTrip> GetTrip(long id, bool bypassCache, string accessToken)
