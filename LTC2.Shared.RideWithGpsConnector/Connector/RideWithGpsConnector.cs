@@ -113,6 +113,11 @@ namespace LTC2.Shared.RideWithGpsConnector.Connector
         {
             var syncItems = await _proxy.GetActivities(request, accessToken);
 
+            if (subject is CalculationResult calculationResult)
+            {
+                calculationResult.SkipPreCheckPlaces = true;
+            }
+
             foreach (var item in syncItems)
             {
                 try

@@ -18,6 +18,7 @@ namespace LTC2.Services.Calculator.Services
             GetSettingsFromConfig<ElasticUploaderSettings>("ElasticUploaderSettings", result);
             GetSettingsFromConfig<CalculatorSettings>("CalculatorSettings", result);
             GetSettingsFromConfig<GenericSettings>("GenericSettings", result);
+            GetSettingsFromConfig<RideWithGpsHttpProxySettings>("RideWithGpsHttpProxySettings", result);
             GetSettingsFromConfig<StravaHttpProxySettings>("StravaHttpProxySettings", result);
 
             GetSettingsFromConfig<SpatiaLiteMapperSettings>("SpatiaLiteMapperSettings", result);

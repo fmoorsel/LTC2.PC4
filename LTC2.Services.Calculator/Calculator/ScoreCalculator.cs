@@ -197,7 +197,7 @@ namespace LTC2.Services.Calculator.Calculator
 
                 _intermediateResultsRepository.Clear(job.AthleteId, isMulti);
 
-                if(calculationResult.Type == CalculationType.multi)
+                if (calculationResult.Type == CalculationType.multi)
                 {
                     var file = Path.Combine(_appSettings.MultiSportFolder, $"{job.AthleteId}.json");
                     File.WriteAllText(file, JsonConvert.SerializeObject(calculationResult.Types));
@@ -382,11 +382,21 @@ namespace LTC2.Services.Calculator.Calculator
                     _intermediateResultsRepository.StoreIntermedidateResult(subject, subject.Type == CalculationType.multi);
                 }
 
-                var places = _mapRepository.PreCheckTrack(track);
 
-                var newPlacesCount = places.Where(p => IsPlaceRelevant(activity, p, subject)).Count();
+                var doLastVisitedCheck = isAllowedType && (subject.LastRideSample == null || activity.DateTimeStart > subject.LastRideSample.VisitedOn);
 
-                if (places.Count > 0 && isAllowedType && (subject.LastRideSample == null || activity.DateTimeStart > subject.LastRideSample.VisitedOn))
+                if (!subject.SkipPreCheckPlaces)
+                {
+                    var places = _mapRepository.PreCheckTrack(track);
+
+                    var newPlacesCount = places.Where(p => IsPlaceRelevant(activity, p, subject)).Count();
+
+                    result = newPlacesCount > 0;
+                    doLastVisitedCheck = doLastVisitedCheck && places.Count > 0;
+                }
+
+
+                if (doLastVisitedCheck)
                 {
                     var visit = new Visit();
 
@@ -400,7 +410,7 @@ namespace LTC2.Services.Calculator.Calculator
                     subject.VisitedPlacesLastRide = new Dictionary<string, Visit>() { { "temp", visit } };
                 }
 
-                return newPlacesCount > 0;
+                return result;
             }
 
             return result;
@@ -457,7 +467,7 @@ namespace LTC2.Services.Calculator.Calculator
                 {
                     _logger.LogWarning(ex, $"Unable to read activity types for athlete: {athleteId}");
                 }
-                
+
             }
 
             return new List<int>();

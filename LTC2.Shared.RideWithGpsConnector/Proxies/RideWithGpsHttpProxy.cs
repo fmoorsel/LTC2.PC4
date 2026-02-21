@@ -51,12 +51,13 @@ namespace LTC2.Shared.RideWithGpsConnector.Proxies
         public async Task<List<RwGpsSyncItem>> GetActivities(GetActivitiesRequest request, string accessToken)
         {
             var since = Uri.EscapeDataString(request.After.ToString("o"));
-            var uri = $"/api/v1/sync.json?since={since}&assets=trip";
+            var uri = $"/api/v1/sync.json?since={since}&assets=trips";
             var authHeader = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
             var response = await ExecuteGetRequest<RwGpsSyncResponse>(uri, authHeader);
 
             return response?.Items
                 ?.Where(t => t.Action == "created" || t.Action == "updated")
+                .OrderBy(i => i.Datetime)
                 .ToList() ?? new List<RwGpsSyncItem>();
         }
 
@@ -96,6 +97,12 @@ namespace LTC2.Shared.RideWithGpsConnector.Proxies
                     if (trip == null)
                         return null;
 
+                    var coordinates = trip.Track_points?
+                        .Select(p => new List<double> { p.X, p.Y })
+                        .ToList() ?? new List<List<double>>();
+
+                    coordinates = SanitizeTrack(coordinates);
+
                     var result = new RwGpsTrip
                     {
                         Name = trip.Name,
@@ -105,9 +112,7 @@ namespace LTC2.Shared.RideWithGpsConnector.Proxies
                         MovingTime = trip.Moving_time,
                         Duration = trip.Duration,
                         Stationary = trip.Stationary,
-                        Coordinates = trip.Track_points
-                            ?.Select(p => new List<double> { p.Y, p.X })
-                            .ToList() ?? new List<List<double>>()
+                        Coordinates = coordinates
                     };
 
                     try
@@ -138,6 +143,57 @@ namespace LTC2.Shared.RideWithGpsConnector.Proxies
             }
 
             return null;
+        }
+
+        public List<List<double>> SanitizeTrack(List<List<double>> original)
+        {
+            if (original.Count < 3)
+            {
+                return original;
+            }
+
+            var sanitized = new List<List<double>>();
+
+            if (original[0][0] >= _settings.MinLon && original[0][0] <= _settings.MaxLon &
+                original[0][1] >= _settings.MinLat && original[0][1] <= _settings.MaxLat)
+            {
+                sanitized.Add(original[0]);
+            }
+
+            for (var i = 1; i < original.Count - 1; i++)
+            {
+                var before = original[i - 1];
+                var after = original[i + 1];
+                var current = original[i];
+
+                var diffXBefore = Math.Abs(current[0] - before[0]);
+                var diffYBefore = Math.Abs(current[0] - before[0]);
+                var diffXAfter = Math.Abs(current[0] - after[0]);
+                var diffYAfter = Math.Abs(current[0] - after[0]);
+
+                var validPoint = diffXBefore < 0.009 &&
+                                 diffYBefore < 0.009 &&
+                                 diffXAfter < 0.009 &&
+                                 diffYAfter < 0.009;
+
+                validPoint = validPoint &&
+                                current[0] >= _settings.MinLon && current[0] <= _settings.MaxLon &
+                                current[1] >= _settings.MinLat && current[1] <= _settings.MaxLat;
+
+
+                if (validPoint)
+                {
+                    sanitized.Add(original[i]);
+                }
+            }
+
+            if (original[original.Count - 1][0] >= _settings.MinLon && original[original.Count - 1][0] <= _settings.MaxLon &
+                original[original.Count - 1][1] >= _settings.MinLat && original[original.Count - 1][1] <= _settings.MaxLat)
+            {
+                sanitized.Add(original[original.Count - 1]);
+            }
+
+            return sanitized;
         }
     }
 }
