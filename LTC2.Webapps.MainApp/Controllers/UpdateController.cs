@@ -30,7 +30,7 @@ namespace LTC2.Webapps.MainApp.Controllers
         [HttpPost]
         [Authorize]
         [Route("update")]
-        public IActionResult Update([FromQuery] bool refresh, [FromQuery] bool bypassCache = false, [FromQuery] bool isRestore = false, [FromQuery] bool isClear = false)
+        public IActionResult Update([FromQuery] bool refresh, [FromQuery] string source = null, [FromQuery] bool bypassCache = false, [FromQuery] bool isRestore = false, [FromQuery] bool isClear = false)
         {
             var authHeader = _tokenUtils.GetAuthenticationHeader(HttpContext.Request);
             var token = authHeader?.Parameter;
@@ -39,7 +39,7 @@ namespace LTC2.Webapps.MainApp.Controllers
             {
                 if (_tokenUtils.ValidateToken(token))
                 {
-                    PostUpdateMessage(_tokenUtils.GetProfileFormToken(token).AthleteId, refresh, bypassCache, isRestore, isClear, null);
+                    PostUpdateMessage(_tokenUtils.GetProfileFormToken(token).AthleteId, refresh, bypassCache, isRestore, isClear, null, source);
 
                     return Ok();
                 }
@@ -51,7 +51,7 @@ namespace LTC2.Webapps.MainApp.Controllers
         [HttpPost]
         [Authorize]
         [Route("updatemulti")]
-        public IActionResult UpdateMulti([FromQuery] bool refresh, [FromBody] List<int> types, [FromQuery] bool bypassCache = false, [FromQuery] bool isRestore = false, [FromQuery] bool isClear = false)
+        public IActionResult UpdateMulti([FromQuery] bool refresh, [FromBody] List<int> types, [FromQuery] string source = null, [FromQuery] bool bypassCache = false, [FromQuery] bool isRestore = false, [FromQuery] bool isClear = false)
         {
             var authHeader = _tokenUtils.GetAuthenticationHeader(HttpContext.Request);
             var token = authHeader?.Parameter;
@@ -60,7 +60,7 @@ namespace LTC2.Webapps.MainApp.Controllers
             {
                 if (_tokenUtils.ValidateToken(token))
                 {
-                    PostUpdateMessage(_tokenUtils.GetProfileFormToken(token).AthleteId, refresh, bypassCache, isRestore, isClear, types);
+                    PostUpdateMessage(_tokenUtils.GetProfileFormToken(token).AthleteId, refresh, bypassCache, isRestore, isClear, types, source);
 
                     return Ok();
                 }
@@ -69,7 +69,7 @@ namespace LTC2.Webapps.MainApp.Controllers
             return Unauthorized();
         }
 
-        private void PostUpdateMessage(string athleteIdAsString, bool refresh, bool bypassCache, bool isRestore, bool isClear, List<int> types)
+        private void PostUpdateMessage(string athleteIdAsString, bool refresh, bool bypassCache, bool isRestore, bool isClear, List<int> types, string source)
         {
             var broker = _brokerFactory.CreateBroker();
             var connection = broker.Connect(_calculatorSettings.BrokerConnection);
@@ -90,7 +90,8 @@ namespace LTC2.Webapps.MainApp.Controllers
                 IsRestoreInterMediate = isRestore,
                 IsClearInterMediate = isClear,
                 Types = types,
-                Type = types == null ? CalculationType.bike : CalculationType.multi
+                Type = types == null ? CalculationType.bike : CalculationType.multi,
+                ConnectorSource = source == "ridewithgps" ? ConnectorSource.RideWithGps : ConnectorSource.Strava
             };
 
             var payLoad = JsonConvert.SerializeObject(calculationJob);

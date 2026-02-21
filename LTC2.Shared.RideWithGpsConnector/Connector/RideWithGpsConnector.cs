@@ -61,7 +61,7 @@ namespace LTC2.Shared.RideWithGpsConnector.Connector
 
         public Task<Session> GetSession(long athleteId)
         {
-            return Task.FromResult(_sessionStore.Retrieve(athleteId));
+            return Task.FromResult(_sessionStore.Retrieve(athleteId, Session.RideWithGpsSession));
         }
 
         public Task<Session> GetSession(Session session)

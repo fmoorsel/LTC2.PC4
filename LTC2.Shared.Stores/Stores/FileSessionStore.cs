@@ -20,7 +20,7 @@ namespace LTC2.Shared.Stores.Stores
             _genericSettings = genericSettings;
         }
 
-        public async Task<Session> RetrieveAsync(long athleteId, Session currentSession = null)
+        public async Task<Session> RetrieveAsync(long athleteId, string origin, Session currentSession = null)
         {
             var result = currentSession ?? new Session();
 
@@ -54,7 +54,7 @@ namespace LTC2.Shared.Stores.Stores
             return result;
         }
 
-        public Session Retrieve(long athleteId, Session currentSession = null)
+        public Session Retrieve(long athleteId, string origin, Session currentSession = null)
         {
             var result = currentSession ?? new Session();
 
@@ -62,7 +62,7 @@ namespace LTC2.Shared.Stores.Stores
             {
                 if (athleteId > 0)
                 {
-                    var fileName = Path.Combine(_genericSettings.SessionsFolder, $"s{athleteId}");
+                    var fileName = Path.Combine(_genericSettings.SessionsFolder, $"{origin}{athleteId}");
 
                     var json = File.ReadAllText(fileName);
 

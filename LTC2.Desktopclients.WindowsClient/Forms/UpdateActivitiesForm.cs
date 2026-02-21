@@ -67,11 +67,11 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                 {
                     var types = _multiSportManager.CurrentActivityTypes.Select(x => (int)x).ToList();
 
-                    await _lTC2HttpProxy.UpdateMulti(token, types, refresh, bypassCache, false, false);
+                    await _lTC2HttpProxy.UpdateMulti(token, types, refresh, bypassCache, false, false, _multiSportManager.RunWithSource);
                 }
                 else
                 {
-                    await _lTC2HttpProxy.Update(token, refresh, bypassCache, false, false);
+                    await _lTC2HttpProxy.Update(token, refresh, bypassCache, false, false, _multiSportManager.RunWithSource);
                 }
 
                 _isCalculating = true;
@@ -146,22 +146,22 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
                             if (_multiSportManager.RunInMultiSportMode)
                             {
-                                await _lTC2HttpProxy.UpdateMulti(token, new List<int>(), false, false, true, false);
+                                await _lTC2HttpProxy.UpdateMulti(token, new List<int>(), false, false, true, false, _multiSportManager.RunWithSource);
                             }
                             else
                             {
-                                await _lTC2HttpProxy.Update(token, false, false, true, false);
+                                await _lTC2HttpProxy.Update(token, false, false, true, false, _multiSportManager.RunWithSource);
                             }
                         }
                         else
                         {
                             if (_multiSportManager.RunInMultiSportMode)
                             {
-                                await _lTC2HttpProxy.UpdateMulti(token, new List<int>(), false, false, false, true);
+                                await _lTC2HttpProxy.UpdateMulti(token, new List<int>(), false, false, false, true, _multiSportManager.RunWithSource);
                             }
                             else
                             {
-                                await _lTC2HttpProxy.Update(token, false, false, false, true);
+                                await _lTC2HttpProxy.Update(token, false, false, false, true, _multiSportManager.RunWithSource);
                             }
                         }
                     }

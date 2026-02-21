@@ -14,18 +14,28 @@ namespace LTC2.Shared.Http.Proxies
         {
         }
 
-        public async Task Update(string accessToken, bool refresh, bool byPassCache, bool isRestore, bool isClear)
+        public async Task Update(string accessToken, bool refresh, bool byPassCache, bool isRestore, bool isClear, string source = null)
         {
             var authHeader = new AuthenticationHeaderValue("Bearer", accessToken);
             var uri = $"/api/Update/update?refresh={refresh}&bypassCache={byPassCache}&isRestore={isRestore}&isClear={isClear}";
 
+            if (source != null)
+            {
+                uri += $"&source={source}";
+            }
+
             await ExecutePostRequest(uri, authHeader);
         }
 
-        public async Task UpdateMulti(string accessToken, List<int> types, bool refresh, bool byPassCache, bool isRestore, bool isClear)
+        public async Task UpdateMulti(string accessToken, List<int> types, bool refresh, bool byPassCache, bool isRestore, bool isClear, string source = null)
         {
             var authHeader = new AuthenticationHeaderValue("Bearer", accessToken);
             var uri = $"/api/Update/updatemulti?refresh={refresh}&bypassCache={byPassCache}&isRestore={isRestore}&isClear={isClear}";
+
+            if (source != null)
+            {
+                uri += $"&source={source}";
+            }
 
             await ExecutePostRequest<List<int>>(uri, types, authHeader);
         }

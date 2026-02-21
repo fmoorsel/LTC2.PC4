@@ -100,11 +100,16 @@ namespace LTC2.Shared.StravaConnector.Connector
 
         private Session GetSessionFromStore(long athleteId, Session currentSession = null)
         {
-            return _sessionStore.Retrieve(athleteId, currentSession);
+            return _sessionStore.Retrieve(athleteId, Session.StravaSession, currentSession);
         }
 
         private bool IsValidSession(Session session)
         {
+            if (session.Origin == Session.RideWithGpsSession)
+            {
+                return true;
+            }
+
             var dateExpiresAt = FromUnixTime(Convert.ToInt64(session.ExpiresAt));
             var remainingTime = dateExpiresAt - DateTime.Now;
 

@@ -25,7 +25,7 @@ namespace LTC2.Shared.Stores.Stores
             DbConnectionString = _genericSettings.DatabaseConnectionString;
         }
 
-        public async Task<Session> RetrieveAsync(long athleteId, Session currentSession = null)
+        public async Task<Session> RetrieveAsync(long athleteId, string origin, Session currentSession = null)
         {
             var result = currentSession ?? new Session();
 
@@ -59,7 +59,7 @@ namespace LTC2.Shared.Stores.Stores
             return result;
         }
 
-        public Session Retrieve(long athleteId, Session currentSession = null)
+        public Session Retrieve(long athleteId, string origin, Session currentSession = null)
         {
             var result = currentSession ?? new Session();
 
