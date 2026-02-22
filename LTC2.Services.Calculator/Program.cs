@@ -57,7 +57,7 @@ namespace LTC2.Services.Calculator
 
                 services.AddSettings(settingsService);
 
-                services.AddSingleton<IServiceTask, InitStravaPropertiesTask>();
+                services.AddSingleton<IServiceTask, InitSourceProxyPropertiesTask>();
                 services.AddSingleton<IServiceTask, InitStatusPublisherTask>();
                 services.AddSingleton<IServiceTask, InitMapRepositoryTask>();
                 services.AddSingleton<IServiceTask, InitScoreCalculatorTask>();

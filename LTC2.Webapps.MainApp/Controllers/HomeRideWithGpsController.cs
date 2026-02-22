@@ -93,6 +93,7 @@ namespace LTC2.Webapps.MainApp.Controllers
             HttpContext.Response.Cookies.Append(_languageCookieName, language ?? _baseTranslationService.CurrentLanguage);
             HttpContext.Response.Cookies.Append(HomeController.MULTI_COOKIE_NAME, multi ? HomeController.MULTI_COOKIE_VALUE : string.Empty);
 
+            ViewBag.TestProfile = testProfile;
             ViewBag.RwGpsClientId = _rideWithGpsHttpProxySettings.ClientId;
             ViewBag.State = testProfile ? $"{state},true" : state;
             ViewBag.ApprovalPrompt = approvalPrompt;

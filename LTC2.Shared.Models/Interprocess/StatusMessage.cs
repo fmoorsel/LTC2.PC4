@@ -35,6 +35,9 @@
 
         public const string STATUS_START = "start";
 
+
+        public const string STATUS_PROFILESELECTED = "profileselected";
+
         public string Status { get; set; }
 
         public string Origin { get; set; }

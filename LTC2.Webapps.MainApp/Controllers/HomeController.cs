@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace LTC2.Webapps.MainApp.Controllers
 {
@@ -28,7 +27,7 @@ namespace LTC2.Webapps.MainApp.Controllers
         private readonly string _stateCookieName = "state";
         private readonly string _languageCookieName = "language";
         private readonly string _appEntrypoint = "../app/index.html";
-        
+
         private readonly AppSettings _appSettings;
 
         public static string MULTI_COOKIE_NAME = "multi";
@@ -56,7 +55,7 @@ namespace LTC2.Webapps.MainApp.Controllers
         {
             if (source == "ridewithgps")
             {
-                return RedirectToAction("Index", "HomeRideWithGps", new { language, multi });
+                return RedirectToAction("Index", "HomeRideWithGps", new { forceLogout, language, multi, profile, source });
             }
 
             var state = Guid.NewGuid().ToString();
@@ -232,7 +231,7 @@ namespace LTC2.Webapps.MainApp.Controllers
                             Secure = true
                         };
 
-                        HttpContext.Response.Cookies.Append(TokenUtils.TokenName, token, cookieOptions2);                        
+                        HttpContext.Response.Cookies.Append(TokenUtils.TokenName, token, cookieOptions2);
                     }
                 }
                 else
@@ -244,7 +243,7 @@ namespace LTC2.Webapps.MainApp.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Exception while getting session from Strava");
-                
+
                 return Unauthorized();
             }
 
@@ -255,7 +254,7 @@ namespace LTC2.Webapps.MainApp.Controllers
             else
             {
                 ViewBag.Entrypoint = _appEntrypoint + $"?strava={DateTime.UtcNow.Ticks}";
-                
+
                 return View("CompleteLogin");
             }
         }

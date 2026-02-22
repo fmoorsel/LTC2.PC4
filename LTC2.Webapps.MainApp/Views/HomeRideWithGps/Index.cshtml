@@ -1,5 +1,7 @@
 @{
 }
+@using LTC2.Shared.BaseMessages.Interfaces;
+@inject IBaseTranslationService _translationService;
 <!DOCTYPE html>
 <html>
 
@@ -61,6 +63,12 @@
     </script>
 
     <div style="display:flex;justify-content:center;align-items:center;height:650px">
+
+        @if (ViewBag.TestProfile)
+        {
+            <p>@_translationService.GetMessage("index.login.prompt.rwgps")</p>
+        }
+
 
         <a href="#" onclick="ConnectToRideWithGps();return false;">
             <img style="max-width:200px;" src="./resources/connect-with-rwgps.png" />

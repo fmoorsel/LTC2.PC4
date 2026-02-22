@@ -91,7 +91,7 @@ namespace LTC2.Webapps.MainApp
             services.AddSingleton<IServiceTask, InitScoreRepositoryTask>();
             services.AddSingleton<IServiceTask, InitStatusPublisherTask>();
             services.AddSingleton<IServiceTask, InitIntermediateResultRepository>();
-            services.AddSingleton<IServiceTask, InitStravaPropertiesTask>();
+            services.AddSingleton<IServiceTask, InitSourceProxyPropertiesTask>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {

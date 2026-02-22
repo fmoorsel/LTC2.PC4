@@ -96,7 +96,7 @@ namespace LTC2.Desktopclients.WindowsClient.Services
             }
         }
 
-        public void WriteDefaults(bool isDefault, string source)
+        public void WriteDefaults(bool isDefault)
         {
             EnsureDefaults();
 
@@ -106,21 +106,10 @@ namespace LTC2.Desktopclients.WindowsClient.Services
             var defaults = JsonConvert.DeserializeObject<MultiSportDefaults>(defaultsAsJson);
 
             defaults.IsDefault = isDefault;
-            defaults.Source = source;
 
             File.WriteAllText(defaultsFile, JsonConvert.SerializeObject(defaults));
         }
 
-        public bool IsSourceDefault(string source)
-        {
-            EnsureDefaults();
-
-            var defaultsAsJson = File.ReadAllText(Path.Combine(_appSettings.MultiSportFolder, _defaultsFile));
-
-            var defaults = JsonConvert.DeserializeObject<MultiSportDefaults>(defaultsAsJson);
-
-            return defaults.Source == source;
-        }
 
         private void EnsureDefaults()
         {

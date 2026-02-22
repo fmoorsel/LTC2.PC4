@@ -5,21 +5,24 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
-namespace LTC2.Services.Calculator.ServiceTasks
+namespace LTC2.Webapps.MainApp.ServiceTasks
 {
-    public class InitStravaPropertiesTask : IServiceTask
+    public class InitSourceProxyPropertiesTask : IServiceTask
     {
         private readonly StravaHttpProxySettings _stravaHttpProxySettings;
+        private readonly RideWithGpsHttpProxySettings _rideWithGpsHttpProxySettings;
         private readonly IDesktopProfileRepository _desktopProfileRepository;
-        private readonly ILogger<InitStravaPropertiesTask> _logger;
+        private readonly ILogger<InitSourceProxyPropertiesTask> _logger;
 
-        public InitStravaPropertiesTask(
+        public InitSourceProxyPropertiesTask(
             StravaHttpProxySettings stravaHttpProxySettings,
+            RideWithGpsHttpProxySettings rideWithGpsHttpProxySetting,
             IDesktopProfileRepository desktopProfileRepository,
-            ILogger<InitStravaPropertiesTask> logger)
+            ILogger<InitSourceProxyPropertiesTask> logger)
         {
             _stravaHttpProxySettings = stravaHttpProxySettings;
             _desktopProfileRepository = desktopProfileRepository;
+            _rideWithGpsHttpProxySettings = rideWithGpsHttpProxySetting;
             _logger = logger;
         }
 
@@ -37,6 +40,9 @@ namespace LTC2.Services.Calculator.ServiceTasks
 
                     _stravaHttpProxySettings.ClientSecret = profile.StravaClientSecret;
                     _stravaHttpProxySettings.ClientId = profile.StravaID;
+
+                    _rideWithGpsHttpProxySettings.ClientId = profile.RwGpsId;
+                    _rideWithGpsHttpProxySettings.ClientSecret = profile.RwGpsSecret;
                 }
             }
 
@@ -68,5 +74,4 @@ namespace LTC2.Services.Calculator.ServiceTasks
             return null;
         }
     }
-
 }
