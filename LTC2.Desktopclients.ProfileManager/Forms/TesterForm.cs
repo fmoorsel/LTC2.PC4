@@ -53,7 +53,8 @@ namespace LTC2.Desktopclients.ProfileManager.Forms
 
             await DeleteCookies();
 
-            webView.CoreWebView2.Navigate($"{_appSettings.StartPage}?profile={ProfileToTest}&language={_translationService.CurrentLanguage}&source={Source}");
+            var url = Visible ? $"{_appSettings.StartPage}?profile={ProfileToTest}&language={_translationService.CurrentLanguage}&source={Source}" : "about:blank";
+            webView.CoreWebView2.Navigate(url);
         }
 
         private async Task DeleteCookies()
