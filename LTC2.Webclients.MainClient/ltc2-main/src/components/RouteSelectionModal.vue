@@ -32,6 +32,8 @@
                   </div>
               </div>
   
+              <template v-if="!isRideWithGpsMode">
+
               <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" style="margin-top: 10px; margin-bottom: 10px;">
 
               <div class="relative overflow-x-auto text-center" >
@@ -64,6 +66,8 @@
                   </div>
               </div>
 
+              </template>
+
               <!-- Modal footer -->
               <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
               </div>
@@ -80,6 +84,7 @@
   import { AppTypes } from '../types/AppTypes';
   import { Routes } from '../models/Routes';
   import { emptyString } from '@/models/Constants';
+  import { runsInRideWithGpsMode } from '@/utils/Utils';
 
   import { PresentationRoute } from '../models/PresentationRoute';
   
@@ -123,7 +128,11 @@
           const feedBackWorking =  _translationService?.getText("selectroutemodal.text.working");
           const feedBackInstuction =  _translationService?.getText("selectroutemodal.text.instruction");
 
-          const header = _translationService?.getText("selectroutemodal.header");
+          const isRideWithGpsMode = runsInRideWithGpsMode();
+
+          const header = isRideWithGpsMode
+              ? _translationService?.getText("selectroutemodal.header.ridewithgps")
+              : _translationService?.getText("selectroutemodal.header");
           const texthint = _translationService?.getText("selectroutemodal.text.hint");
           const buttonTextSelectFile = _translationService?.getText("selectroutemodal.button.selectfile");
           const buttonTextCheckGpx = _translationService?.getText("selectroutemodal.button.checkgpx");
@@ -418,7 +427,7 @@
             }
           }
  
-          return { showModal, hideModal, modalElement, header, tableContainer, texthint, onSelectFile, inputElement, fileName, buttonTextSelectFile, selectFileButton, isButtonDisabled, onSelectGpx, buttonTextCheckGpx, feedBackNoRoutes, feedBackWorking, isEmpty, isWorking, feedBackInstuction, buttonTextLoadStravaRoute, isRoutesLoaded, routesNotYetLoadedText, noRoutesInStravaText, isNoStravaRoutes, loadRoutesButton, onLoadRoutes, isLoadingStravaRoutes, loadingStravaRoutesText, sortedRoutes, loadingStravaRouteText, isStravaRouteLoading, isNoPlaces, noPlacesText, onSelectRoute, onSelectFileButtonClick }
+          return { showModal, hideModal, modalElement, header, tableContainer, texthint, onSelectFile, inputElement, fileName, buttonTextSelectFile, selectFileButton, isButtonDisabled, onSelectGpx, buttonTextCheckGpx, feedBackNoRoutes, feedBackWorking, isEmpty, isWorking, feedBackInstuction, buttonTextLoadStravaRoute, isRoutesLoaded, routesNotYetLoadedText, noRoutesInStravaText, isNoStravaRoutes, loadRoutesButton, onLoadRoutes, isLoadingStravaRoutes, loadingStravaRoutesText, sortedRoutes, loadingStravaRouteText, isStravaRouteLoading, isNoPlaces, noPlacesText, onSelectRoute, onSelectFileButtonClick, isRideWithGpsMode }
       }
   })
   

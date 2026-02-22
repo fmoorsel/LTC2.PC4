@@ -65,3 +65,18 @@ export function runsInMultiSportMode(): boolean {
         return isMultiSportMode;
     }
 }
+
+let isRideWithGpsMode: boolean | undefined = undefined;
+
+export function runsInRideWithGpsMode(): boolean {
+    if (isRideWithGpsMode != undefined) {
+        return isRideWithGpsMode;
+    } else {
+        const params = new URLSearchParams(window.location.search);
+        const value = params.get('ridewithgps');
+
+        isRideWithGpsMode = value !== null && value !== '' && !isNaN(Number(value));
+
+        return isRideWithGpsMode;
+    }
+}
