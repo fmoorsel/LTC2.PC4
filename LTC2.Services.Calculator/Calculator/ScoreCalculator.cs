@@ -342,7 +342,7 @@ namespace LTC2.Services.Calculator.Calculator
             if (activity.Source == ActivitySource.RideWithGps)
             {
                 return activity.ActivityType != null
-                    && activity.ActivityType.StartsWith("cycling:")
+                    && (activity.ActivityType.StartsWith("cycling:") || activity.ActivityType.StartsWith("unknown:generic"))
                     && !activity.ActivityType.EndsWith(":virtual")
                     && !activity.ActivityType.EndsWith(":recumbent");
             }
