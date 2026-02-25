@@ -35,6 +35,7 @@ namespace LTC2.Services.Calculator.Calculator
         private readonly long _maxDistance = 1600000;
 
         private readonly List<StravaActivityType> _activityTypes = new List<StravaActivityType>();
+        private readonly List<string> _activityTypesRwGps = new List<string>();
 
         public ScoreCalculator(
                 AppSettings appSettings,
@@ -56,6 +57,7 @@ namespace LTC2.Services.Calculator.Calculator
             _connectorFactory = connectorFactory;
             _statusNotifier = statusNotifier;
             _appSettings = appSettings;
+            _activityTypesRwGps = calculatorSettings.RwGpsActivityTypes ?? [];
 
             ParseActivityTypes();
         }
@@ -341,10 +343,7 @@ namespace LTC2.Services.Calculator.Calculator
         {
             if (activity.Source == ActivitySource.RideWithGps)
             {
-                return activity.ActivityType != null
-                    && (activity.ActivityType.StartsWith("cycling:") || activity.ActivityType.StartsWith("unknown:generic"))
-                    && !activity.ActivityType.EndsWith(":virtual")
-                    && !activity.ActivityType.EndsWith(":recumbent");
+                return activity.ActivityType != null && (_activityTypesRwGps.Any(a => a == activity.ActivityType));
             }
 
             if (!Enum.TryParse<StravaActivityType>(activity.ActivityType, out var activityType))
