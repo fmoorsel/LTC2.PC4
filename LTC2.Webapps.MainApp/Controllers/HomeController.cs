@@ -197,7 +197,7 @@ namespace LTC2.Webapps.MainApp.Controllers
                     return Unauthorized();
                 }
 
-                var session = await _stravaConnector.GetSession(code);
+                var session = await _stravaConnector.GetSession(code, string.Empty);
 
                 if (session == null || session.AthleteId == -1)
                 {

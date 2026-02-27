@@ -48,7 +48,7 @@ namespace LTC2.Shared.StravaConnector.Connector
 
         }
 
-        public async Task<Session> GetSession(string code)
+        public async Task<Session> GetSession(string code, string redirectUri)
         {
             return await GetSession(code, AuthorizeType.AuthorizationCode);
         }
@@ -134,43 +134,32 @@ namespace LTC2.Shared.StravaConnector.Connector
             return response;
         }
 
-        public async Task BrowseActivities<TResultType>(
+        public async Task BrowseActivities(
                 BrowseActivitiesRequest request,
                 string accessToken,
-                TResultType subject,
-                OnPreCheckActivity<TResultType> onPreCheckActivity,
-                OnCheckActivity<TResultType> onCheckActivity,
-                OnWaitingForSlot<TResultType> onWaitingForSlot) where TResultType : class
-        {
-            var stravaRequest = new GetActivitiesRequest
-            {
-                AthleteId = request.AthleteId,
-                BypassCache = request.BypassCache,
-                After = request.After
-            };
-            await BrowseActivities(stravaRequest, accessToken, subject, onPreCheckActivity, onCheckActivity, onWaitingForSlot);
-        }
-
-        public async Task BrowseActivities<TResultType>(
-                GetActivitiesRequest request,
-                string accessToken,
-                TResultType subject,
-                OnPreCheckActivity<TResultType> onPreCheckActivity,
-                OnCheckActivity<TResultType> onCheckActivity,
-                OnWaitingForSlot<TResultType> onWaitingForSlot) where TResultType : class
+                CalculationResult subject,
+                OnPreCheckActivity onPreCheckActivity,
+                OnCheckActivity onCheckActivity,
+                OnWaitingForSlot onWaitingForSlot)
         {
 
             bool hasActivities = true;
             StravaActivity lastActivity = null;
 
-            request.Page = 0;
-            request.PerPage = 200;
+            var getActivitiesRequest = new GetActivitiesRequest()
+            {
+                AthleteId = request.AthleteId,
+                BypassCache = request.BypassCache,
+                After = request.After,
+                Page = 0,
+                PerPage = 200
+            };
 
             while (hasActivities)
             {
-                request.Page++;
+                getActivitiesRequest.Page++;
 
-                var activities = await TryGetActivities(request, accessToken, lastActivity, onWaitingForSlot, subject);
+                var activities = await TryGetActivities(getActivitiesRequest, accessToken, lastActivity, onWaitingForSlot, subject);
 
                 hasActivities = activities.Activities.Count > 0;
 
@@ -230,7 +219,7 @@ namespace LTC2.Shared.StravaConnector.Connector
             }
         }
 
-        private async Task<GetActivitiesResponse> TryGetActivities<TResultType>(GetActivitiesRequest request, string accessToken, StravaActivity lastActivity, OnWaitingForSlot<TResultType> onWaitingForSlot, TResultType subject) where TResultType : class
+        private async Task<GetActivitiesResponse> TryGetActivities(GetActivitiesRequest request, string accessToken, StravaActivity lastActivity, OnWaitingForSlot onWaitingForSlot, CalculationResult subject)
         {
             var shouldRetry = true;
             var alreadyRetried = false;
@@ -295,7 +284,7 @@ namespace LTC2.Shared.StravaConnector.Connector
             return new GetActivitiesResponse();
         }
 
-        public async Task<List<List<double>>> GetTrackForActivity<TResultType>(string activityId, bool bypassCache, string accessToken, OnWaitingForSlot<TResultType> onWaitingForSlot, TResultType subject) where TResultType : class
+        public async Task<List<List<double>>> GetTrackForActivity(string activityId, bool bypassCache, string accessToken, OnWaitingForSlot onWaitingForSlot, CalculationResult subject)
         {
             try
             {
@@ -321,7 +310,7 @@ namespace LTC2.Shared.StravaConnector.Connector
             return null;
         }
 
-        private async Task<GetActivityCoordinateStreamResponse> TryGetActivityCoordinateStream<TResultType>(GetActivityCoordinateStreamRequest request, string accessToken, OnWaitingForSlot<TResultType> onWaitingForSlot, TResultType subject) where TResultType : class
+        private async Task<GetActivityCoordinateStreamResponse> TryGetActivityCoordinateStream(GetActivityCoordinateStreamRequest request, string accessToken, OnWaitingForSlot onWaitingForSlot, CalculationResult subject)
         {
             var shouldRetry = true;
             var alreadyRetried = false;
@@ -385,7 +374,7 @@ namespace LTC2.Shared.StravaConnector.Connector
         }
 
 
-        private async Task TryGetQuarterSlot<TResultType>(OnWaitingForSlot<TResultType> onWaitingForSlot, TResultType subject) where TResultType : class
+        private async Task TryGetQuarterSlot(OnWaitingForSlot onWaitingForSlot, CalculationResult subject)
         {
             var limits = new LimitsOnlyResponse($"{_limitQuarterUsage},{_limitDayUsage}", $"{_currentQuarterUsage},{_currentDayUsage}");
 
@@ -481,7 +470,7 @@ namespace LTC2.Shared.StravaConnector.Connector
             }
         }
 
-        private async Task WaitForQuarterSlot<TResultType>(OnWaitingForSlot<TResultType> onWaitingForSlot, TResultType subject) where TResultType : class
+        private async Task WaitForQuarterSlot(OnWaitingForSlot onWaitingForSlot, CalculationResult subject)
         {
             var currentStravaSlot = RoundUp(DateTime.UtcNow, TimeSpan.FromMinutes(15));
 

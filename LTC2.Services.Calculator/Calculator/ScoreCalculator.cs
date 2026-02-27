@@ -438,7 +438,7 @@ namespace LTC2.Services.Calculator.Calculator
         {
             if (job.Code != null)
             {
-                return await connector.GetSession(job.Code);
+                return await connector.GetSession(job.Code, string.Empty);
             }
             else if (job.Session != null)
             {

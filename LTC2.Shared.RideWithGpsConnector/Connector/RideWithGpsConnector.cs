@@ -74,7 +74,7 @@ namespace LTC2.Shared.RideWithGpsConnector.Connector
             return await _proxy.GetActivities(request, accessToken);
         }
 
-        public async Task<List<List<double>>> GetTrackForActivity<TResultType>(string activityId, bool bypassCache, string accessToken, OnWaitingForSlot<TResultType> onWaitingForSlot, TResultType subject) where TResultType : class
+        public async Task<List<List<double>>> GetTrackForActivity(string activityId, bool bypassCache, string accessToken, OnWaitingForSlot onWaitingForSlot, CalculationResult subject)
         {
             var trip = await _proxy.GetTrip(long.Parse(activityId), bypassCache, accessToken);
             var track = trip?.Coordinates;
@@ -87,31 +87,21 @@ namespace LTC2.Shared.RideWithGpsConnector.Connector
             return null;
         }
 
-        public async Task BrowseActivities<TResultType>(
+        public async Task BrowseActivities(
             BrowseActivitiesRequest request,
             string accessToken,
-            TResultType subject,
-            OnPreCheckActivity<TResultType> onPreCheckActivity,
-            OnCheckActivity<TResultType> onCheckActivity,
-            OnWaitingForSlot<TResultType> onWaitingForSlot) where TResultType : class
+            CalculationResult subject,
+            OnPreCheckActivity onPreCheckActivity,
+            OnCheckActivity onCheckActivity,
+            OnWaitingForSlot onWaitingForSlot)
         {
             var rwgpsRequest = new GetActivitiesRequest
             {
                 BypassCache = request.BypassCache,
                 After = request.After ?? new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             };
-            await BrowseActivities(rwgpsRequest, accessToken, subject, onPreCheckActivity, onCheckActivity, onWaitingForSlot);
-        }
 
-        public async Task BrowseActivities<TResultType>(
-            GetActivitiesRequest request,
-            string accessToken,
-            TResultType subject,
-            OnPreCheckActivity<TResultType> onPreCheckActivity,
-            OnCheckActivity<TResultType> onCheckActivity,
-            OnWaitingForSlot<TResultType> onWaitingForSlot) where TResultType : class
-        {
-            var syncItems = await _proxy.GetActivities(request, accessToken);
+            var syncItems = await _proxy.GetActivities(rwgpsRequest, accessToken);
 
             if (subject is CalculationResult calculationResult)
             {
