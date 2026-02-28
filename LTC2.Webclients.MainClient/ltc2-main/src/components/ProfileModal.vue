@@ -18,7 +18,7 @@
             <!-- Modal body -->
             <div class="relative overflow-x-auto">
                 <div class="p-2 space-y-2 overflow-y-clip overflow-x-clip mb-4" style="height: 330px;">
-                    <p class="pl-2 hidden md:block">{{ name }} (Strava ID <a :href="athleteLink" target="_blank">{{ athleteId }}</a>)</p>
+                    <p class="pl-2 hidden md:block">{{ name }} ({{ athleteIdLabel }} <a :href="athleteLink" target="_blank">{{ athleteId }}</a>)</p>
                     <p class="pl-2 hidden md:block">{{ clientId }}</p>
                     <p class="pl-2 hidden md:block">{{ scoreLine }}</p>
                     <p class="pl-2 hidden md:block">{{ lastRideLine }}</p>
@@ -66,6 +66,7 @@ import { Modal } from 'flowbite';
 
 import { AppTypes } from '../types/AppTypes';
 import { gloClientSettings } from "../models/ClientSettings";
+import { runsInRideWithGpsMode } from "../utils/Utils";
 
 export default defineComponent ({
     
@@ -111,6 +112,7 @@ export default defineComponent ({
         const isNotStandalone = ref<boolean | undefined>(!gloClientSettings.standaloneVersion);
 
         const athleteId = profile?.athleteId;
+        const athleteIdLabel = runsInRideWithGpsMode() ? "Ride with Gps ID" : "Strava ID";
         const athleteLink = "https://www.strava.com/athletes/" + athleteId;
 
         let modal: Modal;
@@ -175,7 +177,7 @@ export default defineComponent ({
             return true;
         }
 
-        return { showModal, hideModal, submitForm, validateEmail, modalElement, header, name, athleteId, athleteLink, clientId, scoreLine, lastRideLine, scoreLineShort, lastRideLineShort, emailInput, emailLabel, emailForm, emailPlaceholder, buttonSave, buttonClose, isNotStandalone, todoLabel, sortedToDos }
+        return { showModal, hideModal, submitForm, validateEmail, modalElement, header, name, athleteId, athleteIdLabel, athleteLink, clientId, scoreLine, lastRideLine, scoreLineShort, lastRideLineShort, emailInput, emailLabel, emailForm, emailPlaceholder, buttonSave, buttonClose, isNotStandalone, todoLabel, sortedToDos }
     }
 })
 
