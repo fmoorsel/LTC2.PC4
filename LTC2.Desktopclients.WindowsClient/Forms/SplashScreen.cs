@@ -56,9 +56,11 @@ namespace LTC2.Desktopclients.WindowsClient
         private void SetProfileDependencies()
         {
             var isStrava = !string.IsNullOrEmpty(_profileManager.Profile.StravaID);
+            var isRwGps  = !string.IsNullOrEmpty(_profileManager.Profile.RwGpsId);
+            var hasProfile = isStrava || isRwGps;
 
-            chkMultiSport.Enabled = isStrava;
-            chkMultiSport.Checked = isStrava && _multiSportManager.IsMultiSportDefault;
+            chkMultiSport.Enabled = hasProfile;
+            chkMultiSport.Checked = hasProfile && _multiSportManager.IsMultiSportDefault;
         }
 
         private delegate void UpdateStatusDelegate(StatusMessage status);

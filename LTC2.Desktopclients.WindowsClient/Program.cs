@@ -55,6 +55,7 @@ namespace LTC2.Desktopclients.WindowsClient
                 services.AddTransient<UpdateActivitiesForm>();
                 services.AddTransient<SelectProfileForm>();
                 services.AddTransient<SelectActivitiesForm>();
+                services.AddTransient<SelectRwGpsActivitiesForm>();
 
                 AddConfiguration(services);
 

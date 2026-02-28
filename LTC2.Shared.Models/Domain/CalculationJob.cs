@@ -22,6 +22,8 @@ namespace LTC2.Shared.Models.Domain
 
         public List<int> Types { get; set; }
 
+        public List<string> RwGpsTypes { get; set; }
+
         public string Code { get; set; }
 
         public Session Session { get; set; }

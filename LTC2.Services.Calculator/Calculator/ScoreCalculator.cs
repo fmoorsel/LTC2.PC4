@@ -107,10 +107,19 @@ namespace LTC2.Services.Calculator.Calculator
                 IsRefresh = job.Refresh
             };
 
-            if (isMulti && IsTypeSwitch(job.AthleteId, job.Types))
+            if (isMulti)
             {
-                calculationResult.IsRefresh = true;
-                job.Refresh = true;
+                if (job.ConnectorSource == ConnectorSource.RideWithGps && job.RwGpsTypes != null
+                    && IsRwGpsTypeSwitch(job.AthleteId, job.RwGpsTypes))
+                {
+                    calculationResult.IsRefresh = true;
+                    job.Refresh = true;
+                }
+                else if (job.Types != null && IsTypeSwitch(job.AthleteId, job.Types))
+                {
+                    calculationResult.IsRefresh = true;
+                    job.Refresh = true;
+                }
             }
 
 
@@ -132,6 +141,7 @@ namespace LTC2.Services.Calculator.Calculator
 
             calculationResult.Type = job.Type;
             calculationResult.Types = job.Types;
+            calculationResult.RwGpsTypes = job.RwGpsTypes;
 
             var start = DateTime.UtcNow;
 
@@ -200,8 +210,16 @@ namespace LTC2.Services.Calculator.Calculator
 
                 if (calculationResult.Type == CalculationType.multi)
                 {
-                    var file = Path.Combine(_appSettings.MultiSportFolder, $"{job.AthleteId}.json");
-                    File.WriteAllText(file, JsonConvert.SerializeObject(calculationResult.Types));
+                    if (calculationResult.RwGpsTypes != null)
+                    {
+                        var file = Path.Combine(_appSettings.MultiSportFolder, $"{job.AthleteId}_rwgps.json");
+                        File.WriteAllText(file, JsonConvert.SerializeObject(calculationResult.RwGpsTypes));
+                    }
+                    else if (calculationResult.Types != null)
+                    {
+                        var file = Path.Combine(_appSettings.MultiSportFolder, $"{job.AthleteId}.json");
+                        File.WriteAllText(file, JsonConvert.SerializeObject(calculationResult.Types));
+                    }
                 }
 
                 if (dayLimitDetect)
@@ -338,11 +356,13 @@ namespace LTC2.Services.Calculator.Calculator
             return false;
         }
 
-        private bool IsAllowedActivityType(SourceActivity activity, CalculationType calculationType, List<int> types)
+        private bool IsAllowedActivityType(SourceActivity activity, CalculationType calculationType, List<int> types, List<string> rwGpsTypes)
         {
             if (activity.Source == ActivitySource.RideWithGps)
             {
-                return activity.ActivityType != null && (_activityTypesRwGps.Any(a => a == activity.ActivityType));
+                if (calculationType == CalculationType.multi && rwGpsTypes != null)
+                    return activity.ActivityType != null && rwGpsTypes.Contains(activity.ActivityType);
+                return activity.ActivityType != null && _activityTypesRwGps.Any(a => a == activity.ActivityType);
             }
 
             if (!Enum.TryParse<GenericActivityType>(activity.ActivityType, out var activityType))
@@ -365,7 +385,7 @@ namespace LTC2.Services.Calculator.Calculator
             var notExcedingDistance = whiteListed || activity.Distance <= _maxDistance;
             var blackListed = IsBlackListedActivity(activity.Id);
 
-            var isAllowedType = IsAllowedActivityType(activity, subject.Type, subject.Types);
+            var isAllowedType = IsAllowedActivityType(activity, subject.Type, subject.Types, subject.RwGpsTypes);
 
             var result = isAllowedType && !activity.IsManual && notExcedingDistance && notExcedingElapsedTime && !blackListed;
 
@@ -469,6 +489,50 @@ namespace LTC2.Services.Calculator.Calculator
             }
 
             return new List<int>();
+        }
+
+        private List<string> GetCurrentRwGpsTypes(long athleteId)
+        {
+            var file = Path.Combine(_appSettings.MultiSportFolder, $"{athleteId}_rwgps.json");
+
+            if (File.Exists(file))
+            {
+                try
+                {
+                    var content = File.ReadAllText(file);
+
+                    return JsonConvert.DeserializeObject<List<string>>(content);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, $"Unable to read RwGPS activity types for athlete: {athleteId}");
+                }
+            }
+
+            return new List<string>();
+        }
+
+        private bool IsRwGpsTypeSwitch(long athleteId, List<string> jobTypes)
+        {
+            var currentTypes = GetCurrentRwGpsTypes(athleteId);
+
+            foreach (var type in jobTypes)
+            {
+                if (!currentTypes.Contains(type))
+                {
+                    return true;
+                }
+            }
+
+            foreach (var type in currentTypes)
+            {
+                if (!jobTypes.Contains(type))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private bool IsTypeSwitch(long athleteId, List<int> jobTypes)

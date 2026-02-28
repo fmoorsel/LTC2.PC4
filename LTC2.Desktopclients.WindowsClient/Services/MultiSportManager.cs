@@ -12,6 +12,7 @@ namespace LTC2.Desktopclients.WindowsClient.Services
         private readonly string _defaultsFile = "defaults.json";
 
         private List<GenericActivityType> _currentActivityTypes;
+        private List<string> _currentRwGpsActivityTypes;
 
         public MultiSportManager(AppSettings appSettings)
         {
@@ -45,7 +46,66 @@ namespace LTC2.Desktopclients.WindowsClient.Services
 
         public void RefreshCurrentActivityTypes()
         {
-            _currentActivityTypes = GetActivityTypesForAthlete();
+            if (RunWithSource == "ridewithgps")
+            {
+                _currentRwGpsActivityTypes = GetRwGpsActivityTypesForAthlete();
+            }
+            else
+            {
+                _currentActivityTypes = GetActivityTypesForAthlete();
+            }
+        }
+
+        public List<string> CurrentRwGpsActivityTypes
+        {
+            get
+            {
+                if (_currentRwGpsActivityTypes == null)
+                {
+                    _currentRwGpsActivityTypes = GetRwGpsActivityTypesForAthlete();
+                }
+
+                return _currentRwGpsActivityTypes;
+            }
+
+            set
+            {
+                _currentRwGpsActivityTypes = value;
+            }
+        }
+
+        public List<string> GetRwGpsActivityTypesForAthlete(string athleteId = null)
+        {
+            var athlete = athleteId ?? AthleteId;
+
+            EnsureRwGpsActivityTypes(athlete);
+
+            var activityTypesFile = Path.Combine(_appSettings.MultiSportFolder, $"{athlete}_rwgps.json");
+            var activityTypesAsJson = File.ReadAllText(activityTypesFile);
+
+            return JsonConvert.DeserializeObject<List<string>>(activityTypesAsJson);
+        }
+
+        public List<RwGpsActivityTypeDescription> GetRwGpsActivityTypes()
+        {
+            var processModule = Process.GetCurrentProcess().MainModule;
+            var folder = Path.Combine(Path.GetDirectoryName(processModule?.FileName), "Resources");
+
+            var activitiesFile = Path.Combine(folder, $"activities.rwgps.json");
+            var content = File.ReadAllText(activitiesFile);
+
+            return JsonConvert.DeserializeObject<List<RwGpsActivityTypeDescription>>(content);
+        }
+
+        public void SaveRwGpsActivityTypesForAthlete(string athleteId = null, List<string> activityTypes = null)
+        {
+            var athlete = athleteId ?? AthleteId;
+            var toSave = activityTypes ?? CurrentRwGpsActivityTypes;
+            var activityTypesFile = Path.Combine(_appSettings.MultiSportFolder, $"{athlete}_rwgps.json");
+
+            var asJson = JsonConvert.SerializeObject(toSave);
+
+            File.WriteAllText(activityTypesFile, asJson);
         }
 
         public List<GenericActivityType> GetActivityTypesForAthlete(string athleteId = null)
@@ -69,17 +129,6 @@ namespace LTC2.Desktopclients.WindowsClient.Services
             var content = File.ReadAllText(activitiesFile);
 
             return JsonConvert.DeserializeObject<List<ActivityTypeDescription>>(content);
-        }
-
-        public void SaveActivityTypesForAthlete(string athleteId = null, List<GenericActivityType> activityTypes = null)
-        {
-            var athlete = athleteId ?? AthleteId;
-            var toSave = activityTypes ?? CurrentActivityTypes;
-            var activityTypesFile = Path.Combine(_appSettings.MultiSportFolder, $"{athlete}.json");
-
-            var asJson = JsonConvert.SerializeObject(toSave);
-
-            File.WriteAllText(activityTypesFile, asJson);
         }
 
         public bool IsMultiSportDefault
@@ -125,6 +174,45 @@ namespace LTC2.Desktopclients.WindowsClient.Services
                 var defaults = new MultiSportDefaults();
 
                 File.WriteAllText(defaultsFile, JsonConvert.SerializeObject(defaults));
+            }
+        }
+
+        private void EnsureRwGpsActivityTypes(string athleteId)
+        {
+            if (!Directory.Exists(_appSettings.MultiSportFolder))
+            {
+                Directory.CreateDirectory(_appSettings.MultiSportFolder);
+            }
+
+            var typesFile = Path.Combine(_appSettings.MultiSportFolder, $"{athleteId}_rwgps.json");
+
+            if (!File.Exists(typesFile))
+            {
+                var defaultTypes = new List<string>()
+                {
+                    "cycling:generic",
+                    "cycling:road",
+                    "cycling:gravel",
+                    "cycling:mountain",
+                    "cycling:commute",
+                    "cycling:cyclocross",
+                    "cycling:hand_cycling",
+                    "cycling:recumbent",
+                    "cycling:commute",
+                    "cycling:indoor",
+                    "running:generic",
+                    "running:road",
+                    "running:trail",
+                    "running:indoor",
+                    "walking:generic",
+                    "walking:hiking",
+                    "walking:indoor",
+                    "walking:speed",
+                    "other:generic",
+                    "unknown:generic"
+                };
+
+                File.WriteAllText(typesFile, JsonConvert.SerializeObject(defaultTypes));
             }
         }
 

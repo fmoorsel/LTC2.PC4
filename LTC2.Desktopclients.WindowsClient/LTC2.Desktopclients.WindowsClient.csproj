@@ -56,6 +56,9 @@
     <None Update="Resources\activities.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\activities.rwgps.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\messages.nl.multi.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

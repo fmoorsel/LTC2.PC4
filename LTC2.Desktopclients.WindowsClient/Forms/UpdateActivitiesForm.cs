@@ -13,6 +13,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private readonly ITranslationService _translationService;
         private readonly MultiSportManager _multiSportManager;
         private readonly SelectActivitiesForm _selectActivitiesForm;
+        private readonly SelectRwGpsActivitiesForm _selectRwGpsActivitiesForm;
 
         private bool _isCalculating;
         private DateTime _startUpdate;
@@ -26,6 +27,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             ILTC2HttpProxy lTC2HttpProxy,
             MultiSportManager multiSportManager,
             SelectActivitiesForm selectActivitiesForm,
+            SelectRwGpsActivitiesForm selectRwGpsActivitiesForm,
             ITranslationService translationService)
         {
             InitializeComponent();
@@ -37,6 +39,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             _translationService = translationService;
             _multiSportManager = multiSportManager;
             _selectActivitiesForm = selectActivitiesForm;
+            _selectRwGpsActivitiesForm = selectRwGpsActivitiesForm;
         }
 
         private void rdoRefresh_CheckedChanged(object sender, EventArgs e)
@@ -65,9 +68,15 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
                 if (_multiSportManager.RunInMultiSportMode)
                 {
-                    var types = _multiSportManager.CurrentActivityTypes.Select(x => (int)x).ToList();
-
-                    await _lTC2HttpProxy.UpdateMulti(token, types, refresh, bypassCache, false, false, _multiSportManager.RunWithSource);
+                    if (_multiSportManager.RunWithSource == "ridewithgps")
+                    {
+                        await _lTC2HttpProxy.UpdateMulti(token, null, _multiSportManager.CurrentRwGpsActivityTypes, refresh, bypassCache, false, false, _multiSportManager.RunWithSource);
+                    }
+                    else
+                    {
+                        var types = _multiSportManager.CurrentActivityTypes.Select(x => (int)x).ToList();
+                        await _lTC2HttpProxy.UpdateMulti(token, types, null, refresh, bypassCache, false, false, _multiSportManager.RunWithSource);
+                    }
                 }
                 else
                 {
@@ -146,7 +155,10 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
                             if (_multiSportManager.RunInMultiSportMode)
                             {
-                                await _lTC2HttpProxy.UpdateMulti(token, new List<int>(), false, false, true, false, _multiSportManager.RunWithSource);
+                                if (_multiSportManager.RunWithSource == "ridewithgps")
+                                    await _lTC2HttpProxy.UpdateMulti(token, null, new List<string>(), false, false, true, false, _multiSportManager.RunWithSource);
+                                else
+                                    await _lTC2HttpProxy.UpdateMulti(token, new List<int>(), null, false, false, true, false, _multiSportManager.RunWithSource);
                             }
                             else
                             {
@@ -157,7 +169,10 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                         {
                             if (_multiSportManager.RunInMultiSportMode)
                             {
-                                await _lTC2HttpProxy.UpdateMulti(token, new List<int>(), false, false, false, true, _multiSportManager.RunWithSource);
+                                if (_multiSportManager.RunWithSource == "ridewithgps")
+                                    await _lTC2HttpProxy.UpdateMulti(token, null, new List<string>(), false, false, false, true, _multiSportManager.RunWithSource);
+                                else
+                                    await _lTC2HttpProxy.UpdateMulti(token, new List<int>(), null, false, false, false, true, _multiSportManager.RunWithSource);
                             }
                             else
                             {
@@ -266,7 +281,10 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         {
             _multiSportManager.AthleteId = await _webviewConnector.GetAthleteIdFromToken();
 
-            _selectActivitiesForm.ShowDialog();
+            if (_multiSportManager.RunWithSource == "ridewithgps")
+                _selectRwGpsActivitiesForm.ShowDialog();
+            else
+                _selectActivitiesForm.ShowDialog();
         }
     }
 }

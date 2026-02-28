@@ -18,6 +18,8 @@ namespace LTC2.Shared.Models.Domain
 
         public List<int> Types { get; set; }
 
+        public List<string> RwGpsTypes { get; set; }
+
         public Dictionary<string, Visit> VisitedPlacesAllTime { get; set; } = new Dictionary<string, Visit>();
 
         public List<Visit> UpdatedPlacesAllTime
