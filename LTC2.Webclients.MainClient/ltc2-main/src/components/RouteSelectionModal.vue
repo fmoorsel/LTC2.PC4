@@ -32,8 +32,6 @@
                   </div>
               </div>
   
-              <template v-if="!isRideWithGpsMode">
-
               <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" style="margin-top: 10px; margin-bottom: 10px;">
 
               <div class="relative overflow-x-auto text-center" >
@@ -65,8 +63,6 @@
 
                   </div>
               </div>
-
-              </template>
 
               <!-- Modal footer -->
               <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
@@ -133,13 +129,19 @@
           const header = isRideWithGpsMode
               ? _translationService?.getText("selectroutemodal.header.ridewithgps")
               : _translationService?.getText("selectroutemodal.header");
+
+          const source = isRideWithGpsMode ? "ridewithgps" : undefined;
           const texthint = _translationService?.getText("selectroutemodal.text.hint");
           const buttonTextSelectFile = _translationService?.getText("selectroutemodal.button.selectfile");
           const buttonTextCheckGpx = _translationService?.getText("selectroutemodal.button.checkgpx");
-          const buttonTextLoadStravaRoute = _translationService?.getText("selectroutemodal.button.loadstravaroutes");
+          const buttonTextLoadStravaRoute = isRideWithGpsMode
+              ? _translationService?.getText("selectroutemodal.button.loadrwgpsroutes")
+              : _translationService?.getText("selectroutemodal.button.loadstravaroutes");
 
           const routesNotYetLoadedText = _translationService?.getText("selectroutemodal.text.routesNotYetLoadedText");
-          const noRoutesInStravaText = _translationService?.getText("selectroutemodal.text.noRoutesInStrava");
+          const noRoutesInStravaText = isRideWithGpsMode
+              ? _translationService?.getText("selectroutemodal.text.noRoutesInRwGps")
+              : _translationService?.getText("selectroutemodal.text.noRoutesInStrava");
           const loadingStravaRoutesText = _translationService?.getText("selectroutemodal.text.loadingStravaRoutesText");
           const loadingStravaRouteText = _translationService?.getText("selectroutemodal.text.loadingStravaRouteText");
           const noPlacesText = _translationService?.getText("selectroutemodal.text.noplaces");
@@ -227,7 +229,7 @@
             try {
                 isStravaRouteLoading.value = true;
 
-                var route = await _routeCheckerService?.checkRoute(id);
+                var route = await _routeCheckerService?.checkRoute(id, source);
 
                 if (route && hasPlaces(route)) {
                     emit('routeRequested', route);
@@ -313,7 +315,7 @@
                 isLoadingStravaRoutes.value = true;
                 isRoutesLoaded.value = true;
                 
-                const routes = await _routeCheckerService?.listRoutes();
+                const routes = await _routeCheckerService?.listRoutes(source);
 
                 isLoadingStravaRoutes.value = false;
 

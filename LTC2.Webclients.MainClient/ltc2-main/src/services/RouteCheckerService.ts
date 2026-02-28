@@ -94,7 +94,7 @@ export class RouteCheckerService implements IRouteCheckerService {
         }
     }
 
-    async listRoutes() : Promise<PresentationRoutes | undefined> {
+    async listRoutes(source?: string) : Promise<PresentationRoutes | undefined> {
         const token = await this._profileService?.getToken();
         
         if (token) {
@@ -103,7 +103,8 @@ export class RouteCheckerService implements IRouteCheckerService {
             const timeout = 3 * (this._clientSetting?.requestTimeout ?? 5000);
 
             try {
-                const routes = await axios.get<GetRoutesResponse>(url + '/api/Route/list', {headers: {'Authorization': `Bearer ${token}`}, timeout: timeout});
+                const sourceParam = source ? '?source=' + source : '';
+                const routes = await axios.get<GetRoutesResponse>(url + '/api/Route/list' + sourceParam, {headers: {'Authorization': `Bearer ${token}`}, timeout: timeout});
     
                 if (routes?.data && routes.data.limitsExceeded) {
                     throw new LimitsExceededException("Strava limits exceeded", routes.data);
@@ -128,7 +129,7 @@ export class RouteCheckerService implements IRouteCheckerService {
         }
     }
 
-    async checkRoute(routeId: string): Promise<Routes | undefined> {
+    async checkRoute(routeId: string, source?: string): Promise<Routes | undefined> {
         const token = await this._profileService?.getToken();
         
         if (token) {
@@ -137,7 +138,8 @@ export class RouteCheckerService implements IRouteCheckerService {
             const timeout = 3 * (this._clientSetting?.requestTimeout ?? 5000);
             
             try {
-                const route = await axios.get<Routes>(url + '/api/Route/checkstravaroute?RouteId=' + routeId, {headers: {'Authorization': `Bearer ${token}`}, timeout: timeout});
+                const sourceParam = source ? '&source=' + source : '';
+                const route = await axios.get<Routes>(url + '/api/Route/checksourceroute?RouteId=' + routeId + sourceParam, {headers: {'Authorization': `Bearer ${token}`}, timeout: timeout});
 
                 if (route?.data?.limitInfo &&  route?.data?.limitInfo.limitsExceeded) {
                     throw new LimitsExceededException("Strava limits exceeded", route.data.limitInfo);
