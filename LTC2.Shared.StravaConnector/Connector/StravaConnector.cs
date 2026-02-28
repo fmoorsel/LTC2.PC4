@@ -1,4 +1,4 @@
-﻿using LTC2.Shared.Common.Interfaces;
+using LTC2.Shared.Common.Interfaces;
 using LTC2.Shared.Common.Models;
 using LTC2.Shared.Models.Domain;
 using LTC2.Shared.Models.Settings;
@@ -438,7 +438,7 @@ namespace LTC2.Shared.StravaConnector.Connector
             {
                 _logger.LogWarning(ex, "Too many requests reported by Strava and noticed by connector when retrieving routes.");
 
-                return new GetRoutesResponse(ex.Limits);
+                return CreateLimitsExceededResponse<GetRoutesResponse>(ex.Limits);
             }
             catch (Exception ex)
             {
@@ -460,7 +460,7 @@ namespace LTC2.Shared.StravaConnector.Connector
             {
                 _logger.LogWarning(ex, "Too many requests reported by Strava and noticed by connector when retrieving routes.");
 
-                return new GetRouteDetailsAsGpxReponse(ex.Limits);
+                return CreateLimitsExceededResponse<GetRouteDetailsAsGpxReponse>(ex.Limits);
             }
             catch (Exception ex)
             {
@@ -468,6 +468,25 @@ namespace LTC2.Shared.StravaConnector.Connector
 
                 throw;
             }
+        }
+
+        private T CreateLimitsExceededResponse<T>(LimitsOnlyResponse limits) where T : ConnectorResponse, new()
+        {
+            var response = new T
+            {
+                LimitsExceeded = true
+            };
+
+            if (limits.HasLimits)
+            {
+                response.HasLimits = true;
+                response.QuarterRateLimit = limits.QuarterRateLimit;
+                response.QuarterRateUsage = limits.QuarterRateUsage;
+                response.DayRateLimit = limits.DayRateLimit;
+                response.DayRateUsage = limits.DayRateUsage;
+            }
+
+            return response;
         }
 
         private async Task WaitForQuarterSlot(OnWaitingForSlot onWaitingForSlot, CalculationResult subject)

@@ -21,5 +21,9 @@ namespace LTC2.Shared.Common.Interfaces
         Task BrowseActivities(BrowseActivitiesRequest request, string accessToken, CalculationResult subject, OnPreCheckActivity onPreCheckActivity, OnCheckActivity onCheckActivity, OnWaitingForSlot onWaitingForSlot);
 
         Task<List<List<double>>> GetTrackForActivity(string activityId, bool bypassCache, string accessToken, OnWaitingForSlot onWaitingForSlot, CalculationResult subject);
+
+        Task<GetRoutesResponse> GetRoutes(GetRoutesRequest request);
+
+        Task<GetRouteDetailsAsGpxReponse> GetRouteDetailsAsGpx(GetRouteDetailsAsGpxRequest request);
     }
 }

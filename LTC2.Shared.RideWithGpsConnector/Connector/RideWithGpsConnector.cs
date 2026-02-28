@@ -8,6 +8,7 @@ using LTC2.Shared.Stores.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LTC2.Shared.RideWithGpsConnector.Connector
@@ -85,6 +86,36 @@ namespace LTC2.Shared.RideWithGpsConnector.Connector
             }
 
             return null;
+        }
+
+        public async Task<GetRoutesResponse> GetRoutes(GetRoutesRequest request)
+        {
+            var session = await GetSession(request.AthleteId);
+            var rwGpsRoutes = await _proxy.GetRoutes(session.AccessToken);
+
+            return new GetRoutesResponse
+            {
+                Routes = rwGpsRoutes.Select(r => new SourceRoute
+                {
+                    RouteId = r.Id.ToString(),
+                    Name = r.Name,
+                    Distance = r.Distance,
+                    Timestamp = r.Timestamp.HasValue
+                        ? new DateTimeOffset(r.Timestamp.Value).ToUnixTimeSeconds()
+                        : 0
+                }).ToList()
+            };
+        }
+
+        public async Task<GetRouteDetailsAsGpxReponse> GetRouteDetailsAsGpx(GetRouteDetailsAsGpxRequest request)
+        {
+            var session = await GetSession(request.AthleteId);
+            var gpx = await _proxy.GetRouteAsGpx(request.RouteId, session.AccessToken);
+
+            return new GetRouteDetailsAsGpxReponse
+            {
+                Gpx = gpx
+            };
         }
 
         public async Task BrowseActivities(

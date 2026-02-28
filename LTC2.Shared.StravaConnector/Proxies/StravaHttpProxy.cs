@@ -1,3 +1,4 @@
+using LTC2.Shared.Common.Models;
 using LTC2.Shared.Http.Exceptions;
 using LTC2.Shared.Http.Proxies;
 using LTC2.Shared.Models.Domain;
@@ -229,10 +230,12 @@ namespace LTC2.Shared.StravaConnector.Proxies
                         Distance = r.Distance
                     }).ToList();
 
-                    var result = new GetRoutesResponse(responseHeaders[_stravaRateLimit], responseHeaders[_stravaRateUsage])
+                    var result = new GetRoutesResponse
                     {
                         Routes = sourceRoutes
                     };
+
+                    ApplyRateLimits(result, responseHeaders[_stravaRateLimit], responseHeaders[_stravaRateUsage]);
 
                     return result;
                 }
@@ -282,10 +285,12 @@ namespace LTC2.Shared.StravaConnector.Proxies
 
                     SanitizeUsageAndLimitHeaders(responseHeaders);
 
-                    var result = new GetRouteDetailsAsGpxReponse(responseHeaders[_stravaRateLimit], responseHeaders[_stravaRateUsage])
+                    var result = new GetRouteDetailsAsGpxReponse
                     {
                         Gpx = gpx
                     };
+
+                    ApplyRateLimits(result, responseHeaders[_stravaRateLimit], responseHeaders[_stravaRateUsage]);
 
                     return result;
                 }
@@ -397,6 +402,33 @@ namespace LTC2.Shared.StravaConnector.Proxies
             {
                 headers[_stravaRateLimit] = headers[_stravaReadRateLimit];
                 headers[_stravaRateUsage] = headers[_stravaReadRateUsage];
+            }
+        }
+
+        private void ApplyRateLimits(ConnectorResponse response, string limits, string usage)
+        {
+            try
+            {
+                if (limits != null)
+                {
+                    limits = limits.Trim();
+                    var rateLimits = limits.Split(',');
+                    response.QuarterRateLimit = int.Parse(rateLimits[0]);
+                    response.DayRateLimit = int.Parse(rateLimits[1]);
+                }
+
+                if (usage != null)
+                {
+                    usage = usage.Trim();
+                    var rateUsage = usage.Split(',');
+                    response.QuarterRateUsage = int.Parse(rateUsage[0]);
+                    response.DayRateUsage = int.Parse(rateUsage[1]);
+                }
+
+                response.HasLimits = (limits != null) && (usage != null);
+            }
+            catch (Exception)
+            {
             }
         }
 

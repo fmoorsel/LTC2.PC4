@@ -1,4 +1,4 @@
-﻿namespace LTC2.Shared.StravaConnector.Models.Requests
+namespace LTC2.Shared.Common.Models
 {
     public class GetRoutesRequest
     {

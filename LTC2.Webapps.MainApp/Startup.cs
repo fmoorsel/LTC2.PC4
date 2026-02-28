@@ -1,4 +1,4 @@
-﻿using LTC2.Services.Calculator.ServiceTasks;
+using LTC2.Services.Calculator.ServiceTasks;
 using LTC2.Shared.BaseMessages.Interfaces;
 using LTC2.Shared.BaseMessages.Services;
 using LTC2.Shared.Messaging.Implementations.FileBasedBroker.Extensions;
@@ -9,6 +9,7 @@ using LTC2.Shared.Repositories.Repositories;
 using LTC2.Shared.Secrets.Interfaces;
 using LTC2.Shared.Secrets.Vaults;
 using LTC2.Shared.SpatiaLiteRepository.Repositories;
+using LTC2.Shared.Common.Bootstrap.Extensions;
 using LTC2.Shared.RideWithGpsConnector.Bootstrap.Extensions;
 using LTC2.Shared.StravaConnector.Bootstrap.Extensions;
 using LTC2.Shared.Utils.Bootstrap.Extensions;
@@ -62,6 +63,7 @@ namespace LTC2.Webapps.MainApp
 
             services.AddStravaConnector();
             services.AddRideWithGpsConnector();
+            services.AddConnectorFactory();
             services.AddFileBasedBroker();
 
             services.AddControllers().AddNewtonsoftJson();
