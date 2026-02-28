@@ -1,6 +1,6 @@
-﻿namespace LTC2.Shared.StravaConnector.Models
+namespace LTC2.Shared.Models.Domain
 {
-    public enum StravaActivityType
+    public enum GenericActivityType
     {
         AlpineSki,
         BackcountrySki,

@@ -1,7 +1,7 @@
 using LTC2.Shared.Models.Domain;
 using System.Collections.Generic;
 
-namespace LTC2.Shared.Common.Models
+namespace LTC2.Shared.Models.Responses
 {
     public class GetRoutesResponse : ConnectorResponse
     {

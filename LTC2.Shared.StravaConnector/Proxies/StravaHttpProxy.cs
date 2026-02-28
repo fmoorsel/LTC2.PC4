@@ -1,5 +1,6 @@
-using LTC2.Shared.Common.Models;
 using LTC2.Shared.Http.Exceptions;
+using LTC2.Shared.Models.Requests;
+using LTC2.Shared.Models.Responses;
 using LTC2.Shared.Http.Proxies;
 using LTC2.Shared.Models.Domain;
 using LTC2.Shared.Models.Settings;

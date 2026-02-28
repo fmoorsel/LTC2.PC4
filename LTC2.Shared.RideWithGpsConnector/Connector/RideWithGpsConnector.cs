@@ -1,6 +1,7 @@
 using LTC2.Shared.Common.Interfaces;
-using LTC2.Shared.Common.Models;
 using LTC2.Shared.Models.Domain;
+using LTC2.Shared.Models.Requests;
+using LTC2.Shared.Models.Responses;
 using LTC2.Shared.RideWithGpsConnector.Interfaces;
 using LTC2.Shared.RideWithGpsConnector.Models.Requests;
 using LTC2.Shared.RideWithGpsConnector.Models.Responses;

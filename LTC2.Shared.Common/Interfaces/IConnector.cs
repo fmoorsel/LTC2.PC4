@@ -1,5 +1,6 @@
-using LTC2.Shared.Common.Models;
 using LTC2.Shared.Models.Domain;
+using LTC2.Shared.Models.Requests;
+using LTC2.Shared.Models.Responses;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

@@ -1,6 +1,7 @@
 using LTC2.Shared.Common.Interfaces;
-using LTC2.Shared.Common.Models;
 using LTC2.Shared.Models.Domain;
+using LTC2.Shared.Models.Requests;
+using LTC2.Shared.Models.Responses;
 using LTC2.Shared.Models.Settings;
 using LTC2.Shared.Stores.Interfaces;
 using LTC2.Shared.StravaConnector.Exceptions;

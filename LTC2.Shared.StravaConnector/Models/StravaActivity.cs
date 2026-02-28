@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+using LTC2.Shared.Models.Domain;
+using Newtonsoft.Json;
 using System;
 
 namespace LTC2.Shared.StravaConnector.Models
@@ -16,11 +17,11 @@ namespace LTC2.Shared.StravaConnector.Models
         public string TypeString => _type;
 
         [JsonIgnore]
-        public StravaActivityType Type
+        public GenericActivityType Type
         {
             get
             {
-                return (StravaActivityType)Enum.Parse(typeof(StravaActivityType), _type);
+                return (GenericActivityType)Enum.Parse(typeof(GenericActivityType), _type);
             }
         }
 

@@ -1,6 +1,6 @@
 using System;
 
-namespace LTC2.Shared.Common.Models
+namespace LTC2.Shared.Models.Requests
 {
     public class BrowseActivitiesRequest
     {

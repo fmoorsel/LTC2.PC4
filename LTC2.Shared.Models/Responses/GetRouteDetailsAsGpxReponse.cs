@@ -1,4 +1,4 @@
-namespace LTC2.Shared.Common.Models
+namespace LTC2.Shared.Models.Responses
 {
     public class GetRouteDetailsAsGpxReponse : ConnectorResponse
     {

@@ -1,4 +1,4 @@
-﻿using LTC2.Shared.StravaConnector.Models;
+using LTC2.Shared.Models.Domain;
 
 namespace LTC2.Desktopclients.WindowsClient.Models
 {
@@ -8,11 +8,11 @@ namespace LTC2.Desktopclients.WindowsClient.Models
 
         public string Description { get; set; }
 
-        public StravaActivityType ActivityType
+        public GenericActivityType ActivityType
         {
             get
             {
-                return (StravaActivityType)Enum.Parse(typeof(StravaActivityType), Value);
+                return (GenericActivityType)Enum.Parse(typeof(GenericActivityType), Value);
             }
         }
     }

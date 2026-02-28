@@ -1,14 +1,13 @@
-﻿using LTC2.Services.Calculator.Interfaces;
+using LTC2.Services.Calculator.Interfaces;
 using LTC2.Services.Calculator.Models;
 using LTC2.Services.Calculator.Services;
 using LTC2.Shared.Common.Interfaces;
-using LTC2.Shared.Common.Models;
 using LTC2.Shared.Models.Domain;
+using LTC2.Shared.Models.Requests;
 using LTC2.Shared.Models.Interprocess;
 using LTC2.Shared.Models.Settings;
 using LTC2.Shared.Repositories.Interfaces;
 using LTC2.Shared.StravaConnector.Exceptions;
-using LTC2.Shared.StravaConnector.Models;
 using LTC2.Shared.Utils.Utils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -34,7 +33,7 @@ namespace LTC2.Services.Calculator.Calculator
         private readonly long _maxDuration = 100 * 60 * 60;
         private readonly long _maxDistance = 1600000;
 
-        private readonly List<StravaActivityType> _activityTypes = new List<StravaActivityType>();
+        private readonly List<GenericActivityType> _activityTypes = new List<GenericActivityType>();
         private readonly List<string> _activityTypesRwGps = new List<string>();
 
         public ScoreCalculator(
@@ -70,7 +69,7 @@ namespace LTC2.Services.Calculator.Calculator
                 {
                     try
                     {
-                        var actType = (StravaActivityType)Enum.Parse(typeof(StravaActivityType), type);
+                        var actType = (GenericActivityType)Enum.Parse(typeof(GenericActivityType), type);
 
                         _activityTypes.Add(actType);
                     }
@@ -83,7 +82,7 @@ namespace LTC2.Services.Calculator.Calculator
 
             if (_activityTypes.Count == 0)
             {
-                _activityTypes.Add(StravaActivityType.Ride);
+                _activityTypes.Add(GenericActivityType.Ride);
             }
         }
 
@@ -346,14 +345,14 @@ namespace LTC2.Services.Calculator.Calculator
                 return activity.ActivityType != null && (_activityTypesRwGps.Any(a => a == activity.ActivityType));
             }
 
-            if (!Enum.TryParse<StravaActivityType>(activity.ActivityType, out var activityType))
+            if (!Enum.TryParse<GenericActivityType>(activity.ActivityType, out var activityType))
             {
                 return false;
             }
 
             if (calculationType == CalculationType.multi)
             {
-                return types.Select(t => (StravaActivityType)t).Contains(activityType);
+                return types.Select(t => (GenericActivityType)t).Contains(activityType);
             }
 
             return _activityTypes.Contains(activityType);

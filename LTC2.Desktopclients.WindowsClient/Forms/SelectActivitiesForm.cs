@@ -1,6 +1,6 @@
-﻿using LTC2.Desktopclients.WindowsClient.Services;
+using LTC2.Desktopclients.WindowsClient.Services;
 using LTC2.Shared.Messages.Interfaces;
-using LTC2.Shared.StravaConnector.Models;
+using LTC2.Shared.Models.Domain;
 
 namespace LTC2.Desktopclients.WindowsClient.Forms
 {
@@ -52,7 +52,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
         private void btnOK_Click(object sender, EventArgs e)
         {
-            var currentActivityTypes = new List<StravaActivityType>();
+            var currentActivityTypes = new List<GenericActivityType>();
 
             _multiSportManager.GetActivityTypes().ForEach(activity =>
             {

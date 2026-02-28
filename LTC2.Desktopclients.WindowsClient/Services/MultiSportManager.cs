@@ -1,5 +1,5 @@
-﻿using LTC2.Desktopclients.WindowsClient.Models;
-using LTC2.Shared.StravaConnector.Models;
+using LTC2.Desktopclients.WindowsClient.Models;
+using LTC2.Shared.Models.Domain;
 using Newtonsoft.Json;
 using System.Diagnostics;
 
@@ -11,7 +11,7 @@ namespace LTC2.Desktopclients.WindowsClient.Services
 
         private readonly string _defaultsFile = "defaults.json";
 
-        private List<StravaActivityType> _currentActivityTypes;
+        private List<GenericActivityType> _currentActivityTypes;
 
         public MultiSportManager(AppSettings appSettings)
         {
@@ -24,7 +24,7 @@ namespace LTC2.Desktopclients.WindowsClient.Services
 
         public string RunWithSource { get; set; }
 
-        public List<StravaActivityType> CurrentActivityTypes
+        public List<GenericActivityType> CurrentActivityTypes
         {
             get
             {
@@ -48,7 +48,7 @@ namespace LTC2.Desktopclients.WindowsClient.Services
             _currentActivityTypes = GetActivityTypesForAthlete();
         }
 
-        public List<StravaActivityType> GetActivityTypesForAthlete(string athleteId = null)
+        public List<GenericActivityType> GetActivityTypesForAthlete(string athleteId = null)
         {
             var athlete = athleteId ?? AthleteId;
 
@@ -57,7 +57,7 @@ namespace LTC2.Desktopclients.WindowsClient.Services
             var activityTypesFile = Path.Combine(_appSettings.MultiSportFolder, $"{athlete}.json");
             var activityTypesAsJson = File.ReadAllText(activityTypesFile);
 
-            return JsonConvert.DeserializeObject<List<StravaActivityType>>(activityTypesAsJson);
+            return JsonConvert.DeserializeObject<List<GenericActivityType>>(activityTypesAsJson);
         }
 
         public List<ActivityTypeDescription> GetActivityTypes()
@@ -71,7 +71,7 @@ namespace LTC2.Desktopclients.WindowsClient.Services
             return JsonConvert.DeserializeObject<List<ActivityTypeDescription>>(content);
         }
 
-        public void SaveActivityTypesForAthlete(string athleteId = null, List<StravaActivityType> activityTypes = null)
+        public void SaveActivityTypesForAthlete(string athleteId = null, List<GenericActivityType> activityTypes = null)
         {
             var athlete = athleteId ?? AthleteId;
             var toSave = activityTypes ?? CurrentActivityTypes;
@@ -139,18 +139,18 @@ namespace LTC2.Desktopclients.WindowsClient.Services
 
             if (!File.Exists(defaultsFile))
             {
-                var defaultTypes = new List<StravaActivityType>()
+                var defaultTypes = new List<GenericActivityType>()
                 {
-                    StravaActivityType.Ride,
-                    StravaActivityType.EBikeRide,
-                    StravaActivityType.MountainBikeRide,
-                    StravaActivityType.Velomobile,
-                    StravaActivityType.GravelRide,
-                    StravaActivityType.EMountainBikeRide,
-                    StravaActivityType.Run,
-                    StravaActivityType.Walk,
-                    StravaActivityType.Hike,
-                    StravaActivityType.TrailRun
+                    GenericActivityType.Ride,
+                    GenericActivityType.EBikeRide,
+                    GenericActivityType.MountainBikeRide,
+                    GenericActivityType.Velomobile,
+                    GenericActivityType.GravelRide,
+                    GenericActivityType.EMountainBikeRide,
+                    GenericActivityType.Run,
+                    GenericActivityType.Walk,
+                    GenericActivityType.Hike,
+                    GenericActivityType.TrailRun
                 };
 
                 File.WriteAllText(defaultsFile, JsonConvert.SerializeObject(defaultTypes));
