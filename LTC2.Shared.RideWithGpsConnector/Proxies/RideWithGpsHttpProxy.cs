@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace LTC2.Shared.RideWithGpsConnector.Proxies
 {
@@ -53,15 +54,39 @@ namespace LTC2.Shared.RideWithGpsConnector.Proxies
             var since = Uri.EscapeDataString(request.After.ToString("o"));
             var uri = $"/api/v1/sync.json?since={since}&assets=trips";
             var authHeader = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
-            var response = await ExecuteGetRequest<RwGpsSyncResponse>(uri, authHeader);
+            var retryCount = 0;
 
-            var deletedItems = response?.Items?.Where(t => t.Action == "deleted");
-            var updatedItems = response?.Items?.Where(t => t.Action == "updated" && !deletedItems.Any(d => d.Item_id == t.Item_id));
-            var createdItems = response?.Items?.Where(t => t.Action == "created" && !deletedItems.Any(d => d.Item_id == t.Item_id) && !updatedItems.Any(d => d.Item_id == t.Item_id));
+            while (retryCount < 3)
+            {
+                try
+                {
+                    var response = await ExecuteGetRequest<RwGpsSyncResponse>(uri, authHeader);
 
-            var resultItems = updatedItems?.Concat(createdItems);
+                    var deletedItems = response?.Items?.Where(t => t.Action == "deleted");
+                    var updatedItems = response?.Items?.Where(t => t.Action == "updated" && !deletedItems.Any(d => d.Item_id == t.Item_id));
+                    var createdItems = response?.Items?.Where(t => t.Action == "created" && !deletedItems.Any(d => d.Item_id == t.Item_id) && !updatedItems.Any(d => d.Item_id == t.Item_id));
 
-            return resultItems.OrderBy(i => i.Datetime).ToList() ?? new List<RwGpsSyncItem>();
+                    var resultItems = updatedItems?.Concat(createdItems);
+
+                    return resultItems.OrderBy(i => i.Datetime).ToList() ?? new List<RwGpsSyncItem>();
+                }
+                catch (HttpProxyException hpe)
+                {
+                    if (hpe.Code < (int)HttpStatusCode.InternalServerError)
+                    {
+                        throw;
+                    }
+
+                    retryCount++;
+
+                    if (retryCount >= 3)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return new List<RwGpsSyncItem>();
         }
 
         public async Task<RwGpsTrip> GetTrip(long id, bool bypassCache, string accessToken)
@@ -146,6 +171,113 @@ namespace LTC2.Shared.RideWithGpsConnector.Proxies
             }
 
             return null;
+        }
+
+        public async Task<string> GetRouteAsGpx(long id, string accessToken)
+        {
+            var authHeader = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+            var retryCount = 0;
+
+            while (retryCount < 3)
+            {
+                try
+                {
+                    var response = await ExecuteGetRequest<RwGpsRouteResponse>($"/api/v1/routes/{id}.json", authHeader);
+
+                    var route = response?.Route;
+                    if (route == null)
+                    {
+                        return null;
+                    }
+
+                    var trackPoints = route.Track_points ?? new List<RwGpsRouteTrackPoint>();
+
+                    XNamespace gpxNs = "http://www.topografix.com/GPX/1/1";
+
+                    var doc = new XDocument(
+                        new XDeclaration("1.0", "UTF-8", null),
+                        new XElement(gpxNs + "gpx",
+                            new XAttribute("version", "1.1"),
+                            new XAttribute("creator", "RideWithGPS"),
+                            new XElement(gpxNs + "trk",
+                                new XElement(gpxNs + "name", route.Name),
+                                new XElement(gpxNs + "trkseg",
+                                    trackPoints.Select(point =>
+                                        new XElement(gpxNs + "trkpt",
+                                            new XAttribute("lat", point.Y),
+                                            new XAttribute("lon", point.X),
+                                            new XElement(gpxNs + "ele", point.E)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    );
+
+                    return doc.Declaration + Environment.NewLine + doc.ToString();
+                }
+                catch (HttpProxyException hpe)
+                {
+                    if (hpe.Code < (int)HttpStatusCode.InternalServerError)
+                    {
+                        throw;
+                    }
+
+                    retryCount++;
+
+                    if (retryCount >= 3)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public async Task<List<RwGpsRoute>> GetRoutes(string accessToken)
+        {
+            var authHeader = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+            var uri = $"/api/v1/routes.json?page_size={_settings.MaxRoutesCount}";
+            var retryCount = 0;
+
+            while (retryCount < 3)
+            {
+                try
+                {
+                    var response = await ExecuteGetRequest<RwGpsRoutesListResponse>(uri, authHeader);
+
+                    var routes = response?.Routes;
+                    if (routes == null)
+                    {
+                        return [];
+                    }
+
+                    return [.. routes.Select(r => new RwGpsRoute
+                    {
+                        Id = r.Id,
+                        Name = r.Name,
+                        Distance = r.Distance,
+                        Timestamp = r.Updated_at ?? r.Created_at
+                    })];
+                }
+                catch (HttpProxyException hpe)
+                {
+                    if (hpe.Code < (int)HttpStatusCode.InternalServerError)
+                    {
+                        throw;
+                    }
+
+                    retryCount++;
+
+                    if (retryCount >= 3)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return [];
         }
 
         public List<List<double>> SanitizeTrack(List<List<double>> original)

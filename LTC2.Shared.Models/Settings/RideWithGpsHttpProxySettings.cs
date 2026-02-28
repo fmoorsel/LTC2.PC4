@@ -6,6 +6,8 @@ namespace LTC2.Shared.Models.Settings
 
         public string ClientSecret { get; set; }
 
+        public int MaxRoutesCount { get; set; } = 100;
+
         public double MinLat { get; set; } = double.MinValue;
 
         public double MaxLat { get; set; } = double.MaxValue;

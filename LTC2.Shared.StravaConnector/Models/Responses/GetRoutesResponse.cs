@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using LTC2.Shared.Models.Domain;
+using System.Collections.Generic;
 
 namespace LTC2.Shared.StravaConnector.Models.Responses
 {
@@ -12,10 +13,10 @@ namespace LTC2.Shared.StravaConnector.Models.Responses
         {
         }
 
-        public GetRoutesResponse(LimitsOnlyResponse limitsOnlyResponse): base(limitsOnlyResponse)
+        public GetRoutesResponse(LimitsOnlyResponse limitsOnlyResponse) : base(limitsOnlyResponse)
         {
         }
 
-        public List<StravaRoute> Routes { get; set; } = new List<StravaRoute>();    
+        public List<SourceRoute> Routes { get; set; } = [];
     }
 }

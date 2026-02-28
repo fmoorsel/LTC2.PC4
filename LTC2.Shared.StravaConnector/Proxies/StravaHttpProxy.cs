@@ -1,5 +1,6 @@
-﻿using LTC2.Shared.Http.Exceptions;
+using LTC2.Shared.Http.Exceptions;
 using LTC2.Shared.Http.Proxies;
+using LTC2.Shared.Models.Domain;
 using LTC2.Shared.Models.Settings;
 using LTC2.Shared.StravaConnector.Exceptions;
 using LTC2.Shared.StravaConnector.Interfaces;
@@ -12,6 +13,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -215,20 +217,22 @@ namespace LTC2.Shared.StravaConnector.Proxies
 
                     var responseHeaders = CreateRatesHeaderFilter();
 
-                    var routes = await ExecuteGetRequest<List<StravaRoute>>($"/api/v3/athletes/{request.AthleteId}/routes?{perPage}", responseHeaders, authHeader);
+                    var stravaRoutes = await ExecuteGetRequest<List<StravaRoute>>($"/api/v3/athletes/{request.AthleteId}/routes?{perPage}", responseHeaders, authHeader);
 
                     SanitizeUsageAndLimitHeaders(responseHeaders);
 
+                    var sourceRoutes = stravaRoutes.Select(r => new SourceRoute
+                    {
+                        RouteId = r.RouteId,
+                        Name = r.Name.Length >= 40 ? r.Name.Substring(0, 40) + "..." : r.Name,
+                        Timestamp = r.Timestamp,
+                        Distance = r.Distance
+                    }).ToList();
+
                     var result = new GetRoutesResponse(responseHeaders[_stravaRateLimit], responseHeaders[_stravaRateUsage])
                     {
-                        Routes = routes
+                        Routes = sourceRoutes
                     };
-
-                    foreach (var route in result.Routes)
-                    {
-                        var length = route.Name.Length;
-                        route.Name = length >= 40 ? route.Name.Substring(0, 40) + "..." : route.Name.Substring(0, length);
-                    }
 
                     return result;
                 }
