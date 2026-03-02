@@ -13,7 +13,6 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private readonly ITranslationService _translationService;
         private readonly MultiSportManager _multiSportManager;
         private readonly SelectActivitiesForm _selectActivitiesForm;
-        private readonly SelectRwGpsActivitiesForm _selectRwGpsActivitiesForm;
 
         private bool _isCalculating;
         private DateTime _startUpdate;
@@ -27,7 +26,6 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             ILTC2HttpProxy lTC2HttpProxy,
             MultiSportManager multiSportManager,
             SelectActivitiesForm selectActivitiesForm,
-            SelectRwGpsActivitiesForm selectRwGpsActivitiesForm,
             ITranslationService translationService)
         {
             InitializeComponent();
@@ -39,7 +37,6 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             _translationService = translationService;
             _multiSportManager = multiSportManager;
             _selectActivitiesForm = selectActivitiesForm;
-            _selectRwGpsActivitiesForm = selectRwGpsActivitiesForm;
         }
 
         private void rdoRefresh_CheckedChanged(object sender, EventArgs e)
@@ -281,10 +278,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         {
             _multiSportManager.AthleteId = await _webviewConnector.GetAthleteIdFromToken();
 
-            if (_multiSportManager.RunWithSource == "ridewithgps")
-                _selectRwGpsActivitiesForm.ShowDialog();
-            else
-                _selectActivitiesForm.ShowDialog();
+            _selectActivitiesForm.ShowDialog();
         }
     }
 }
