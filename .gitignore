@@ -387,3 +387,4 @@ PC5GER
 /LTC2.Tools.NodeUtils/data/geojson/PCSGBGeoJson2024.1.0.json
 /LTC2.Webclients.MainClient/ltc2-main/public/maps/PCSGBsmallGeoJson2024.1.0.json
 /.idea
+/LTC2.Webclients.MainClient/ltc2-main/.claude

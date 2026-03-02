@@ -13,8 +13,6 @@ import { Routes } from '../models/Routes';
 import { GetRoutesResponse } from '../models/GetRoutesResponse';
 import { PresentationRoutes } from '../models/PresentationRoutes';
 
-import { Buffer } from "buffer";
-
 import axios, { AxiosError } from "axios";
 
 @injectable()
@@ -71,7 +69,7 @@ export class RouteCheckerService implements IRouteCheckerService {
             const timeout = 3 * (this._clientSetting?.requestTimeout ?? 5000);
             
             try {
-                const encodedData = Buffer.from(file).toString('base64');
+                const encodedData = btoa(String.fromCharCode(...new TextEncoder().encode(file)));
 
                 const route = await axios.get<Routes>(url + '/api/Route/checkgpxfrompath?file=' + encodedData, {headers: {'Authorization': `Bearer ${token}`}, timeout: timeout});
 
