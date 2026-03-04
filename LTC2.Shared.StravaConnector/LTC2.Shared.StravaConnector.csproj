@@ -21,9 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LTC2.Shared.Database\LTC2.Shared.Database.csproj" />
+    <ProjectReference Include="..\LTC2.Shared.Common\LTC2.Shared.Common.csproj" />
     <ProjectReference Include="..\LTC2.Shared.Http\LTC2.Shared.Http.csproj" />
     <ProjectReference Include="..\LTC2.Shared.Models\LTC2.Shared.Models.csproj" />
+    <ProjectReference Include="..\LTC2.Shared.Stores\LTC2.Shared.Stores.csproj" />
     <ProjectReference Include="..\LTC2.Shared.Utils\LTC2.Shared.Utils.csproj" />
   </ItemGroup>
 

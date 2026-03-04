@@ -2,6 +2,7 @@
 using LTC2.Shared.Messaging.Implementations.FileBasedBroker;
 using LTC2.Shared.Messaging.Interfaces;
 using LTC2.Shared.Models.Domain;
+using LTC2.Shared.Models.Requests;
 using LTC2.Webapps.MainApp.Models;
 using LTC2.Webapps.MainApp.Utils;
 using Microsoft.AspNetCore.Authorization;
@@ -30,7 +31,7 @@ namespace LTC2.Webapps.MainApp.Controllers
         [HttpPost]
         [Authorize]
         [Route("update")]
-        public IActionResult Update([FromQuery] bool refresh, [FromQuery] bool bypassCache = false, [FromQuery] bool isRestore = false, [FromQuery] bool isClear = false)
+        public IActionResult Update([FromQuery] bool refresh, [FromQuery] string source = null, [FromQuery] bool bypassCache = false, [FromQuery] bool isRestore = false, [FromQuery] bool isClear = false)
         {
             var authHeader = _tokenUtils.GetAuthenticationHeader(HttpContext.Request);
             var token = authHeader?.Parameter;
@@ -39,7 +40,7 @@ namespace LTC2.Webapps.MainApp.Controllers
             {
                 if (_tokenUtils.ValidateToken(token))
                 {
-                    PostUpdateMessage(_tokenUtils.GetProfileFormToken(token).AthleteId, refresh, bypassCache, isRestore, isClear, null);
+                    PostUpdateMessage(_tokenUtils.GetProfileFormToken(token).AthleteId, refresh, bypassCache, isRestore, isClear, null, null, source);
 
                     return Ok();
                 }
@@ -51,7 +52,7 @@ namespace LTC2.Webapps.MainApp.Controllers
         [HttpPost]
         [Authorize]
         [Route("updatemulti")]
-        public IActionResult UpdateMulti([FromQuery] bool refresh, [FromBody] List<int> types, [FromQuery] bool bypassCache = false, [FromQuery] bool isRestore = false, [FromQuery] bool isClear = false)
+        public IActionResult UpdateMulti([FromQuery] bool refresh, [FromBody] UpdateMultiRequest body, [FromQuery] string source = null, [FromQuery] bool bypassCache = false, [FromQuery] bool isRestore = false, [FromQuery] bool isClear = false)
         {
             var authHeader = _tokenUtils.GetAuthenticationHeader(HttpContext.Request);
             var token = authHeader?.Parameter;
@@ -60,7 +61,7 @@ namespace LTC2.Webapps.MainApp.Controllers
             {
                 if (_tokenUtils.ValidateToken(token))
                 {
-                    PostUpdateMessage(_tokenUtils.GetProfileFormToken(token).AthleteId, refresh, bypassCache, isRestore, isClear, types);
+                    PostUpdateMessage(_tokenUtils.GetProfileFormToken(token).AthleteId, refresh, bypassCache, isRestore, isClear, body?.Types, body?.RwGpsTypes, source);
 
                     return Ok();
                 }
@@ -69,7 +70,7 @@ namespace LTC2.Webapps.MainApp.Controllers
             return Unauthorized();
         }
 
-        private void PostUpdateMessage(string athleteIdAsString, bool refresh, bool bypassCache, bool isRestore, bool isClear, List<int> types)
+        private void PostUpdateMessage(string athleteIdAsString, bool refresh, bool bypassCache, bool isRestore, bool isClear, List<int> types, List<string> rwGpsTypes, string source)
         {
             var broker = _brokerFactory.CreateBroker();
             var connection = broker.Connect(_calculatorSettings.BrokerConnection);
@@ -90,7 +91,9 @@ namespace LTC2.Webapps.MainApp.Controllers
                 IsRestoreInterMediate = isRestore,
                 IsClearInterMediate = isClear,
                 Types = types,
-                Type = types == null ? CalculationType.bike : CalculationType.multi
+                RwGpsTypes = rwGpsTypes,
+                Type = (types != null || rwGpsTypes != null) ? CalculationType.multi : CalculationType.bike,
+                ConnectorSource = source == "ridewithgps" ? ConnectorSource.RideWithGps : ConnectorSource.Strava
             };
 
             var payLoad = JsonConvert.SerializeObject(calculationJob);

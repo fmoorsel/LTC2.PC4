@@ -12,11 +12,13 @@ namespace LTC2.Desktopclients.WindowsClient
         private readonly StatusNotifier _statusNotifier;
         private readonly ITranslationService _translationService;
         private readonly MultiSportManager _multiSportManager;
+        private readonly ProfileManager _profileManager;
 
         private bool _started;
         private bool _startViewer;
         private bool _calculatorStarted;
         private bool _webappStarted;
+        //        private bool _profileDependenciesSet;
 
         private MainForm _mainForm;
 
@@ -26,6 +28,7 @@ namespace LTC2.Desktopclients.WindowsClient
             StatusNotifier statusNotifier,
             ITranslationService translationService,
             MultiSportManager multiSportManager,
+            ProfileManager profileManager,
             AppSettings appSettings)
         {
             InitializeComponent();
@@ -35,6 +38,7 @@ namespace LTC2.Desktopclients.WindowsClient
             _statusNotifier.OnStatusNotification += OnStatusNotification;
             _translationService = translationService;
             _multiSportManager = multiSportManager;
+            _profileManager = profileManager;
 
             _translationService.LoadMessagesForForm(this);
 
@@ -45,9 +49,18 @@ namespace LTC2.Desktopclients.WindowsClient
         {
             _mainForm = mainForm;
 
-            chkMultiSport.Checked = _multiSportManager.IsMultiSportDefault;
-
             ShowDialog();
+        }
+
+
+        private void SetProfileDependencies()
+        {
+            var isStrava = !string.IsNullOrEmpty(_profileManager.Profile.StravaID);
+            var isRwGps  = !string.IsNullOrEmpty(_profileManager.Profile.RwGpsId);
+            var hasProfile = isStrava || isRwGps;
+
+            chkMultiSport.Enabled = hasProfile;
+            chkMultiSport.Checked = hasProfile && _multiSportManager.IsMultiSportDefault;
         }
 
         private delegate void UpdateStatusDelegate(StatusMessage status);
@@ -98,9 +111,15 @@ namespace LTC2.Desktopclients.WindowsClient
                     _webappStarted = true;
                 }
             }
+            else if (status.Status == StatusMessage.STATUS_PROFILESELECTED)
+            {
+                SetProfileDependencies();
+            }
 
             if (_calculatorStarted && _webappStarted && !_started)
             {
+                //                SetProfileDependencies();
+
                 btnStart.Enabled = true;
                 btnStart.Focus();
 
@@ -137,6 +156,7 @@ namespace LTC2.Desktopclients.WindowsClient
 
             _multiSportManager.WriteDefaults(chkMultiSport.Checked);
             _multiSportManager.RunInMultiSportMode = chkMultiSport.Checked;
+            _multiSportManager.RunWithSource = !string.IsNullOrEmpty(_profileManager.Profile.RwGpsId) ? "ridewithgps" : "strava";
 
             if (_multiSportManager.RunInMultiSportMode)
             {

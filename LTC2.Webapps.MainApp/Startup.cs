@@ -1,4 +1,4 @@
-﻿using LTC2.Services.Calculator.ServiceTasks;
+using LTC2.Services.Calculator.ServiceTasks;
 using LTC2.Shared.BaseMessages.Interfaces;
 using LTC2.Shared.BaseMessages.Services;
 using LTC2.Shared.Messaging.Implementations.FileBasedBroker.Extensions;
@@ -9,6 +9,8 @@ using LTC2.Shared.Repositories.Repositories;
 using LTC2.Shared.Secrets.Interfaces;
 using LTC2.Shared.Secrets.Vaults;
 using LTC2.Shared.SpatiaLiteRepository.Repositories;
+using LTC2.Shared.Common.Bootstrap.Extensions;
+using LTC2.Shared.RideWithGpsConnector.Bootstrap.Extensions;
 using LTC2.Shared.StravaConnector.Bootstrap.Extensions;
 using LTC2.Shared.Utils.Bootstrap.Extensions;
 using LTC2.Shared.Utils.Bootstrap.Interfaces;
@@ -60,6 +62,8 @@ namespace LTC2.Webapps.MainApp
             services.AddSettings(settingsService);
 
             services.AddStravaConnector();
+            services.AddRideWithGpsConnector();
+            services.AddConnectorFactory();
             services.AddFileBasedBroker();
 
             services.AddControllers().AddNewtonsoftJson();
@@ -89,7 +93,7 @@ namespace LTC2.Webapps.MainApp
             services.AddSingleton<IServiceTask, InitScoreRepositoryTask>();
             services.AddSingleton<IServiceTask, InitStatusPublisherTask>();
             services.AddSingleton<IServiceTask, InitIntermediateResultRepository>();
-            services.AddSingleton<IServiceTask, InitStravaPropertiesTask>();
+            services.AddSingleton<IServiceTask, InitSourceProxyPropertiesTask>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
@@ -196,9 +200,12 @@ namespace LTC2.Webapps.MainApp
         {
             var processModule = Process.GetCurrentProcess().MainModule;
             var appSettingsFolder = Path.GetDirectoryName(processModule?.FileName);
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
 
-            var configuration = new ConfigurationBuilder().SetBasePath(appSettingsFolder)
-                        .AddJsonFile("appsettings.json", true, true)
+            var configuration = new ConfigurationBuilder()
+                        .SetBasePath(appSettingsFolder)
+                        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                        .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
                         .Build();
 
             return configuration.GetSection("AppSettings").Get<AppSettings>();

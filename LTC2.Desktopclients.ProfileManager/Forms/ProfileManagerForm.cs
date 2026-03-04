@@ -20,6 +20,11 @@ namespace LTC2.Desktopclients.ProfileManager.Forms
         private bool _edit;
         private int _keepSelectedIndex;
 
+        private Profile _currentProfileRwgps;
+        private List<Profile> _rwgpsProfiles;
+        private bool _editRwgps;
+        private int _keepSelectedIndexRwgps;
+
         public ProfileManagerForm(
             StatusNotifier statusNotifier,
             TesterForm testerForm,
@@ -42,6 +47,8 @@ namespace LTC2.Desktopclients.ProfileManager.Forms
 
             CheckValid();
             GetProfiles();
+            CheckValidRwgps();
+            GetRwGpsProfiles();
         }
 
 
@@ -208,6 +215,7 @@ namespace LTC2.Desktopclients.ProfileManager.Forms
             if (_desktopProfileRepository.StoreProfile(_currentProfile, true))
             {
                 _testerForm.ProfileToTest = _currentProfile.ID;
+                _testerForm.Source = "strava";
                 _testerForm.ShowDialog();
 
                 if (_testerForm.IsTestSuccessFull)
@@ -255,7 +263,9 @@ namespace LTC2.Desktopclients.ProfileManager.Forms
 
         private void GetProfiles()
         {
-            var unsortedProfiles = _desktopProfileRepository.GetProfiles();
+            var unsortedProfiles = _desktopProfileRepository.GetProfiles()
+                .Where(p => !string.IsNullOrEmpty(p.StravaID))
+                .ToList();
 
             _profiles = unsortedProfiles.OrderBy(p => $"{p.Name} ({p.AthleteId})").ToList();
 
@@ -348,6 +358,216 @@ namespace LTC2.Desktopclients.ProfileManager.Forms
         private void lstProfielen_DoubleClick(object sender, EventArgs e)
         {
             btnEdit_Click(sender, e);
+        }
+
+        // ===== RWGPS =====
+
+        private void GetRwGpsProfiles()
+        {
+            var unsortedProfiles = _desktopProfileRepository.GetProfiles()
+                .Where(p => !string.IsNullOrEmpty(p.RwGpsId))
+                .ToList();
+
+            _rwgpsProfiles = unsortedProfiles.OrderBy(p => $"{p.Name} ({p.RwGpsId})").ToList();
+
+            lstProfielenRwg.Items.Clear();
+
+            foreach (var profile in _rwgpsProfiles)
+            {
+                lstProfielenRwg.Items.Add($"{profile.Name} ({profile.AthleteId})");
+            }
+
+            if (_rwgpsProfiles.Count > 0)
+            {
+                var selectedIndex = _keepSelectedIndexRwgps > lstProfielenRwg.Items.Count - 1 ? 0 : _keepSelectedIndexRwgps;
+
+                lstProfielenRwg.Enabled = true;
+                lstProfielenRwg.SelectedIndex = selectedIndex;
+                btnEditRwg.Enabled = true;
+                btnDeleteRwg.Enabled = true;
+            }
+            else
+            {
+                btnEditRwg.Enabled = false;
+                lstProfielenRwg.Enabled = false;
+                btnDeleteRwg.Enabled = false;
+            }
+        }
+
+        private void CheckValidRwgps()
+        {
+            lblErrorRwGpsId.Visible = false;
+
+            var isValid = txtRwGpsId.Text != "" && txtRwGpsSecret.Text != "" && txtProfileNameRwg.Text != "";
+
+            btnTestProfileRwg.Enabled = isValid;
+        }
+
+        private void EmptyDetailsRwgps(bool enabled)
+        {
+            txtProfileNameRwg.Text = "";
+            txtRwGpsSecret.Text = "";
+            txtRwGpsId.Text = "";
+
+            txtRwGpsSecret.PasswordChar = '*';
+            btnShowSecretRwg.Text = _translationService.GetMessage("button.show.secret");
+
+            CheckValidRwgps();
+            GetRwGpsProfiles();
+
+            grpDetailsRwg.Enabled = enabled;
+
+            CheckValidRwgps();
+            GetRwGpsProfiles();
+        }
+
+        private void btnNewRwg_Click(object sender, EventArgs e)
+        {
+            _editRwgps = false;
+
+            _currentProfileRwgps = new Profile()
+            {
+                ID = Guid.NewGuid().ToString()
+            };
+
+            EmptyDetailsRwgps(true);
+
+            txtProfileNameRwg.Focus();
+        }
+
+        private void btnEditRwg_Click(object sender, EventArgs e)
+        {
+            if (lstProfielenRwg.SelectedIndex >= 0)
+            {
+                _keepSelectedIndexRwgps = lstProfielenRwg.SelectedIndex;
+
+                _editRwgps = true;
+
+                _currentProfileRwgps = _rwgpsProfiles[lstProfielenRwg.SelectedIndex];
+
+                EmptyDetailsRwgps(true);
+
+                txtProfileNameRwg.Text = _currentProfileRwgps.Name;
+                txtRwGpsId.Text = _currentProfileRwgps.RwGpsId;
+                txtRwGpsSecret.Text = _currentProfileRwgps.RwGpsSecret;
+
+                txtProfileNameRwg.Focus();
+            }
+        }
+
+        private void btnDeleteRwg_Click(object sender, EventArgs e)
+        {
+            if (lstProfielenRwg.SelectedIndex >= 0)
+            {
+                var profile = _rwgpsProfiles[lstProfielenRwg.SelectedIndex];
+
+                var parameters = new List<string>()
+                {
+                    profile.Name,
+                    profile.RwGpsId
+                };
+
+                var dialogResult = MessageBox.Show(_translationService.GetMessage("messagebox.confirm.delete", parameters), _translationService.GetMessage("messagebox.confirm.delete.header"), MessageBoxButtons.YesNo);
+
+                if (dialogResult == DialogResult.Yes)
+                {
+                    _desktopProfileRepository.RemoveAllTempProfiles();
+                    _desktopProfileRepository.DeleteProfile(profile);
+
+                    EmptyDetailsRwgps(false);
+                }
+            }
+        }
+
+        private void btnTestProfileRwg_Click(object sender, EventArgs e)
+        {
+            _currentProfileRwgps.Name = txtProfileNameRwg.Text;
+            _currentProfileRwgps.RwGpsId = txtRwGpsId.Text;
+            _currentProfileRwgps.RwGpsSecret = txtRwGpsSecret.Text;
+
+            _desktopProfileRepository.RemoveAllTempProfiles();
+
+            if (_desktopProfileRepository.StoreProfile(_currentProfileRwgps, true))
+            {
+                _testerForm.ProfileToTest = _currentProfileRwgps.ID;
+                _testerForm.Source = "ridewithgps";
+                _testerForm.ShowDialog();
+
+                if (_testerForm.IsTestSuccessFull)
+                {
+                    var save = !_editRwgps;
+
+                    if (_editRwgps && _currentProfileRwgps.AthleteId != _testerForm.AthleteId)
+                    {
+                        var parameters = new List<string>()
+                        {
+                            _currentProfileRwgps.AthleteId,
+                            _testerForm.AthleteId
+                        };
+
+                        var dialogResult = MessageBox.Show(_translationService.GetMessage("messagebox.confirm.other.account", parameters), _translationService.GetMessage("messagebox.confirm.other.account.header"), MessageBoxButtons.YesNo);
+
+                        save = (dialogResult == DialogResult.Yes);
+                    }
+                    else
+                    {
+                        save = true;
+                    }
+
+                    if (save)
+                    {
+                        _currentProfileRwgps.AthleteId = _testerForm.AthleteId;
+
+                        _desktopProfileRepository.RemoveAllTempProfiles();
+                        _desktopProfileRepository.StoreProfile(_currentProfileRwgps, false);
+
+                        EmptyDetailsRwgps(false);
+
+                        grpDetailsRwg.Enabled = false;
+                    }
+                }
+            }
+            else
+            {
+                var text = _translationService.GetMessage("messagebox.error.profile");
+                var caption = _translationService.GetMessage("messagebox.error.profile.header");
+
+                MessageBox.Show(text, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void btnShowSecretRwg_Click(object sender, EventArgs e)
+        {
+            if (txtRwGpsSecret.PasswordChar != '*')
+            {
+                txtRwGpsSecret.PasswordChar = '*';
+                btnShowSecretRwg.Text = _translationService.GetMessage("button.show.secret");
+            }
+            else
+            {
+                txtRwGpsSecret.PasswordChar = '\0';
+                btnShowSecretRwg.Text = _translationService.GetMessage("button.hide.secret");
+            }
+        }
+
+        private void txtProfileNameRwg_TextChanged(object sender, EventArgs e)
+        {
+            CheckValidRwgps();
+        }
+
+        private void txtRwGpsId_TextChanged(object sender, EventArgs e)
+        {
+            CheckValidRwgps();
+        }
+
+        private void txtRwGpsSecret_TextChanged(object sender, EventArgs e)
+        {
+            CheckValidRwgps();
+        }
+
+        private void lstProfielenRwg_DoubleClick(object sender, EventArgs e)
+        {
+            btnEditRwg_Click(sender, e);
         }
     }
 }

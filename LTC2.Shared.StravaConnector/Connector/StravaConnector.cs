@@ -1,5 +1,9 @@
-﻿using LTC2.Shared.Models.Domain;
+using LTC2.Shared.Common.Interfaces;
+using LTC2.Shared.Models.Domain;
+using LTC2.Shared.Models.Requests;
+using LTC2.Shared.Models.Responses;
 using LTC2.Shared.Models.Settings;
+using LTC2.Shared.Stores.Interfaces;
 using LTC2.Shared.StravaConnector.Exceptions;
 using LTC2.Shared.StravaConnector.Interfaces;
 using LTC2.Shared.StravaConnector.Models;
@@ -45,7 +49,7 @@ namespace LTC2.Shared.StravaConnector.Connector
 
         }
 
-        public async Task<Session> GetSession(string code)
+        public async Task<Session> GetSession(string code, string redirectUri)
         {
             return await GetSession(code, AuthorizeType.AuthorizationCode);
         }
@@ -86,6 +90,7 @@ namespace LTC2.Shared.StravaConnector.Connector
                 AccessToken = authorizeResponse.Access_token,
                 RefreshToken = authorizeResponse.Refresh_token,
                 ExpiresAt = authorizeResponse.Expires_at,
+                Origin = Session.StravaSession,
                 Athlete = authorizeResponse.Athlete ?? oldSession?.Athlete
             };
 
@@ -96,11 +101,16 @@ namespace LTC2.Shared.StravaConnector.Connector
 
         private Session GetSessionFromStore(long athleteId, Session currentSession = null)
         {
-            return _sessionStore.Retrieve(athleteId, currentSession);
+            return _sessionStore.Retrieve(athleteId, Session.StravaSession, currentSession);
         }
 
         private bool IsValidSession(Session session)
         {
+            if (session.Origin == Session.RideWithGpsSession)
+            {
+                return true;
+            }
+
             var dateExpiresAt = FromUnixTime(Convert.ToInt64(session.ExpiresAt));
             var remainingTime = dateExpiresAt - DateTime.Now;
 
@@ -125,46 +135,64 @@ namespace LTC2.Shared.StravaConnector.Connector
             return response;
         }
 
-        public async Task BrowseActivities<TResultType>(
-                GetActivitiesRequest request,
+        public async Task BrowseActivities(
+                BrowseActivitiesRequest request,
                 string accessToken,
-                TResultType subject,
-                OnPreCheckActivity<TResultType> onPreCheckActivity,
-                OnCheckActivity<TResultType> onCheckActivity,
-                OnWaitingForSlot<TResultType> onWaitingForSlot) where TResultType : class
+                CalculationResult subject,
+                OnPreCheckActivity onPreCheckActivity,
+                OnCheckActivity onCheckActivity,
+                OnWaitingForSlot onWaitingForSlot)
         {
 
             bool hasActivities = true;
             StravaActivity lastActivity = null;
 
-            request.Page = 0;
-            request.PerPage = 200;
+            var getActivitiesRequest = new GetActivitiesRequest()
+            {
+                AthleteId = request.AthleteId,
+                BypassCache = request.BypassCache,
+                After = request.After,
+                Page = 0,
+                PerPage = 200
+            };
 
             while (hasActivities)
             {
-                request.Page++;
+                getActivitiesRequest.Page++;
 
-                var activities = await TryGetActivities(request, accessToken, lastActivity, onWaitingForSlot, subject);
+                var activities = await TryGetActivities(getActivitiesRequest, accessToken, lastActivity, onWaitingForSlot, subject);
 
                 hasActivities = activities.Activities.Count > 0;
 
                 if (hasActivities)
                 {
-                    foreach (var activity in activities.Activities)
+                    foreach (var stravaActivity in activities.Activities)
                     {
-                        if (!activity.IsManual)
+                        if (!stravaActivity.IsManual)
                         {
                             try
                             {
-                                var proximatedTrack = GeoCoder.DecodeToTrack(activity.Map?.SummaryPolyline);
-                                var shouldCheck = onPreCheckActivity(activity, proximatedTrack, subject);
+                                var sourceActivity = new SourceActivity
+                                {
+                                    Id = stravaActivity.Id,
+                                    Name = stravaActivity.Name,
+                                    ActivityType = stravaActivity.TypeString,
+                                    Distance = stravaActivity.Distance,
+                                    ElapsedTime = stravaActivity.ElapsedTime,
+                                    IsManual = stravaActivity.IsManual,
+                                    DateTimeStart = stravaActivity.DateTimeStart,
+                                    Source = ActivitySource.Strava
+                                };
+
+                                var proximatedTrack = GeoCoder.DecodeToTrack(stravaActivity.Map?.SummaryPolyline);
+                                var shouldCheck = onPreCheckActivity(sourceActivity, proximatedTrack, subject);
 
                                 if (shouldCheck)
                                 {
                                     var coordinateStreamRequest = new GetActivityCoordinateStreamRequest()
                                     {
                                         AthleteId = request.AthleteId,
-                                        ActivityId = activity.Id,
+                                        ActivityId = stravaActivity.Id,
                                         BypassCache = request.BypassCache
                                     };
 
@@ -173,26 +201,26 @@ namespace LTC2.Shared.StravaConnector.Connector
 
                                     if (track.Count >= 2)
                                     {
-                                        onCheckActivity(activity, track, subject);
+                                        onCheckActivity(sourceActivity, track, subject);
                                     }
                                 }
                             }
                             catch (Exception ex)
                             {
-                                _logger.LogWarning(ex, $"Unable to process activity {activity.Id} due to {ex.Message}");
+                                _logger.LogWarning(ex, $"Unable to process activity {stravaActivity.Id} due to {ex.Message}");
 
                                 await Task.Delay(1000);
                             }
 
                         }
 
-                        lastActivity = activity;
+                        lastActivity = stravaActivity;
                     }
                 }
             }
         }
 
-        private async Task<GetActivitiesResponse> TryGetActivities<TResultType>(GetActivitiesRequest request, string accessToken, StravaActivity lastActivity, OnWaitingForSlot<TResultType> onWaitingForSlot, TResultType subject) where TResultType : class
+        private async Task<GetActivitiesResponse> TryGetActivities(GetActivitiesRequest request, string accessToken, StravaActivity lastActivity, OnWaitingForSlot onWaitingForSlot, CalculationResult subject)
         {
             var shouldRetry = true;
             var alreadyRetried = false;
@@ -257,7 +285,7 @@ namespace LTC2.Shared.StravaConnector.Connector
             return new GetActivitiesResponse();
         }
 
-        public async Task<List<List<double>>> GetTrackForActivity<TResultType>(string activityId, bool bypassCache, string accessToken, OnWaitingForSlot<TResultType> onWaitingForSlot, TResultType subject) where TResultType : class
+        public async Task<List<List<double>>> GetTrackForActivity(string activityId, bool bypassCache, string accessToken, OnWaitingForSlot onWaitingForSlot, CalculationResult subject)
         {
             try
             {
@@ -283,7 +311,7 @@ namespace LTC2.Shared.StravaConnector.Connector
             return null;
         }
 
-        private async Task<GetActivityCoordinateStreamResponse> TryGetActivityCoordinateStream<TResultType>(GetActivityCoordinateStreamRequest request, string accessToken, OnWaitingForSlot<TResultType> onWaitingForSlot, TResultType subject) where TResultType : class
+        private async Task<GetActivityCoordinateStreamResponse> TryGetActivityCoordinateStream(GetActivityCoordinateStreamRequest request, string accessToken, OnWaitingForSlot onWaitingForSlot, CalculationResult subject)
         {
             var shouldRetry = true;
             var alreadyRetried = false;
@@ -347,7 +375,7 @@ namespace LTC2.Shared.StravaConnector.Connector
         }
 
 
-        private async Task TryGetQuarterSlot<TResultType>(OnWaitingForSlot<TResultType> onWaitingForSlot, TResultType subject) where TResultType : class
+        private async Task TryGetQuarterSlot(OnWaitingForSlot onWaitingForSlot, CalculationResult subject)
         {
             var limits = new LimitsOnlyResponse($"{_limitQuarterUsage},{_limitDayUsage}", $"{_currentQuarterUsage},{_currentDayUsage}");
 
@@ -411,7 +439,7 @@ namespace LTC2.Shared.StravaConnector.Connector
             {
                 _logger.LogWarning(ex, "Too many requests reported by Strava and noticed by connector when retrieving routes.");
 
-                return new GetRoutesResponse(ex.Limits);
+                return CreateLimitsExceededResponse<GetRoutesResponse>(ex.Limits);
             }
             catch (Exception ex)
             {
@@ -433,7 +461,7 @@ namespace LTC2.Shared.StravaConnector.Connector
             {
                 _logger.LogWarning(ex, "Too many requests reported by Strava and noticed by connector when retrieving routes.");
 
-                return new GetRouteDetailsAsGpxReponse(ex.Limits);
+                return CreateLimitsExceededResponse<GetRouteDetailsAsGpxReponse>(ex.Limits);
             }
             catch (Exception ex)
             {
@@ -443,7 +471,26 @@ namespace LTC2.Shared.StravaConnector.Connector
             }
         }
 
-        private async Task WaitForQuarterSlot<TResultType>(OnWaitingForSlot<TResultType> onWaitingForSlot, TResultType subject) where TResultType : class
+        private T CreateLimitsExceededResponse<T>(LimitsOnlyResponse limits) where T : ConnectorResponse, new()
+        {
+            var response = new T
+            {
+                LimitsExceeded = true
+            };
+
+            if (limits.HasLimits)
+            {
+                response.HasLimits = true;
+                response.QuarterRateLimit = limits.QuarterRateLimit;
+                response.QuarterRateUsage = limits.QuarterRateUsage;
+                response.DayRateLimit = limits.DayRateLimit;
+                response.DayRateUsage = limits.DayRateUsage;
+            }
+
+            return response;
+        }
+
+        private async Task WaitForQuarterSlot(OnWaitingForSlot onWaitingForSlot, CalculationResult subject)
         {
             var currentStravaSlot = RoundUp(DateTime.UtcNow, TimeSpan.FromMinutes(15));
 
@@ -465,5 +512,6 @@ namespace LTC2.Shared.StravaConnector.Connector
         {
             return new DateTime((dt.Ticks + d.Ticks - 1) / d.Ticks * d.Ticks, dt.Kind);
         }
+
     }
 }

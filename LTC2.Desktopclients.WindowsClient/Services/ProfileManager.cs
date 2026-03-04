@@ -1,13 +1,43 @@
 ﻿using LTC2.Shared.Models.Desktop;
+using LTC2.Shared.Models.Interprocess;
 using LTC2.Shared.Repositories.Interfaces;
 
 namespace LTC2.Desktopclients.WindowsClient.Services
 {
     public class ProfileManager
     {
-        private bool? _hasMultipleProfiles;
+        private readonly StatusNotifier _statusNotifier;
 
-        public Profile Profile { get; set; }
+
+        public ProfileManager(IDesktopProfileRepository desktopProfileRepository, StatusNotifier statusNotifier)
+        {
+            _desktopProfileRepository = desktopProfileRepository;
+            _statusNotifier = statusNotifier;
+        }
+
+        private bool? _hasMultipleProfiles;
+        private Profile _profile;
+
+        public Profile Profile
+        {
+
+            get
+            {
+                return _profile;
+            }
+
+            set
+            {
+                _profile = value;
+
+                var notification = new StatusMessage
+                {
+                    Status = StatusMessage.STATUS_PROFILESELECTED
+                };
+
+                _statusNotifier.Notify(notification);
+            }
+        }
 
         public bool HasMultipleProfiles
         {
@@ -24,10 +54,6 @@ namespace LTC2.Desktopclients.WindowsClient.Services
 
         private readonly IDesktopProfileRepository _desktopProfileRepository;
 
-        public ProfileManager(IDesktopProfileRepository desktopProfileRepository)
-        {
-            _desktopProfileRepository = desktopProfileRepository;
-        }
 
         public List<Profile> GetProfiles()
         {

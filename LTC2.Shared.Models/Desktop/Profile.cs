@@ -11,5 +11,9 @@
         public string StravaClientSecret { get; set; }
 
         public string AthleteId { get; set; }
+
+        public string RwGpsId { get; set; }
+
+        public string RwGpsSecret { get; set; }
     }
 }

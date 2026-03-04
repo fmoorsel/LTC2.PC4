@@ -1,4 +1,6 @@
-﻿using LTC2.Shared.StravaConnector.Models.Requests;
+using LTC2.Shared.Models.Requests;
+using LTC2.Shared.Models.Responses;
+using LTC2.Shared.StravaConnector.Models.Requests;
 using LTC2.Shared.StravaConnector.Models.Responses;
 using System.Threading.Tasks;
 

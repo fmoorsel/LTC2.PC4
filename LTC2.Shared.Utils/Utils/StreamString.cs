@@ -22,7 +22,7 @@ namespace LTC2.Shared.Utils.Utils
             len = ioStream.ReadByte() * 256;
             len += ioStream.ReadByte();
             byte[] inBuffer = new byte[len];
-            ioStream.Read(inBuffer, 0, len);
+            _ = ioStream.Read(inBuffer, 0, len);
 
             return streamEncoding.GetString(inBuffer);
         }

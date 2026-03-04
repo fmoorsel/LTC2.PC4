@@ -1,15 +1,15 @@
 ﻿using LTC2.Shared.BaseMessages.Interfaces;
 using LTC2.Shared.Models.Settings;
 using LTC2.Shared.StravaConnector.Interfaces;
+using LTC2.Webapps.MainApp.Models;
 using LTC2.Webapps.MainApp.Services;
 using LTC2.Webapps.MainApp.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using LTC2.Webapps.MainApp.Models;
-using Microsoft.Extensions.Logging;
 
 namespace LTC2.Webapps.MainApp.Controllers
 {
@@ -27,7 +27,7 @@ namespace LTC2.Webapps.MainApp.Controllers
         private readonly string _stateCookieName = "state";
         private readonly string _languageCookieName = "language";
         private readonly string _appEntrypoint = "../app/index.html";
-        
+
         private readonly AppSettings _appSettings;
 
         public static string MULTI_COOKIE_NAME = "multi";
@@ -51,8 +51,13 @@ namespace LTC2.Webapps.MainApp.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index(bool forceLogout, string profile, string language, bool multi)
+        public IActionResult Index(bool forceLogout, string profile, string language, bool multi, string source)
         {
+            if (source == "ridewithgps")
+            {
+                return RedirectToAction("Index", "HomeRideWithGps", new { forceLogout, language, multi, profile, source });
+            }
+
             var state = Guid.NewGuid().ToString();
             var testProfile = false;
             var approvalPrompt = "auto";
@@ -88,7 +93,7 @@ namespace LTC2.Webapps.MainApp.Controllers
 
                     if (validUntil >= DateTime.UtcNow.AddHours(1))
                     {
-                        return Redirect(_appEntrypoint + $"?t={DateTime.UtcNow.Ticks}");
+                        return Redirect(_appEntrypoint + $"?strava={DateTime.UtcNow.Ticks}strava");
                     }
                 }
             }
@@ -103,7 +108,7 @@ namespace LTC2.Webapps.MainApp.Controllers
             HttpContext.Response.Cookies.Append(_languageCookieName, language ?? _baseTranslationService.CurrentLanguage);
             HttpContext.Response.Cookies.Append(MULTI_COOKIE_NAME, multi ? MULTI_COOKIE_VALUE : string.Empty);
 
-            ViewBag.AppEntryPoint = _appEntrypoint + $"?t={DateTime.UtcNow.Ticks}";
+            ViewBag.AppEntryPoint = _appEntrypoint + $"?strava={DateTime.UtcNow.Ticks}";
 
             return View();
         }
@@ -192,7 +197,7 @@ namespace LTC2.Webapps.MainApp.Controllers
                     return Unauthorized();
                 }
 
-                var session = await _stravaConnector.GetSession(code);
+                var session = await _stravaConnector.GetSession(code, string.Empty);
 
                 if (session == null || session.AthleteId == -1)
                 {
@@ -226,7 +231,7 @@ namespace LTC2.Webapps.MainApp.Controllers
                             Secure = true
                         };
 
-                        HttpContext.Response.Cookies.Append(TokenUtils.TokenName, token, cookieOptions2);                        
+                        HttpContext.Response.Cookies.Append(TokenUtils.TokenName, token, cookieOptions2);
                     }
                 }
                 else
@@ -238,18 +243,18 @@ namespace LTC2.Webapps.MainApp.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Exception while getting session from Strava");
-                
+
                 return Unauthorized();
             }
 
             if (_appSettings.UseRedirectDuringLogin)
             {
-                return Redirect(_appEntrypoint + $"?t={DateTime.UtcNow.Ticks}");
+                return Redirect(_appEntrypoint + $"?strava={DateTime.UtcNow.Ticks}");
             }
             else
             {
-                ViewBag.Entrypoint = _appEntrypoint + $"?t={DateTime.UtcNow.Ticks}";
-                
+                ViewBag.Entrypoint = _appEntrypoint + $"?strava={DateTime.UtcNow.Ticks}";
+
                 return View("CompleteLogin");
             }
         }

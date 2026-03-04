@@ -1,14 +1,13 @@
-﻿using LTC2.Services.Calculator.Interfaces;
+using LTC2.Services.Calculator.Interfaces;
 using LTC2.Services.Calculator.Models;
 using LTC2.Services.Calculator.Services;
+using LTC2.Shared.Common.Interfaces;
 using LTC2.Shared.Models.Domain;
+using LTC2.Shared.Models.Requests;
 using LTC2.Shared.Models.Interprocess;
 using LTC2.Shared.Models.Settings;
 using LTC2.Shared.Repositories.Interfaces;
 using LTC2.Shared.StravaConnector.Exceptions;
-using LTC2.Shared.StravaConnector.Interfaces;
-using LTC2.Shared.StravaConnector.Models;
-using LTC2.Shared.StravaConnector.Models.Requests;
 using LTC2.Shared.Utils.Utils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -25,7 +24,7 @@ namespace LTC2.Services.Calculator.Calculator
         private readonly CalculatorSettings _calculatorSettings;
         private readonly ILogger<ScoreCalculator> _logger;
         private readonly IMapRepository _mapRepository;
-        private readonly IStravaConnector _stravaConnector;
+        private readonly IConnectorFactory _connectorFactory;
         private readonly IScoresRepository _scoresRepository;
         private readonly StatusNotifier _statusNotifier;
         private readonly IIntermediateResultsRepository _intermediateResultsRepository;
@@ -34,7 +33,8 @@ namespace LTC2.Services.Calculator.Calculator
         private readonly long _maxDuration = 100 * 60 * 60;
         private readonly long _maxDistance = 1600000;
 
-        private readonly List<StravaActivityType> _activityTypes = new List<StravaActivityType>();
+        private readonly List<GenericActivityType> _activityTypes = new List<GenericActivityType>();
+        private readonly List<string> _activityTypesRwGps = new List<string>();
 
         public ScoreCalculator(
                 AppSettings appSettings,
@@ -42,7 +42,7 @@ namespace LTC2.Services.Calculator.Calculator
                 CalculatorSettings calculatorSettings,
                 IMapRepository mapRepository,
                 IScoresRepository scoresRepository,
-                IStravaConnector stravaConnector,
+                IConnectorFactory connectorFactory,
                 IIntermediateResultsRepository intermediateResultsRepository,
                 StatusNotifier statusNotifier,
                 ILogger<ScoreCalculator> logger
@@ -53,9 +53,10 @@ namespace LTC2.Services.Calculator.Calculator
             _mapRepository = mapRepository;
             _scoresRepository = scoresRepository;
             _intermediateResultsRepository = intermediateResultsRepository;
-            _stravaConnector = stravaConnector;
+            _connectorFactory = connectorFactory;
             _statusNotifier = statusNotifier;
             _appSettings = appSettings;
+            _activityTypesRwGps = calculatorSettings.RwGpsActivityTypes ?? [];
 
             ParseActivityTypes();
         }
@@ -68,7 +69,7 @@ namespace LTC2.Services.Calculator.Calculator
                 {
                     try
                     {
-                        var actType = (StravaActivityType)Enum.Parse(typeof(StravaActivityType), type);
+                        var actType = (GenericActivityType)Enum.Parse(typeof(GenericActivityType), type);
 
                         _activityTypes.Add(actType);
                     }
@@ -81,7 +82,7 @@ namespace LTC2.Services.Calculator.Calculator
 
             if (_activityTypes.Count == 0)
             {
-                _activityTypes.Add(StravaActivityType.Ride);
+                _activityTypes.Add(GenericActivityType.Ride);
             }
         }
 
@@ -90,10 +91,11 @@ namespace LTC2.Services.Calculator.Calculator
             _logger.LogInformation($"Calclation job received for: {job.AthleteId} of type {job.Type}");
 
             var dayLimitDetect = false;
-            var stravaSession = await GetSession(job);
+            var connector = _connectorFactory.Create(job.ConnectorSource);
+            var session = await GetSession(job, connector);
             var isMulti = job.Type == CalculationType.multi;
 
-            var request = new GetActivitiesRequest()
+            var request = new BrowseActivitiesRequest()
             {
                 AthleteId = job.AthleteId,
                 BypassCache = job.BypassCache
@@ -105,10 +107,19 @@ namespace LTC2.Services.Calculator.Calculator
                 IsRefresh = job.Refresh
             };
 
-            if (isMulti && IsTypeSwitch(job.AthleteId, job.Types))
+            if (isMulti)
             {
-                calculationResult.IsRefresh = true;
-                job.Refresh = true;
+                if (job.ConnectorSource == ConnectorSource.RideWithGps && job.RwGpsTypes != null
+                    && IsRwGpsTypeSwitch(job.AthleteId, job.RwGpsTypes))
+                {
+                    calculationResult.IsRefresh = true;
+                    job.Refresh = true;
+                }
+                else if (job.Types != null && IsTypeSwitch(job.AthleteId, job.Types))
+                {
+                    calculationResult.IsRefresh = true;
+                    job.Refresh = true;
+                }
             }
 
 
@@ -130,6 +141,7 @@ namespace LTC2.Services.Calculator.Calculator
 
             calculationResult.Type = job.Type;
             calculationResult.Types = job.Types;
+            calculationResult.RwGpsTypes = job.RwGpsTypes;
 
             var start = DateTime.UtcNow;
 
@@ -149,7 +161,7 @@ namespace LTC2.Services.Calculator.Calculator
             {
                 try
                 {
-                    await _stravaConnector.BrowseActivities(request, stravaSession.AccessToken, calculationResult, OnPreCheckActivity, OnCheckActivity, OnWaitingForSlot);
+                    await connector.BrowseActivities(request, session.AccessToken, calculationResult, OnPreCheckActivity, OnCheckActivity, OnWaitingForSlot);
                 }
                 catch (StravaTooManyDailyRequestsException)
                 {
@@ -163,7 +175,7 @@ namespace LTC2.Services.Calculator.Calculator
             {
                 var lastRide = calculationResult.LastRideSample;
 
-                var preciseTrack = await _stravaConnector.GetTrackForActivity(calculationResult.LastRideSample.ExternalId, request.BypassCache, stravaSession.AccessToken, OnWaitingForSlot, calculationResult);
+                var preciseTrack = await connector.GetTrackForActivity(calculationResult.LastRideSample.ExternalId, request.BypassCache, session.AccessToken, OnWaitingForSlot, calculationResult);
 
                 lastRide.Track = preciseTrack ?? lastRide.Track;
 
@@ -196,10 +208,18 @@ namespace LTC2.Services.Calculator.Calculator
 
                 _intermediateResultsRepository.Clear(job.AthleteId, isMulti);
 
-                if(calculationResult.Type == CalculationType.multi)
+                if (calculationResult.Type == CalculationType.multi)
                 {
-                    var file = Path.Combine(_appSettings.MultiSportFolder, $"{job.AthleteId}.json");
-                    File.WriteAllText(file, JsonConvert.SerializeObject(calculationResult.Types));
+                    if (calculationResult.RwGpsTypes != null)
+                    {
+                        var file = Path.Combine(_appSettings.MultiSportFolder, $"{job.AthleteId}_rwgps.json");
+                        File.WriteAllText(file, JsonConvert.SerializeObject(calculationResult.RwGpsTypes));
+                    }
+                    else if (calculationResult.Types != null)
+                    {
+                        var file = Path.Combine(_appSettings.MultiSportFolder, $"{job.AthleteId}.json");
+                        File.WriteAllText(file, JsonConvert.SerializeObject(calculationResult.Types));
+                    }
                 }
 
                 if (dayLimitDetect)
@@ -220,9 +240,9 @@ namespace LTC2.Services.Calculator.Calculator
             _intermediateResultsRepository.StoreIntermedidateResult(subject, subject.Type == CalculationType.multi);
         }
 
-        public void OnCheckActivity(StravaActivity activity, List<List<double>> track, CalculationResult subject)
+        public void OnCheckActivity(SourceActivity activity, List<List<double>> track, CalculationResult subject)
         {
-            _logger.LogDebug($"Check {activity.Name} {activity.DateTimeStart} {activity.Distance} {activity.Type}");
+            _logger.LogDebug($"Check {activity.Name} {activity.DateTimeStart} {activity.Distance} {activity.ActivityType}");
 
             var places = _mapRepository.CheckTrack(track);
 
@@ -309,9 +329,9 @@ namespace LTC2.Services.Calculator.Calculator
             _statusNotifier.SetNotification(StatusMessage.STATUS_RESULT, $"calculated in: {seconds} seconds");
         }
 
-        private void NotifyActivityCheck(StravaActivity activity)
+        private void NotifyActivityCheck(SourceActivity activity)
         {
-            _logger.LogDebug($"Precheck {activity.Name} {activity.DateTimeStart} {activity.Distance} {activity.Type}");
+            _logger.LogDebug($"Precheck {activity.Name} {activity.DateTimeStart} {activity.Distance} {activity.ActivityType}");
 
             _statusNotifier.SetNotification(StatusMessage.STATUS_CHECK, $"{activity.DateTimeStart} {activity.Name}");
         }
@@ -336,21 +356,38 @@ namespace LTC2.Services.Calculator.Calculator
             return false;
         }
 
-        public bool OnPreCheckActivity(StravaActivity activity, List<List<double>> track, CalculationResult subject)
+        private bool IsAllowedActivityType(SourceActivity activity, CalculationType calculationType, List<int> types, List<string> rwGpsTypes)
+        {
+            if (activity.Source == ActivitySource.RideWithGps)
+            {
+                if (calculationType == CalculationType.multi && rwGpsTypes != null)
+                    return activity.ActivityType != null && rwGpsTypes.Contains(activity.ActivityType);
+                return activity.ActivityType != null && _activityTypesRwGps.Any(a => a == activity.ActivityType);
+            }
+
+            if (!Enum.TryParse<GenericActivityType>(activity.ActivityType, out var activityType))
+            {
+                return false;
+            }
+
+            if (calculationType == CalculationType.multi)
+            {
+                return types.Select(t => (GenericActivityType)t).Contains(activityType);
+            }
+
+            return _activityTypes.Contains(activityType);
+        }
+
+        public bool OnPreCheckActivity(SourceActivity activity, List<List<double>> track, CalculationResult subject)
         {
             var whiteListed = IsWhiteListedActivity(activity.Id);
             var notExcedingElapsedTime = whiteListed || (activity.ElapsedTime <= _maxDuration);
             var notExcedingDistance = whiteListed || activity.Distance <= _maxDistance;
             var blackListed = IsBlackListedActivity(activity.Id);
 
-            var allowedActivities = _activityTypes;
+            var isAllowedType = IsAllowedActivityType(activity, subject.Type, subject.Types, subject.RwGpsTypes);
 
-            if (subject.Type == CalculationType.multi)
-            {
-                allowedActivities = subject.Types.Select(t => (StravaActivityType)t).ToList();
-            }
-
-            var result = allowedActivities.Contains(activity.Type) && !activity.IsManual && notExcedingDistance && notExcedingElapsedTime && !blackListed;
+            var result = isAllowedType && !activity.IsManual && notExcedingDistance && notExcedingElapsedTime && !blackListed;
 
             NotifyActivityCheck(activity);
 
@@ -363,11 +400,21 @@ namespace LTC2.Services.Calculator.Calculator
                     _intermediateResultsRepository.StoreIntermedidateResult(subject, subject.Type == CalculationType.multi);
                 }
 
-                var places = _mapRepository.PreCheckTrack(track);
 
-                var newPlacesCount = places.Where(p => IsPlaceRelevant(activity, p, subject)).Count();
+                var doLastVisitedCheck = isAllowedType && (subject.LastRideSample == null || activity.DateTimeStart > subject.LastRideSample.VisitedOn);
 
-                if (places.Count > 0 && allowedActivities.Contains(activity.Type) && (subject.LastRideSample == null || activity.DateTimeStart > subject.LastRideSample.VisitedOn))
+                if (!subject.SkipPreCheckPlaces)
+                {
+                    var places = _mapRepository.PreCheckTrack(track);
+
+                    var newPlacesCount = places.Where(p => IsPlaceRelevant(activity, p, subject)).Count();
+
+                    result = newPlacesCount > 0;
+                    doLastVisitedCheck = doLastVisitedCheck && places.Count > 0;
+                }
+
+
+                if (doLastVisitedCheck)
                 {
                     var visit = new Visit();
 
@@ -381,13 +428,13 @@ namespace LTC2.Services.Calculator.Calculator
                     subject.VisitedPlacesLastRide = new Dictionary<string, Visit>() { { "temp", visit } };
                 }
 
-                return newPlacesCount > 0;
+                return result;
             }
 
             return result;
         }
 
-        private bool IsPlaceRelevant(StravaActivity activity, Place place, CalculationResult subject)
+        private bool IsPlaceRelevant(SourceActivity activity, Place place, CalculationResult subject)
         {
             var currentYear = DateTime.Now.Year;
 
@@ -406,19 +453,19 @@ namespace LTC2.Services.Calculator.Calculator
             _logger.LogInformation($"Score calculator initialised: {places.Count} places");
         }
 
-        private async Task<Session> GetSession(CalculationJob job)
+        private async Task<Session> GetSession(CalculationJob job, IConnector connector)
         {
             if (job.Code != null)
             {
-                return await _stravaConnector.GetSession(job.Code);
+                return await connector.GetSession(job.Code, string.Empty);
             }
             else if (job.Session != null)
             {
-                return await _stravaConnector.GetSession(job.Session);
+                return await connector.GetSession(job.Session);
             }
             else
             {
-                return await _stravaConnector.GetSession(job.AthleteId);
+                return await connector.GetSession(job.AthleteId);
             }
         }
 
@@ -438,10 +485,54 @@ namespace LTC2.Services.Calculator.Calculator
                 {
                     _logger.LogWarning(ex, $"Unable to read activity types for athlete: {athleteId}");
                 }
-                
+
             }
 
             return new List<int>();
+        }
+
+        private List<string> GetCurrentRwGpsTypes(long athleteId)
+        {
+            var file = Path.Combine(_appSettings.MultiSportFolder, $"{athleteId}_rwgps.json");
+
+            if (File.Exists(file))
+            {
+                try
+                {
+                    var content = File.ReadAllText(file);
+
+                    return JsonConvert.DeserializeObject<List<string>>(content);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, $"Unable to read RwGPS activity types for athlete: {athleteId}");
+                }
+            }
+
+            return new List<string>();
+        }
+
+        private bool IsRwGpsTypeSwitch(long athleteId, List<string> jobTypes)
+        {
+            var currentTypes = GetCurrentRwGpsTypes(athleteId);
+
+            foreach (var type in jobTypes)
+            {
+                if (!currentTypes.Contains(type))
+                {
+                    return true;
+                }
+            }
+
+            foreach (var type in currentTypes)
+            {
+                if (!jobTypes.Contains(type))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private bool IsTypeSwitch(long athleteId, List<int> jobTypes)

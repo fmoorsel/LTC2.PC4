@@ -3,16 +3,19 @@ using LTC2.Services.Calculator.Interfaces;
 using LTC2.Services.Calculator.Models;
 using LTC2.Services.Calculator.Services;
 using LTC2.Services.Calculator.ServiceTasks;
+using LTC2.Shared.Common.Bootstrap.Extensions;
 using LTC2.Shared.Messaging.Implementations.FileBasedBroker.Extensions;
+using LTC2.Shared.RideWithGpsConnector.Bootstrap.Extensions;
 using LTC2.Shared.Repositories.Interfaces;
 using LTC2.Shared.Repositories.Mapdefinitions;
 using LTC2.Shared.Repositories.Repositories;
 using LTC2.Shared.Secrets.Interfaces;
 using LTC2.Shared.Secrets.Vaults;
 using LTC2.Shared.SpatiaLiteRepository.Repositories;
+using LTC2.Shared.Stores.Interfaces;
+using LTC2.Shared.Stores.Stores;
 using LTC2.Shared.StravaConnector.Bootstrap.Extensions;
 using LTC2.Shared.StravaConnector.Interfaces;
-using LTC2.Shared.StravaConnector.Stores;
 using LTC2.Shared.Utils.Bootstrap.Extensions;
 using LTC2.Shared.Utils.Bootstrap.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -54,7 +57,7 @@ namespace LTC2.Services.Calculator
 
                 services.AddSettings(settingsService);
 
-                services.AddSingleton<IServiceTask, InitStravaPropertiesTask>();
+                services.AddSingleton<IServiceTask, InitSourceProxyPropertiesTask>();
                 services.AddSingleton<IServiceTask, InitStatusPublisherTask>();
                 services.AddSingleton<IServiceTask, InitMapRepositoryTask>();
                 services.AddSingleton<IServiceTask, InitScoreCalculatorTask>();
@@ -82,6 +85,8 @@ namespace LTC2.Services.Calculator
                 services.AddSingleton<ISessionStore, FileSessionStore>();
 
                 services.AddStravaConnector();
+                services.AddRideWithGpsConnector();
+                services.AddConnectorFactory();
                 services.AddFileBasedBroker();
             });
 

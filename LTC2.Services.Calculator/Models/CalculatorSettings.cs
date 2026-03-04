@@ -15,6 +15,8 @@ namespace LTC2.Services.Calculator.Models
 
         public List<string> ActivityTypes { get; set; }
 
+        public List<string> RwGpsActivityTypes { get; set; }
+
         public List<string> WhiteListedActivities { get; set; }
 
         public List<string> BlackListedActivities { get; set; }

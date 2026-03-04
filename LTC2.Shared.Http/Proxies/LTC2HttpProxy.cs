@@ -1,5 +1,6 @@
 ﻿using LTC2.Shared.Http.Exceptions;
 using LTC2.Shared.Http.Interfaces;
+using LTC2.Shared.Models.Requests;
 using LTC2.Shared.Models.Settings;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -14,20 +15,31 @@ namespace LTC2.Shared.Http.Proxies
         {
         }
 
-        public async Task Update(string accessToken, bool refresh, bool byPassCache, bool isRestore, bool isClear)
+        public async Task Update(string accessToken, bool refresh, bool byPassCache, bool isRestore, bool isClear, string source = null)
         {
             var authHeader = new AuthenticationHeaderValue("Bearer", accessToken);
             var uri = $"/api/Update/update?refresh={refresh}&bypassCache={byPassCache}&isRestore={isRestore}&isClear={isClear}";
 
+            if (source != null)
+            {
+                uri += $"&source={source}";
+            }
+
             await ExecutePostRequest(uri, authHeader);
         }
 
-        public async Task UpdateMulti(string accessToken, List<int> types, bool refresh, bool byPassCache, bool isRestore, bool isClear)
+        public async Task UpdateMulti(string accessToken, List<int> types, List<string> rwGpsTypes, bool refresh, bool byPassCache, bool isRestore, bool isClear, string source = null)
         {
             var authHeader = new AuthenticationHeaderValue("Bearer", accessToken);
             var uri = $"/api/Update/updatemulti?refresh={refresh}&bypassCache={byPassCache}&isRestore={isRestore}&isClear={isClear}";
 
-            await ExecutePostRequest<List<int>>(uri, types, authHeader);
+            if (source != null)
+            {
+                uri += $"&source={source}";
+            }
+
+            var body = new UpdateMultiRequest { Types = types, RwGpsTypes = rwGpsTypes };
+            await ExecutePostRequest<UpdateMultiRequest>(uri, body, authHeader);
         }
 
         public async Task<bool> HasIntermediateResult(string accessToken, bool multi)

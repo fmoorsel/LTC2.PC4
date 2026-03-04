@@ -1,9 +1,11 @@
-﻿using LTC2.Shared.ActivityFormats.Gpx.Utils;
+using LTC2.Shared.ActivityFormats.Gpx.Utils;
+using LTC2.Shared.Common.Interfaces;
 using LTC2.Shared.Models.Domain;
+using LTC2.Shared.Models.Requests;
+using LTC2.Shared.Models.Responses;
 using LTC2.Shared.Repositories.Interfaces;
 using LTC2.Shared.StravaConnector.Exceptions;
 using LTC2.Shared.StravaConnector.Interfaces;
-using LTC2.Shared.StravaConnector.Models.Requests;
 using LTC2.Webapps.MainApp.Models;
 using LTC2.Webapps.MainApp.Models.Requests;
 using LTC2.Webapps.MainApp.Utils;
@@ -30,6 +32,7 @@ namespace LTC2.Webapps.MainApp.Controllers
         private readonly IMapRepository _mapRepository;
         private readonly TokenUtils _tokenUtils;
         private readonly IStravaConnector _stravaConnector;
+        private readonly IConnectorFactory _connectorFactory;
 
         private bool _isMapRepositoryOpen = false;
         private object _mapRepositoryLock = new object();
@@ -40,12 +43,14 @@ namespace LTC2.Webapps.MainApp.Controllers
             IMapRepository mapRepository,
             IStravaConnector stravaConnector,
             IStravaHttpProxy stravaHttpProxy,
+            IConnectorFactory connectorFactory,
             AppSettings appSettings)
         {
             _appSettings = appSettings;
             _mapRepository = mapRepository;
             _tokenUtils = tokenUtils;
             _stravaConnector = stravaConnector;
+            _connectorFactory = connectorFactory;
             _logger = logger;
         }
 
@@ -60,7 +65,7 @@ namespace LTC2.Webapps.MainApp.Controllers
 
             return Ok(response);
         }
-        
+
         [HttpGet]
         [Authorize]
         [Route("checkgpxfrompath")]
@@ -70,22 +75,45 @@ namespace LTC2.Webapps.MainApp.Controllers
             {
                 var base64EncodedBytes = Convert.FromBase64String(file);
                 var decodedString = Encoding.UTF8.GetString(base64EncodedBytes);
-                
+
                 var fileName = ReadGpxFile(decodedString);
-                
 
                 var response = CheckGpxFile(fileName);
 
-                return Ok(response);                
-            };
-            
+                return Ok(response);
+            }
+            ;
+
             return Unauthorized();
-        }        
+        }
 
         [HttpGet]
         [Authorize]
         [Route("checkstravaroute")]
         public async Task<IActionResult> CheckStravaRoute([FromQuery] CheckStravaRouteRequest request)
+        {
+            return await CheckSourceRouteInternal(request.RouteId, ConnectorSource.Strava);
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("checkrwgpsroute")]
+        public async Task<IActionResult> CheckRwGpsRoute([FromQuery] CheckStravaRouteRequest request)
+        {
+            return await CheckSourceRouteInternal(request.RouteId, ConnectorSource.RideWithGps);
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("checksourceroute")]
+        public async Task<IActionResult> CheckSourceRoute([FromQuery] CheckStravaRouteRequest request, [FromQuery] string source)
+        {
+            var connectorSource = source == "ridewithgps" ? ConnectorSource.RideWithGps : ConnectorSource.Strava;
+
+            return await CheckSourceRouteInternal(request.RouteId, connectorSource);
+        }
+
+        private async Task<IActionResult> CheckSourceRouteInternal(string routeId, ConnectorSource connectorSource)
         {
             var authHeader = _tokenUtils.GetAuthenticationHeader(HttpContext.Request);
             var token = authHeader?.Parameter;
@@ -98,11 +126,13 @@ namespace LTC2.Webapps.MainApp.Controllers
 
                     var gpxRequest = new GetRouteDetailsAsGpxRequest();
                     gpxRequest.AthleteId = Convert.ToInt64(athleteId);
-                    gpxRequest.RouteId = Convert.ToInt64(request.RouteId);
+                    gpxRequest.RouteId = Convert.ToInt64(routeId);
+
+                    var connector = _connectorFactory.Create(connectorSource);
 
                     try
                     {
-                        var gpx = await _stravaConnector.GetRouteDetailsAsGpx(gpxRequest);
+                        var gpx = await connector.GetRouteDetailsAsGpx(gpxRequest);
 
                         if (gpx.LimitsExceeded)
                         {
@@ -128,11 +158,11 @@ namespace LTC2.Webapps.MainApp.Controllers
                             var response = CheckGpxFile(gpxFile);
 
                             response.IsStravaRoute = true;
-                            response.StravaRouteId = request.RouteId;
+                            response.StravaRouteId = routeId;
 
                             return Ok(response);
                         }
-                    } 
+                    }
                     catch (StravaTooManyDailyRequestsException ex)
                     {
                         var response = new Routes();
@@ -161,7 +191,7 @@ namespace LTC2.Webapps.MainApp.Controllers
         [HttpGet]
         [Authorize]
         [Route("list")]
-        public async Task<IActionResult> GetRoutes()
+        public async Task<IActionResult> GetRoutes([FromQuery] string source)
         {
             var authHeader = _tokenUtils.GetAuthenticationHeader(HttpContext.Request);
             var token = authHeader?.Parameter;
@@ -175,7 +205,9 @@ namespace LTC2.Webapps.MainApp.Controllers
                     var request = new GetRoutesRequest();
                     request.AthleteId = Convert.ToInt64(athleteId);
 
-                    var routes = await _stravaConnector.GetRoutes(request);
+                    var connectorSource = source == "ridewithgps" ? ConnectorSource.RideWithGps : ConnectorSource.Strava;
+                    var connector = _connectorFactory.Create(connectorSource);
+                    var routes = await connector.GetRoutes(request);
 
                     return Ok(routes);
                 }
@@ -216,8 +248,8 @@ namespace LTC2.Webapps.MainApp.Controllers
             {
                 var uniqueId = Guid.NewGuid().ToString();
                 var gpxName = Path.Combine(_appSettings.TempRoutesFolder, $"{uniqueId}.gpx");
-                
-                System.IO.File.Copy(file, gpxName);   
+
+                System.IO.File.Copy(file, gpxName);
 
                 return gpxName;
             }
@@ -227,7 +259,7 @@ namespace LTC2.Webapps.MainApp.Controllers
 
                 throw;
             }
-            
+
         }
 
         private string ReadGpxFile(IFormFile file)
@@ -341,7 +373,7 @@ namespace LTC2.Webapps.MainApp.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Error cleaning old gpx files");
-             
+
                 throw;
             }
         }

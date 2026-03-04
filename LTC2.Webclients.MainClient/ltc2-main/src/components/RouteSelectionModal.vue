@@ -80,6 +80,7 @@
   import { AppTypes } from '../types/AppTypes';
   import { Routes } from '../models/Routes';
   import { emptyString } from '@/models/Constants';
+  import { runsInRideWithGpsMode } from '@/utils/Utils';
 
   import { PresentationRoute } from '../models/PresentationRoute';
   
@@ -123,14 +124,24 @@
           const feedBackWorking =  _translationService?.getText("selectroutemodal.text.working");
           const feedBackInstuction =  _translationService?.getText("selectroutemodal.text.instruction");
 
-          const header = _translationService?.getText("selectroutemodal.header");
+          const isRideWithGpsMode = runsInRideWithGpsMode();
+
+          const header = isRideWithGpsMode
+              ? _translationService?.getText("selectroutemodal.header.ridewithgps")
+              : _translationService?.getText("selectroutemodal.header");
+
+          const source = isRideWithGpsMode ? "ridewithgps" : undefined;
           const texthint = _translationService?.getText("selectroutemodal.text.hint");
           const buttonTextSelectFile = _translationService?.getText("selectroutemodal.button.selectfile");
           const buttonTextCheckGpx = _translationService?.getText("selectroutemodal.button.checkgpx");
-          const buttonTextLoadStravaRoute = _translationService?.getText("selectroutemodal.button.loadstravaroutes");
+          const buttonTextLoadStravaRoute = isRideWithGpsMode
+              ? _translationService?.getText("selectroutemodal.button.loadrwgpsroutes")
+              : _translationService?.getText("selectroutemodal.button.loadstravaroutes");
 
           const routesNotYetLoadedText = _translationService?.getText("selectroutemodal.text.routesNotYetLoadedText");
-          const noRoutesInStravaText = _translationService?.getText("selectroutemodal.text.noRoutesInStrava");
+          const noRoutesInStravaText = isRideWithGpsMode
+              ? _translationService?.getText("selectroutemodal.text.noRoutesInRwGps")
+              : _translationService?.getText("selectroutemodal.text.noRoutesInStrava");
           const loadingStravaRoutesText = _translationService?.getText("selectroutemodal.text.loadingStravaRoutesText");
           const loadingStravaRouteText = _translationService?.getText("selectroutemodal.text.loadingStravaRouteText");
           const noPlacesText = _translationService?.getText("selectroutemodal.text.noplaces");
@@ -218,7 +229,7 @@
             try {
                 isStravaRouteLoading.value = true;
 
-                var route = await _routeCheckerService?.checkRoute(id);
+                var route = await _routeCheckerService?.checkRoute(id, source);
 
                 if (route && hasPlaces(route)) {
                     emit('routeRequested', route);
@@ -304,7 +315,7 @@
                 isLoadingStravaRoutes.value = true;
                 isRoutesLoaded.value = true;
                 
-                const routes = await _routeCheckerService?.listRoutes();
+                const routes = await _routeCheckerService?.listRoutes(source);
 
                 isLoadingStravaRoutes.value = false;
 
@@ -418,7 +429,7 @@
             }
           }
  
-          return { showModal, hideModal, modalElement, header, tableContainer, texthint, onSelectFile, inputElement, fileName, buttonTextSelectFile, selectFileButton, isButtonDisabled, onSelectGpx, buttonTextCheckGpx, feedBackNoRoutes, feedBackWorking, isEmpty, isWorking, feedBackInstuction, buttonTextLoadStravaRoute, isRoutesLoaded, routesNotYetLoadedText, noRoutesInStravaText, isNoStravaRoutes, loadRoutesButton, onLoadRoutes, isLoadingStravaRoutes, loadingStravaRoutesText, sortedRoutes, loadingStravaRouteText, isStravaRouteLoading, isNoPlaces, noPlacesText, onSelectRoute, onSelectFileButtonClick }
+          return { showModal, hideModal, modalElement, header, tableContainer, texthint, onSelectFile, inputElement, fileName, buttonTextSelectFile, selectFileButton, isButtonDisabled, onSelectGpx, buttonTextCheckGpx, feedBackNoRoutes, feedBackWorking, isEmpty, isWorking, feedBackInstuction, buttonTextLoadStravaRoute, isRoutesLoaded, routesNotYetLoadedText, noRoutesInStravaText, isNoStravaRoutes, loadRoutesButton, onLoadRoutes, isLoadingStravaRoutes, loadingStravaRoutesText, sortedRoutes, loadingStravaRouteText, isStravaRouteLoading, isNoPlaces, noPlacesText, onSelectRoute, onSelectFileButtonClick, isRideWithGpsMode }
       }
   })
   

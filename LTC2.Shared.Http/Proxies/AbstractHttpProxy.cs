@@ -38,6 +38,32 @@ namespace LTC2.Shared.Http.Proxies
             return response;
         }
 
+        protected async Task<TResponse> ExecuteGetRequest<TResponse>(string uri, IEnumerable<KeyValuePair<string, string>> requestHeaders)
+            where TResponse : class
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, uri);
+            requestMessage.Headers.Accept.Add(ApplicationJsonMediaTypeWithQualityHeaderValue);
+
+            if (requestHeaders != null)
+            {
+                foreach (var header in requestHeaders)
+                {
+                    requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                }
+            }
+
+            var responseMessage = await _httpClient.SendAsync(requestMessage);
+            var responseContent = responseMessage.Content;
+            var responseBody = await responseContent.ReadAsStringAsync();
+
+            if (!responseMessage.IsSuccessStatusCode)
+            {
+                throw new HttpProxyException((int)responseMessage.StatusCode);
+            }
+
+            return JsonConvert.DeserializeObject<TResponse>(responseBody);
+        }
+
         protected async Task<TResponse> ExecuteGetRequest<TResponse>(string uri, Dictionary<string, string> filteredResponseHeaders, AuthenticationHeaderValue authHeader = null)
             where TResponse : class
         {

@@ -16,6 +16,9 @@ namespace LTC2.Desktopclients.ProfileManager.Forms
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string AthleteId { get; set; }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public string Source { get; set; }
+
 
         private readonly AppSettings _appSettings;
         private readonly ITranslationService _translationService;
@@ -48,16 +51,24 @@ namespace LTC2.Desktopclients.ProfileManager.Forms
                 _isWebFormInitialized = true;
             }
 
-            await DeleteStravaCookies();
+            await DeleteCookies();
 
-            webView.CoreWebView2.Navigate($"{_appSettings.StartPage}?profile={ProfileToTest}&language={_translationService.CurrentLanguage}");
+            var url = Visible ? $"{_appSettings.StartPage}?profile={ProfileToTest}&language={_translationService.CurrentLanguage}&source={Source}" : "about:blank";
+            webView.CoreWebView2.Navigate(url);
         }
 
-        private async Task DeleteStravaCookies()
+        private async Task DeleteCookies()
         {
             var stravaCookies = await webView.CoreWebView2.CookieManager.GetCookiesAsync("https://www.strava.com");
 
             foreach (var cookie in stravaCookies)
+            {
+                webView.CoreWebView2.CookieManager.DeleteCookie(cookie);
+            }
+
+            var rwgpsCookies = await webView.CoreWebView2.CookieManager.GetCookiesAsync("https://ridewithgps.com");
+
+            foreach (var cookie in rwgpsCookies)
             {
                 webView.CoreWebView2.CookieManager.DeleteCookie(cookie);
             }
@@ -135,7 +146,7 @@ namespace LTC2.Desktopclients.ProfileManager.Forms
         {
             try
             {
-                var result = await webView.ExecuteScriptAsync("StravaAthleteId()");
+                var result = await webView.ExecuteScriptAsync("AthleteId()");
                 var success = result != "null" && result != null;
 
                 if (success)

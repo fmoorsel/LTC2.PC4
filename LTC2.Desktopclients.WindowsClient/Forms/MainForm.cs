@@ -222,15 +222,22 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
             if (_profileManager.HasMultipleProfiles)
             {
-                await DeleteStravaCookies();
+                await DeleteCookies();
             }
         }
 
-        private async Task DeleteStravaCookies()
+        private async Task DeleteCookies()
         {
             var stravaCookies = await webView.CoreWebView2.CookieManager.GetCookiesAsync("https://www.strava.com");
 
             foreach (var cookie in stravaCookies)
+            {
+                webView.CoreWebView2.CookieManager.DeleteCookie(cookie);
+            }
+
+            var rwgpsCookies = await webView.CoreWebView2.CookieManager.GetCookiesAsync("https://ridewithgps.com");
+
+            foreach (var cookie in rwgpsCookies)
             {
                 webView.CoreWebView2.CookieManager.DeleteCookie(cookie);
             }
@@ -261,7 +268,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                     if (webView.CoreWebView2.Source.StartsWith(url))
                     {
                         btnRefresh.Enabled = true;
-                        
+
                         break;
                     }
                 }
@@ -301,7 +308,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
         private string GetUrl()
         {
-            return $"{_appSettings.StartPage}?language={_translationService.CurrentLanguage}&multi={_multiSportManager.RunInMultiSportMode}";
+            return $"{_appSettings.StartPage}?language={_translationService.CurrentLanguage}&multi={_multiSportManager.RunInMultiSportMode}&source={_multiSportManager.RunWithSource}";
         }
     }
 }

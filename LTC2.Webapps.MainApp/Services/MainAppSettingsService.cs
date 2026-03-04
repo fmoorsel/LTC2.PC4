@@ -3,6 +3,7 @@ using LTC2.Shared.Models.Settings;
 using LTC2.Shared.Utils.Bootstrap.Interfaces;
 using LTC2.Webapps.MainApp.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -26,6 +27,7 @@ namespace LTC2.Webapps.MainApp.Services
 
             GetSettingsFromConfig<GenericSettings>("GenericSettings", result);
             GetSettingsFromConfig<StravaHttpProxySettings>("StravaHttpProxySettings", result);
+            GetSettingsFromConfig<RideWithGpsHttpProxySettings>("RideWithGpsHttpProxySettings", result);
             GetSettingsFromConfig<AuthorizationSettings>("AuthorizationSettings", result);
             GetSettingsFromConfig<CalculatorSettings>("CalculatorSettings", result);
             GetSettingsFromConfig<MainClientSettings>("MainClientSettings", result);
@@ -72,9 +74,11 @@ namespace LTC2.Webapps.MainApp.Services
         {
             var processModule = Process.GetCurrentProcess().MainModule;
             var appSettingsFolder = Path.GetDirectoryName(processModule?.FileName);
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
 
             var configuration = new ConfigurationBuilder().SetBasePath(appSettingsFolder)
                         .AddJsonFile("appsettings.json", true, true)
+                        .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
                         .Build();
 
             if (configuration != null)
