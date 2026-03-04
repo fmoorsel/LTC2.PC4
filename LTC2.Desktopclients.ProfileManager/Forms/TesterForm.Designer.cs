@@ -70,7 +70,7 @@
             btnLinkProfile.Name = "btnLinkProfile";
             btnLinkProfile.Size = new Size(108, 49);
             btnLinkProfile.TabIndex = 0;
-            btnLinkProfile.Text = "Profiel koppelen";
+            btnLinkProfile.Text = "#button.link.profile";
             btnLinkProfile.UseVisualStyleBackColor = true;
             btnLinkProfile.Click += btnLinkProfile_Click;
             // 
@@ -126,7 +126,7 @@
             MinimumSize = new Size(1200, 380);
             Name = "TesterForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Test je Strava API...";
+            Text = "#form.test.profile";
             FormClosing += TesterForm_FormClosing;
             Load += TesterForm_Load;
             VisibleChanged += TesterForm_VisibleChanged;

@@ -27,7 +27,6 @@
   "messagebox.confirm.delete": "Wil je profiel %0% (%1%) verwijderen?",
   "messagebox.confirm.delete.header": "Bevestig",
 
-  "button.link.profile": "Profiel koppelen"
-
-
+  "button.link.profile": "Profiel koppelen",
+  "form.test.profile": "Test je Strava/Ride with Gps API..."
 }

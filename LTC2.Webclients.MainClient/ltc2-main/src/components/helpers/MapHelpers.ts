@@ -638,9 +638,10 @@ export class MapHelper {
 
             if (trackExtent) {
                 const center = this.getCenter(trackExtent);
+                const zoom = this._clientSettings?.trackZoom ?? (this.getInitialZoom() + 1);
     
                 this._map.getView().setCenter(center);
-                this._map.getView().setZoom(this.getInitialZoom() + 1);
+                this._map.getView().setZoom(zoom);
             }    
         }
         

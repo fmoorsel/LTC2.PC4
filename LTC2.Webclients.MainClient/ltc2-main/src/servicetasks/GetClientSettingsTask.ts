@@ -27,6 +27,6 @@ export class GetClientSettingsTask implements ISeriveTask {
         gloClientSettings.messageTimeout = clientSettings.data.messageTimeout;
         gloClientSettings.urlTiles = clientSettings.data.urlTiles;
         gloClientSettings.standaloneVersion = clientSettings.data.standaloneVersion;
-
+        gloClientSettings.trackZoom = clientSettings.data.trackZoom;
     }
 }

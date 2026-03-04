@@ -27,6 +27,8 @@ class ClientSettings {
     public messageTimeout = 2000;
 
     public standaloneVersion = false;
+
+    public trackZoom = 8.5;
 }
 
 const gloClientSettings = new ClientSettings();

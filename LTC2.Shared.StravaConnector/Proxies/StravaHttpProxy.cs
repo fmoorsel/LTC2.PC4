@@ -1,8 +1,8 @@
 using LTC2.Shared.Http.Exceptions;
-using LTC2.Shared.Models.Requests;
-using LTC2.Shared.Models.Responses;
 using LTC2.Shared.Http.Proxies;
 using LTC2.Shared.Models.Domain;
+using LTC2.Shared.Models.Requests;
+using LTC2.Shared.Models.Responses;
 using LTC2.Shared.Models.Settings;
 using LTC2.Shared.StravaConnector.Exceptions;
 using LTC2.Shared.StravaConnector.Interfaces;
@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LTC2.Shared.StravaConnector.Proxies
@@ -60,13 +61,31 @@ namespace LTC2.Shared.StravaConnector.Proxies
             var codeParameter = new KeyValuePair<string, string>(request.Type == AuthorizeType.RefreshToken ? "refresh_token" : "code", request.Code);
 
             _logger.LogInformation($"Using Strava with clientid {clientIdParameter}");
-            
+
             parameters.Add(clientIdParameter);
             parameters.Add(clientSecretParameter);
             parameters.Add(codeParameter);
             parameters.Add(grantTypeParameter);
 
-            return await ExecuteFormUrlEncodedRequest<AuthorizeResponse>("/oauth/token", null, parameters);
+            var count = 0;
+            Exception exception = null;
+            while (count < 3)
+            {
+                count++;
+
+                try
+                {
+                    return await ExecuteFormUrlEncodedRequest<AuthorizeResponse>("/oauth/token", null, parameters);
+                }
+                catch (Exception ex)
+                {
+                    Thread.Sleep(500);
+
+                    exception = ex;
+                }
+            }
+
+            throw exception;
         }
 
         public async Task<GetActivitiesResponse> GetActivities(GetActivitiesRequest request, string accessToken)
