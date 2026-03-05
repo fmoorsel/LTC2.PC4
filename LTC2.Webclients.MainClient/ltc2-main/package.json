@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vite",
     "build": "vite build",
-    "lint": "eslint --ext .js,.ts,.vue src/"
+    "lint": "eslint src/"
   },
   "dependencies": {
     "@types/geobuf": "^3.0.1",
@@ -29,11 +29,11 @@
   },
   "devDependencies": {
     "@swc/core": "^1.10.0",
-"@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
+"@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
     "@vitejs/plugin-vue": "^5.0.0",
-    "@vue/eslint-config-typescript": "^11.0.0",
-    "eslint": "^8.57.0",
+    "@vue/eslint-config-typescript": "^14.0.0",
+    "eslint": "^9.27.0",
     "eslint-plugin-vue": "^9.31.0",
     "sass": "^1.97.3",
     "typescript": "~4.9.5",
