@@ -8,8 +8,6 @@ import { TYPES } from '../types/TYPES';
 import { ClientSettings } from '../models/ClientSettings';
 
 import {GeoJSON, FeatureCollection } from "geojson"
-import { decode } from "geobuf";
-import Pbf from "pbf";
 
 import axios from "axios";
 
@@ -21,7 +19,6 @@ export class MapService implements IMapService {
 
     private _map? : GeoJSON;
     private _mapDistricts? : GeoJSON;
-    private _mapFromPbf? : GeoJSON;
     
     private _nameDictionary = new Map<string, string>();
 
@@ -76,7 +73,7 @@ export class MapService implements IMapService {
     }
 
     getGroupedPlaces(maxChars: number): string[] {
-        const empty = [];
+        const empty: string[] = [];
         
         return this.getGroupedNotCheckedPlaces(maxChars, empty);
     }
@@ -127,22 +124,6 @@ export class MapService implements IMapService {
         return emptyString;
     }
 
-    getMapFromPbf(): GeoJSON {
-        if (this._mapFromPbf){
-            return this._mapFromPbf;
-        }
-              
-        throw new Error("Map not loaded");
-    }
-
-    async getAcurateMapFromPbf(): Promise<GeoJSON> {
-        if (this._clientSetting?.urlPbdfGeoJsonAcurateMap) {
-            return await this.getPbfGeoJsonFromUrl(this._clientSetting?.urlPbdfGeoJsonAcurateMap);
-        }
-
-        throw new Error("Url not set");
-    }
-
     async getGeoJsonMap(): Promise<void> {
         if (this._clientSetting?.urlGeoJsonMap) {
             const response = await axios.get<GeoJSON>(this._clientSetting?.urlGeoJsonMap, { timeout: this._clientSetting?.requestTimeout });
@@ -162,32 +143,10 @@ export class MapService implements IMapService {
             throw new Error("Url not set");
         }
     }
-
-    async getPbfGeoJsonFromUrl(url: string): Promise<GeoJSON> {
-        const responsePbf = await axios.get(url, { 
-            timeout: this._clientSetting?.requestTimeout,
-            responseType: 'arraybuffer'
-        });
-        
-        const arrBuff = responsePbf.data as ArrayBuffer;
-        const byteArray = new Uint8Array(arrBuff);
-        const pbf = new Pbf(byteArray);
-
-        return decode(pbf);
-    }
-
-    async getPbfGeoJsonMap(): Promise<void> {
-        if (this._clientSetting?.urlPbfGeoJsonMap) {
-            this._mapFromPbf = await this.getPbfGeoJsonFromUrl(this._clientSetting?.urlPbfGeoJsonMap);
-        } else {
-            throw new Error("Url not set");
-        }
-    }
-    
+   
     async loadMap(): Promise<void> {
         await this.getGeoJsonMap();
         await this.getGeoJsonMapDistricts();
-        await this.getPbfGeoJsonMap();
     }
     
 }
