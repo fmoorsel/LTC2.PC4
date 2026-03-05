@@ -79,7 +79,7 @@ export default {
     const _mapService = inject(AppTypes.IMapServiceKey);
     const _translationService = inject(AppTypes.ITranslationServiceKey);
 
-    const profileVisits = _profileService ? _profileService?.getVisits() : new Array<Visit>();
+    const profileVisits = _profileService ? _profileService?.getVisits() : [];
     
     const profile = _profileService?.getProfile();
     const visits = ref<Visit[]>(profileVisits);
@@ -116,7 +116,7 @@ export default {
 
     let spinnerActive = false;
     
-    let scriptTag = document.createElement("script");
+    const scriptTag = document.createElement("script");
     scriptTag.setAttribute("type", "text/javascript");
     scriptTag.setAttribute("src", "./services/Library.js");
     document.getElementsByTagName("head")[0].appendChild(scriptTag);

@@ -76,14 +76,14 @@ export class MapService implements IMapService {
     }
 
     getGroupedPlaces(maxChars: number): string[] {
-        const empty = new Array<string>();
+        const empty = [];
         
         return this.getGroupedNotCheckedPlaces(maxChars, empty);
     }
 
     getGroupedNotCheckedPlaces(maxChars: number, checked: string[]): string[] {
         const places = this.getPlaces().filter(p => !(checked.some(c => c == p)));
-        const resultLines = new Array<string>();
+        const resultLines = [];
 
         let currentLine = emptyString;
 

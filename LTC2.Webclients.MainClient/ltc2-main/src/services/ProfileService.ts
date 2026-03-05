@@ -70,7 +70,7 @@ export class ProfileService implements IProfileService {
         if (this._profile) {
             return this._profile.placesInAllTimeScore;    
         } else {
-            return new Array<Visit>();
+            return [];
         }
     }
  

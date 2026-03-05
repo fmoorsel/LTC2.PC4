@@ -155,7 +155,7 @@
           const isStravaRouteLoading = ref(false);
           const isNoPlaces = ref(false);
 
-          let stravaRoutes :  PresentationRoute[] = new Array<PresentationRoute>();
+          const stravaRoutes :  PresentationRoute[] = [];
 
           const sortedRoutes = ref(stravaRoutes);
 
@@ -169,7 +169,7 @@
               document.addEventListener('onFileEvent', function(event) {
                 const fileToUploadJson = (event as CustomEvent).detail['message'];
 
-                var file = JSON.parse(fileToUploadJson) as FileToUpload;
+                const file = JSON.parse(fileToUploadJson) as FileToUpload;
 
                 fileName.value = file.onlyFileName;
                 
@@ -229,7 +229,7 @@
             try {
                 isStravaRouteLoading.value = true;
 
-                var route = await _routeCheckerService?.checkRoute(id, source);
+                const route = await _routeCheckerService?.checkRoute(id, source);
 
                 if (route && hasPlaces(route)) {
                     emit('routeRequested', route);
@@ -261,7 +261,7 @@
           }
 
           const onSelectFile = (event: Event) => {
-            let files = (event as HTMLInputEvent).target.files;
+            const files = (event as HTMLInputEvent).target.files;
 
             if (!files?.length) {
                 return;
@@ -325,7 +325,7 @@
                     isNoStravaRoutes.value = true;
                 }
                 
-                sortedRoutes.value = routes?.routes ?? new Array<PresentationRoute>();
+                sortedRoutes.value = routes?.routes ?? [];
             }
             catch (error) {
                 console.log("error when selecting track: " + error);
@@ -354,14 +354,14 @@
                     loadRoutesButton.value.disabled = true;
                 }
 
-                let files = selectedFiles;
+                const files = selectedFiles;
 
                 if (!files?.length) {
                     return;
                 }
 
                 try {
-                    var route = await _routeCheckerService?.checkGpx(files[0]);
+                    const route = await _routeCheckerService?.checkGpx(files[0]);
 
                     if (route && hasPlaces(route)) {
                         emit('routeRequested', route);
@@ -400,7 +400,7 @@
             try {
 
                 if (selectedBypassFile) {
-                    var route = await _routeCheckerService?.checkGpxFromPath(selectedBypassFile?.fileName);
+                    const route = await _routeCheckerService?.checkGpxFromPath(selectedBypassFile?.fileName);
 
                     if (route && hasPlaces(route)) {
                         emit('routeRequested', route);

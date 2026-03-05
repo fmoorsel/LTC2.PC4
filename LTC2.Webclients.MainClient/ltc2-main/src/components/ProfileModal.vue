@@ -84,8 +84,8 @@ export default defineComponent ({
         const toDoCountNumber = (_mapService?.getPlaceCount() ?? 0) - (profile?.placesInAllTimeScore.length ?? 0);
         const toDoCount = toDoCountNumber >= 0 ?  toDoCountNumber.toString() : '--';
 
-        const visits = _profileService?.getVisits()?.map(v => v.name) ?? new Array<string>();
-        const toDos = _mapService?.getGroupedNotCheckedPlaces(80, visits) ?? new Array<string>();
+        const visits = _profileService?.getVisits()?.map(v => v.name) ?? [];
+        const toDos = _mapService?.getGroupedNotCheckedPlaces(80, visits) ?? [];
 
         const sortedToDos = ref(toDos);
 

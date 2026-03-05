@@ -75,21 +75,17 @@ export default defineComponent({
 
         let mapHelper: MapHelper;
         
-        let bottonYearText: string | undefined;
-        let buttonLastText: string | undefined;
-        let buttonRouteText: string | undefined;
-  
         const score = _profileService?.getProfile()?.placesInAllTimeScore;
         const scoreYear = _profileService?.getProfile()?.placesInYearScore;
         const scoreLast = _profileService?.getProfile()?.placesInLastRideScore;
-        
+
         const yearTotal = (scoreYear?.length ?? 0).toString();
-        bottonYearText = _translationService?.getTextViaTemplate("challengemap.buttonYearText", [ currentYear.toString(), yearTotal ]);
+        const bottonYearText = _translationService?.getTextViaTemplate("challengemap.buttonYearText", [ currentYear.toString(), yearTotal ]);
 
         const lastTotal = (scoreLast?.length ?? 0).toString();
-        buttonLastText = _translationService?.getTextViaTemplate("challengemap.buttonLastText", [lastTotal ]);
+        const buttonLastText = _translationService?.getTextViaTemplate("challengemap.buttonLastText", [lastTotal ]);
 
-        buttonRouteText =  _translationService?.getText("challengemap.buttonRouteText")
+        const buttonRouteText =  _translationService?.getText("challengemap.buttonRouteText")
 
         hasYear.value = scoreYear && scoreYear.length > 0;
 
