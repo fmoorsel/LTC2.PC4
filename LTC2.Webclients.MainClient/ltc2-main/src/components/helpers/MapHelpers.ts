@@ -9,6 +9,8 @@ import { OSM } from 'ol/source';
 import { fromLonLat } from 'ol/proj';
 
 import MVT from 'ol/format/MVT';
+import GeoJSONFormat from 'ol/format/GeoJSON';
+import { GeoJSON } from 'geojson';
 import VectorTileLayer from 'ol/layer/VectorTile';
 import VectorTileSource from 'ol/source/VectorTile';
 import VectorSource from 'ol/source/Vector';
@@ -328,6 +330,9 @@ export class MapHelper {
     private _timelapseLayer: VectorTileLayer | undefined;
     private _linesTimelapseLayer: VectorLayer<VectorSource> | undefined;
 
+    private _provincesLayer: VectorLayer<VectorSource> | undefined;
+    private _showProvinces = false;
+
     private _timelapseRunning = false;
     private _timelapseBreakRequested = false;
 
@@ -540,6 +545,40 @@ export class MapHelper {
 
     public getShowTrackForSelectedPlace(): boolean {
         return this._showTrack
+    }
+
+    public getShowProvinces(): boolean {
+        return this._showProvinces;
+    }
+
+    public showHideProvinces(geoJson: GeoJSON) {
+        this._showProvinces = !this._showProvinces;
+
+        if (this._showProvinces) {
+            if (!this._provincesLayer) {
+                const format = new GeoJSONFormat();
+                const features = format.readFeatures(geoJson, {
+                    featureProjection: 'EPSG:3857'
+                });
+
+                this._provincesLayer = new VectorLayer({
+                    source: new VectorSource({ features }),
+                    style: new Style({
+                        stroke: new Stroke({
+                            color: '#000000',
+                            width: 2
+                        })
+                    }),
+                    zIndex: 1000
+                });
+            }
+
+            this._map.addLayer(this._provincesLayer);
+        } else {
+            if (this._provincesLayer) {
+                this._map.removeLayer(this._provincesLayer);
+            }
+        }
     }
 
     private removeTrackLayers() {

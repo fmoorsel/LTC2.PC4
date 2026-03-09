@@ -28,6 +28,9 @@
         <input type="checkbox" ref="checkBoxRoute" class="focus:ring-0 focus:ring-offset-0 focus:shadow-none" style="margin-left: 10px; margin-right: 2px; vertical-align: middle;position: relative;" @click="onShowHideRoute()"><a href="#" style="vertical-align: middle;position: relative;" @click="onShowHideRoute()"> {{ buttonRouteText }} </a>
     </div>
 
+    <div>
+        <input type="checkbox" ref="checkBoxProvinces" class="focus:ring-0 focus:ring-offset-0 focus:shadow-none" style="margin-left: 10px; margin-right: 2px; vertical-align: middle;position: relative;" @click="onShowHideProvinces()"><a href="#" style="vertical-align: middle;position: relative;" @click="onShowHideProvinces()"> {{ bottumProvinciesText }}</a>
+    </div>
 
     <p style="margin-left: 10px; margin-top: 5px; font-size: 12px;">{{ bottumText }}</p>
   </div>
@@ -51,6 +54,7 @@ export default defineComponent({
         const _clientSettings = inject(AppTypes.ClientSettingsKey);
         const _translationService = inject(AppTypes.ITranslationServiceKey);
         const _routeCheckerService = inject(AppTypes.IRouteCheckerService);
+        const _mapService = inject(AppTypes.IMapServiceKey);
         
         const challengeMap = ref<HTMLElement>();
         const popup = ref<HTMLElement>();
@@ -59,6 +63,7 @@ export default defineComponent({
         const checkBoxLast = ref<HTMLInputElement>();
         const checkBoxTrack = ref<HTMLInputElement>();
         const checkBoxRoute = ref<HTMLInputElement>();
+        const checkBoxProvinces = ref<HTMLInputElement>();
         const place = ref<string>("");
         const hasYear = ref<boolean>();
         const hasTrack = ref<boolean>();
@@ -86,6 +91,7 @@ export default defineComponent({
         const buttonLastText = _translationService?.getTextViaTemplate("challengemap.buttonLastText", [lastTotal ]);
 
         const buttonRouteText =  _translationService?.getText("challengemap.buttonRouteText")
+        const bottumProvinciesText = _translationService?.getText("challengemap.buttonProvinciesText")
 
         hasYear.value = scoreYear && scoreYear.length > 0;
 
@@ -197,6 +203,18 @@ export default defineComponent({
             doCheckBoxes(4);
         }
 
+        const onShowHideProvinces = () => {
+            const geoJson = _mapService?.getDistrictsMap();
+
+            if (geoJson) {
+                mapHelper.showHideProvinces(geoJson);
+            }
+
+            if (checkBoxProvinces.value) {
+                checkBoxProvinces.value.checked = mapHelper.getShowProvinces();
+            }
+        }
+
         const showRoute = (routes: Routes, doZoom = true) => {
             console.log('show route');
 
@@ -264,7 +282,7 @@ export default defineComponent({
             }
         }
 
-        return ({ challengeMap, popup, place, closePopup, mapcontrol, checkBoxYear, checkBoxLast, checkBoxTrack, checkBoxRoute, onclickDetails, onclickCheckRoute, buttonText, buttonReloadRouteText, buttonCheckRouteText, buttonRouteText, bottumYearText: bottonYearText, buttonTimelapseText, bottumText, bottumLastText: buttonLastText, hasYear, onShowHideYear, onShowHideLast, onShowHideTrackForPlace, onShowHideRoute, showTrackForPlace, onClickTimelapse, hasTrack, currentTrackDate, showRoute, hasRoutes, isStravaRoute, onclickReloadRoute } )
+        return ({ challengeMap, popup, place, closePopup, mapcontrol, checkBoxYear, checkBoxLast, checkBoxTrack, checkBoxRoute, checkBoxProvinces, onclickDetails, onclickCheckRoute, buttonText, buttonReloadRouteText, buttonCheckRouteText, buttonRouteText, bottumYearText: bottonYearText, buttonTimelapseText, bottumText, bottumLastText: buttonLastText, bottumProvinciesText, hasYear, onShowHideYear, onShowHideLast, onShowHideTrackForPlace, onShowHideRoute, onShowHideProvinces, showTrackForPlace, onClickTimelapse, hasTrack, currentTrackDate, showRoute, hasRoutes, isStravaRoute, onclickReloadRoute } )
     }
 })
 </script>

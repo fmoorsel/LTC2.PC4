@@ -33,6 +33,7 @@
     "challengemap.buttonLastText": "Laatste rit (#{0})",
     "challengemap.buttonTimelapse": "Timelapse",
     "challengemap.buttonRouteText": "Gecheckte route",
+    "challengemap.buttonProvinciesText": "Toon provincies",
     "challengemap.bottumText": "© 2018-2026 LTC2",
     "selectroutemodal.header" : "Upload een GPX bestand of kies een Strava route:",
     "selectroutemodal.header.ridewithgps" : "Upload een GPX bestand of kies een Ride with GPS route:",
