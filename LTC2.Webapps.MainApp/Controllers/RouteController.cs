@@ -190,6 +190,23 @@ namespace LTC2.Webapps.MainApp.Controllers
 
         [HttpGet]
         [Authorize]
+        [Route("centerpoint")]
+        public IActionResult GetCenterPointForName([FromQuery] string name)
+        {
+            EnsureMapRepository();
+
+            var result = _mapRepository.GetCenterPointForName(name);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Authorize]
         [Route("list")]
         public async Task<IActionResult> GetRoutes([FromQuery] string source)
         {

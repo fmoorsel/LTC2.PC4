@@ -145,7 +145,17 @@ namespace LTC2.Shared.SpatiaLiteRepository.Repositories
                 mapName,
                 mapFeaturePointer
             FROM
-                Map;            
+                Map;
+        ";
+
+        private readonly string _queryCenterPointForName = @"
+            SELECT
+                ST_X(ST_Centroid(ST_Union(mapBorder))) as x,
+                ST_Y(ST_Centroid(ST_Union(mapBorder))) as y
+            FROM
+                Map
+            WHERE
+                mapName = @Name;
         ";
 
         public SpatiaLiteRepository(
@@ -301,6 +311,23 @@ namespace LTC2.Shared.SpatiaLiteRepository.Repositories
             }
 
             return result;
+        }
+
+        public List<double> GetCenterPointForName(string name)
+        {
+            if (_connection != null)
+            {
+                var parameters = new Dictionary<string, object>()
+                {
+                    { "@Name", name }
+                };
+
+                var records = GetRecords<List<double>>(_connection, _queryCenterPointForName, new PointRowMapper(), parameters);
+
+                return records.Count > 0 ? records[0] : null;
+            }
+
+            return null;
         }
 
         private void AddSpatialIndices()

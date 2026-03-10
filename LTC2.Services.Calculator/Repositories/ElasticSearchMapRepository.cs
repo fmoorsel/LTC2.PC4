@@ -16,6 +16,7 @@ namespace LTC2.Services.Calculator.Repositories
     {
         private readonly CalculatorSettings _settings;
         private readonly IPlacesRepository _placesRepository;
+        private readonly ILogger<AbstractElasticSearchRepository> _logger;
 
         private readonly string _tempId = "temp";
 
@@ -23,6 +24,7 @@ namespace LTC2.Services.Calculator.Repositories
         {
             _settings = settings;
             _placesRepository = placesRepository;
+            _logger = logger;
         }
 
         public void CheckPreparedMap()
@@ -249,6 +251,13 @@ namespace LTC2.Services.Calculator.Repositories
             }
 
             return placeDtos;
+        }
+
+        public List<double> GetCenterPointForName(string name)
+        {
+            _logger.LogWarning($"GetCenterPointForName is not implemented in {nameof(ElasticSearchMapRepository)}");
+
+            return null;
         }
 
         public List<Place> GetAllPlaces()

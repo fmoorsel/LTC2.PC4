@@ -2,6 +2,7 @@
 using LTC2.Shared.Models.Settings;
 using LTC2.Shared.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 
 namespace LTC2.Shared.SpatiaLiteRepository.Repositories
@@ -101,6 +102,27 @@ namespace LTC2.Shared.SpatiaLiteRepository.Repositories
         public List<Place> PreCheckTrack(List<List<double>> track)
         {
             return _spatiaLiteRepository.PreCheckTrack(track);
+        }
+
+        public List<double> GetCenterPointForName(string name)
+        {
+            try
+            {
+                var result = _spatiaLiteRepository.GetCenterPointForName(name);
+
+                if (result == null)
+                {
+                    _logger.LogWarning($"GetCenterPointForName: no result found for name '{name}'");
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning(e, $"GetCenterPointForName failed for name '{name}': {e.Message}");
+
+                return null;
+            }
         }
     }
 }

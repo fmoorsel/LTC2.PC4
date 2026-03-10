@@ -150,6 +150,13 @@ namespace LTC2.Services.Calculator.Repositories
             return result;
         }
 
+        public List<double> GetCenterPointForName(string name)
+        {
+            _logger.LogWarning($"GetCenterPointForName is not implemented in {nameof(MemoryMapRepository)}");
+
+            return null;
+        }
+
         public List<Place> GetAllPlaces()
         {
             return new List<Place>(_placesCache);

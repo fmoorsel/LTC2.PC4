@@ -191,6 +191,13 @@ namespace LTC2.Services.Calculator.Repositories
             return CheckTrack(track, "spGetPotentialPlacesOfCurrentTrack");
         }
 
+        public List<double> GetCenterPointForName(string name)
+        {
+            _logger.LogWarning($"GetCenterPointForName is not implemented in {nameof(SqlServerMapRepository)}");
+
+            return null;
+        }
+
         public List<Place> GetAllPlaces()
         {
             var result = new List<Place>();

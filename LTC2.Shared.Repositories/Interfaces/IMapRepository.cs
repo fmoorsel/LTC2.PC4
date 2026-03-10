@@ -19,5 +19,7 @@ namespace LTC2.Shared.Repositories.Interfaces
 
         public void CheckPreparedMap();
 
+        public List<double> GetCenterPointForName(string name);
+
     }
 }
