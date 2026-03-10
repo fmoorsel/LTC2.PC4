@@ -21,6 +21,7 @@ export class MapService implements IMapService {
     private _mapDistricts? : GeoJSON;
     
     private _nameDictionary = new Map<string, string>();
+    private _idDictionary = new Map<string, string>();
 
     getMap(): GeoJSON {
         if (this._map){
@@ -57,6 +58,7 @@ export class MapService implements IMapService {
 
                     if (pointer && name && id && !this._nameDictionary.has(id)) {
                         this._nameDictionary.set(id, name);
+                        this._idDictionary.set(name, id);
                     }
                 }
             });
@@ -117,6 +119,23 @@ export class MapService implements IMapService {
 
                 if (name) {
                     return name;
+                }
+            }
+        }
+
+        return emptyString;
+    }
+
+    getIdForPlaceName(name: string): string {
+        if (this._map) {
+
+            if (name){
+                this.populateDictionaryWhenEmpty();
+
+                const id = this._idDictionary.get(name);
+
+                if (id) {
+                    return id;
                 }
             }
         }

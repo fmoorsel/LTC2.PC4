@@ -41,7 +41,11 @@
                         <p class="pl-2">{{ todoLabel }}</p>
 
                         <div class="p-2 space-y-2 overflow-y-scroll overflow-x-clip mb-4" style="height: 160px;">
-                            <p v-for="line in sortedToDos" :key="line" class="p-2" style="padding-top: 0px; padding-bottom: 0px; margin: 0px;">{{ line }}</p>
+                            <p v-for="(names, lineIndex) in todoLines" :key="lineIndex" class="p-2" style="padding-top: 0px; padding-bottom: 0px; margin: 0px;">
+                                <template v-for="(name, nameIndex) in names" :key="name">
+                                    <a href="#" @click.prevent="onTodoClick(name)" class="text-blue-600 hover:underline">{{ name }}</a><span v-if="nameIndex < names.length - 1">, </span>
+                                </template>
+                            </p>
                         </div>
                    
                     </div>
@@ -70,7 +74,7 @@ import { runsInRideWithGpsMode } from "../utils/Utils";
 
 export default defineComponent ({
     
-    emits: ['profileUpdated', 'error'],
+    emits: ['profileUpdated', 'error', 'todoSelected'],
 
     setup (_, { emit }) {
         const _profileService = inject(AppTypes.IProfileServiceKey);
@@ -88,6 +92,7 @@ export default defineComponent ({
         const toDos = _mapService?.getGroupedNotCheckedPlaces(80, visits) ?? [];
 
         const sortedToDos = ref(toDos);
+        const todoLines = ref(toDos.map(line => line.split(', ').map(n => n.trim()).filter(n => n)));
 
         const modalElement = ref<HTMLElement>();
         const emailForm = ref<HTMLFormElement>();
@@ -131,6 +136,11 @@ export default defineComponent ({
 
         const hideModal = () => {
             modal.hide();
+        }
+
+        const onTodoClick = (name: string) => {
+            emit('todoSelected', name);
+            hideModal();
         }
 
         const submitForm = async () => {
@@ -177,7 +187,7 @@ export default defineComponent ({
             return true;
         }
 
-        return { showModal, hideModal, submitForm, validateEmail, modalElement, header, name, athleteId, athleteIdLabel, athleteLink, clientId, scoreLine, lastRideLine, scoreLineShort, lastRideLineShort, emailInput, emailLabel, emailForm, emailPlaceholder, buttonSave, buttonClose, isNotStandalone, todoLabel, sortedToDos }
+        return { showModal, hideModal, submitForm, validateEmail, modalElement, header, name, athleteId, athleteIdLabel, athleteLink, clientId, scoreLine, lastRideLine, scoreLineShort, lastRideLineShort, emailInput, emailLabel, emailForm, emailPlaceholder, buttonSave, buttonClose, isNotStandalone, todoLabel, sortedToDos, todoLines, onTodoClick }
     }
 })
 

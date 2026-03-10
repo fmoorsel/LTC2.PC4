@@ -6,6 +6,7 @@ export interface IMapService {
     loadMap(): Promise<void>;
 
     getPlaceName(placeId: string): string;
+    getIdForPlaceName(name: string): string;
     getPlaceCount(): number;
 
     getGroupedNotCheckedPlaces(maxChars: number, checked: string[]): string[];

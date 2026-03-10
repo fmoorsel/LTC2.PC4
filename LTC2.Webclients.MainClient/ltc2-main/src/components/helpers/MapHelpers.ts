@@ -52,11 +52,16 @@ export class MapStyleHelper {
     public static LayerStyleCheckedPlace = 9;
     public static LayerStyleNewCheckedPlace = 10;
     public static LayerStyleNewYearCheckedPlace = 11;
+    public static LayerStyleDistrictsLine = 12;
 
     private _styles : Style[] = [];
 
     constructor() {
         this.initStyles();
+    }
+
+    public getRawStyle(styleId: number): Style {
+        return this._styles[styleId];
     }
 
     public getStyle(styleId: number, map: Map | undefined): Style {        
@@ -114,7 +119,6 @@ export class MapStyleHelper {
                 width: 0.5
             })
         });
-
       
         const layerStyleVisitedMulti = new Style({
             fill: new Fill({
@@ -145,7 +149,6 @@ export class MapStyleHelper {
                 width: 0.5
             })
         });                
-
 
         const layerStyleLine = new Style({
             stroke: new Stroke({
@@ -265,6 +268,13 @@ export class MapStyleHelper {
             })
         });
 
+        const layerStyleDistrictBordersLine = new Style({
+            stroke: new Stroke({
+                color: '#000000',
+                width: 2
+            })
+        });
+
         this._styles[MapStyleHelper.LayerStyle] = layerStyle;
         this._styles[MapStyleHelper.LayerStyleVisited] = layerStyleVisited;
         this._styles[MapStyleHelper.LayerStyleVisitedYear] = layerStyleVisitedYear;
@@ -277,6 +287,7 @@ export class MapStyleHelper {
         this._styles[MapStyleHelper.LayerStyleCheckedPlace] = layerStyleCheckedPlace;
         this._styles[MapStyleHelper.LayerStyleNewCheckedPlace] = layerStyleNewCheckedPlace;
         this._styles[MapStyleHelper.LayerStyleNewYearCheckedPlace] = layerStyleNewCheckedYearPlace;
+        this._styles[MapStyleHelper.LayerStyleDistrictsLine] = layerStyleDistrictBordersLine;
 
         if (runsInMultiSportMode()) {
             this._styles[MapStyleHelper.LayerStyleVisited] = layerStyleVisitedMulti;
@@ -332,6 +343,9 @@ export class MapHelper {
 
     private _provincesLayer: VectorLayer<VectorSource> | undefined;
     private _showProvinces = false;
+
+    private _todoLayer: VectorTileLayer | undefined;
+    private _showTodo = false;
 
     private _timelapseRunning = false;
     private _timelapseBreakRequested = false;
@@ -427,6 +441,7 @@ export class MapHelper {
         this.removeTrackLayers();
         this.removeTimelapseLayers();
         this.removeRouteLayers();
+        this.removeTodoLayer();
 
         if (this._showYear) {
             this._map.addLayer(this._yearLayer);
@@ -448,6 +463,7 @@ export class MapHelper {
         this.removeTrackLayers();
         this.removeTimelapseLayers();
         this.removeRouteLayers();
+        this.removeTodoLayer();
 
         if (this._showLast) {
             this._map.addLayer(this._lastRidePlacesLayer);
@@ -466,10 +482,11 @@ export class MapHelper {
 
     public showHideTrackForSelectedPlace() {
         const isTrackShowed = this._showTrack;
-        
+
         this.removeTrackLayers();
         this.removeTimelapseLayers();
         this.removeRouteLayers();
+        this.removeTodoLayer();
 
         if (this._showYear) {
             this._map.removeLayer(this._yearLayer);
@@ -491,10 +508,11 @@ export class MapHelper {
 
     public showHideRoute() {
         const isRouteShowed = this._showRoute;
-        
+
         this.removeTrackLayers();
         this.removeTimelapseLayers();
         this.removeRouteLayers();
+        this.removeTodoLayer();
 
         if (this._showYear) {
             this._map.removeLayer(this._yearLayer);
@@ -554,6 +572,8 @@ export class MapHelper {
     public showHideProvinces(geoJson: GeoJSON) {
         this._showProvinces = !this._showProvinces;
 
+        const mapStyleHelper = this._mapStyleHelper;
+
         if (this._showProvinces) {
             if (!this._provincesLayer) {
                 const format = new GeoJSONFormat();
@@ -563,12 +583,7 @@ export class MapHelper {
 
                 this._provincesLayer = new VectorLayer({
                     source: new VectorSource({ features }),
-                    style: new Style({
-                        stroke: new Stroke({
-                            color: '#000000',
-                            width: 2
-                        })
-                    }),
+                    style: mapStyleHelper.getRawStyle(MapStyleHelper.LayerStyleDistrictsLine),
                     zIndex: 1000
                 });
             }
@@ -626,10 +641,71 @@ export class MapHelper {
         this._showTimelapse = false;
     }
 
+    public removeTodoLayer() {
+        if (this._showTodo) {
+            if (this._todoLayer) {
+                this._map.removeLayer(this._todoLayer);
+            }
+
+            this._todoLayer = undefined;
+            this._showTodo = false;
+        }
+    }
+
+    public getShowTodo(): boolean {
+        return this._showTodo;
+    }
+
+    public showTodoPlace(placeId: string, centerPoint: number[] | null) {
+        this.removeTodoLayer();
+        this.removeTrackLayers();
+        this.removeTimelapseLayers();
+        this.removeRouteLayers();
+
+        if (this._showYear) {
+            this._map.removeLayer(this._yearLayer);
+            this._showYear = false;
+        }
+
+        if (this._showLast) {
+            this._map.removeLayer(this._lastRideLineLayer);
+            this._map.removeLayer(this._lastRidePlacesLayer);
+            this._showLast = false;
+        }
+
+        const mapStyleHelper = this._mapStyleHelper;
+        const map = this._map;
+
+        this._todoLayer = new VectorTileLayer({
+            source: this._vectorTileSource,
+            style: function (feature) {
+                const featurePointer = feature.getProperties()["featurePointer"] as string;
+                const id = featurePointer.split(":")[0];
+
+                if (id === placeId) {
+                    return mapStyleHelper.getStyle(MapStyleHelper.LayerStyleSelectedPlace, map);
+                }
+
+                return new Style();
+            }
+        });
+
+        this._map.addLayer(this._todoLayer);
+        this._showTodo = true;
+
+        if (centerPoint) {
+            const center = fromLonLat([centerPoint[0], centerPoint[1]]);
+
+            this._map.getView().setCenter(center);
+            this._map.getView().setZoom(this.getInitialZoom() + 4);
+        }
+    }
+
     public showTrackForSelectedPlace(placeId: string, track: Track, doZoom = true) {
         this.removeTrackLayers();
         this.removeTimelapseLayers();
         this.removeRouteLayers();
+        this.removeTodoLayer();
 
         this._currentTrack = track;
         this._currentPlace = placeId;
@@ -722,6 +798,7 @@ export class MapHelper {
             this.removeTrackLayers();
             this.removeTimelapseLayers();
             this.removeRouteLayers();
+            this.removeTodoLayer();
     
             this._currentRoutes = routes;
 
@@ -799,6 +876,7 @@ export class MapHelper {
     private removeNonTimelapseLayers() {
         this.removeTrackLayers();
         this.removeRouteLayers();
+        this.removeTodoLayer();
     
         if (this._showYear) {
             this._map.removeLayer(this._yearLayer);

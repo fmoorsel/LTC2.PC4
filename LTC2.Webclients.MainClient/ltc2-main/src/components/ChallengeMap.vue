@@ -236,6 +236,16 @@ export default defineComponent({
             });
         }
 
+        const showTodoPlace = (placeId: string, centerPoint: number[] | null) => {
+            if (mapHelper.isTimelapseRunning()) {
+                mapHelper.performTimelapse(undefined);
+            }
+
+            mapHelper.showTodoPlace(placeId, centerPoint);
+
+            doCheckBoxes(0);
+        }
+
         const showTrackForPlace = (placeId: string, track: Track) => {
             if (mapHelper.getShowLastRide()) {
                 onShowHideLast();
@@ -282,7 +292,7 @@ export default defineComponent({
             }
         }
 
-        return ({ challengeMap, popup, place, closePopup, mapcontrol, checkBoxYear, checkBoxLast, checkBoxTrack, checkBoxRoute, checkBoxProvinces, onclickDetails, onclickCheckRoute, buttonText, buttonReloadRouteText, buttonCheckRouteText, buttonRouteText, bottumYearText: bottonYearText, buttonTimelapseText, bottumText, bottumLastText: buttonLastText, bottumProvinciesText, hasYear, onShowHideYear, onShowHideLast, onShowHideTrackForPlace, onShowHideRoute, onShowHideProvinces, showTrackForPlace, onClickTimelapse, hasTrack, currentTrackDate, showRoute, hasRoutes, isStravaRoute, onclickReloadRoute } )
+        return ({ challengeMap, popup, place, closePopup, mapcontrol, checkBoxYear, checkBoxLast, checkBoxTrack, checkBoxRoute, checkBoxProvinces, onclickDetails, onclickCheckRoute, buttonText, buttonReloadRouteText, buttonCheckRouteText, buttonRouteText, bottumYearText: bottonYearText, buttonTimelapseText, bottumText, bottumLastText: buttonLastText, bottumProvinciesText, hasYear, onShowHideYear, onShowHideLast, onShowHideTrackForPlace, onShowHideRoute, onShowHideProvinces, showTrackForPlace, showTodoPlace, onClickTimelapse, hasTrack, currentTrackDate, showRoute, hasRoutes, isStravaRoute, onclickReloadRoute } )
     }
 })
 </script>

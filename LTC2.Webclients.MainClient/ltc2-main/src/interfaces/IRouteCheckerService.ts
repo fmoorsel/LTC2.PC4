@@ -9,4 +9,6 @@ export interface IRouteCheckerService {
     checkRoute(routeId: string, source?: string): Promise<Routes | undefined>;
 
     checkGpxFromPath(file: string): Promise<Routes | undefined>;
+
+    getCenterPointForName(name: string): Promise<number[] | null>;
 }

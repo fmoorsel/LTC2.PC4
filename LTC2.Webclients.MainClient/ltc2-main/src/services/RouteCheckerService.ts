@@ -127,6 +127,40 @@ export class RouteCheckerService implements IRouteCheckerService {
         }
     }
 
+    async getCenterPointForName(name: string): Promise<number[] | null> {
+        const token = await this._profileService?.getToken();
+
+        if (token) {
+            const settings = await this._settingsService?.getSettings();
+            const url = settings?.routeServiceBaseUrl;
+            const timeout = 3 * (this._clientSetting?.requestTimeout ?? 5000);
+
+            try {
+                const result = await axios.get<number[]>(url + '/api/Route/centerpoint?name=' + encodeURIComponent(name), {headers: {'Authorization': `Bearer ${token}`}, timeout: timeout});
+
+                return result.data;
+            } catch(error) {
+                console.log(error);
+
+                if(axios.isAxiosError(error)){
+                    const axiosError = error as AxiosError;
+
+                    if (axiosError.response?.status == 401){
+                        throw new NotAuthorizedException("Missing or expired token.");
+                    }
+
+                    if (axiosError.response?.status == 404){
+                        return null;
+                    }
+                }
+
+                throw error;
+            }
+        } else {
+            throw new NotAuthorizedException("Missing or expired token.");
+        }
+    }
+
     async checkRoute(routeId: string, source?: string): Promise<Routes | undefined> {
         const token = await this._profileService?.getToken();
         

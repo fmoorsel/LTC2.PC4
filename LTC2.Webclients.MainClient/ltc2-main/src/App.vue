@@ -45,7 +45,7 @@
       </div>
       <ChallengeMap ref="challengeMap" @detailsRequested="onShowResultClick()" @route-requested="onRoutesRequested" @spinnerRequested="onSpinnerRequested()" @route-selection-requested="onRouteSelectionRequested()"/>
       <ResultsModal :visits="visits" ref="resultsModal" @error="onError" @track-for-place-requested="onTrackForPlaceRequested" />
-      <ProfileModal ref="profileModal" @profileUpdated="onProfileUpdated()" @error="onError"/>
+      <ProfileModal ref="profileModal" @profileUpdated="onProfileUpdated()" @error="onError" @todo-selected="onTodoSelected"/>
       <SpinnerModal ref="spinnerModal" />
       <RouteSelectionModal ref="routeSelectionModal" @error="onError" @route-requested="onRoutesRequested"/>
     </div>
@@ -78,6 +78,7 @@ export default {
     const _profileService = inject(AppTypes.IProfileServiceKey);
     const _mapService = inject(AppTypes.IMapServiceKey);
     const _translationService = inject(AppTypes.ITranslationServiceKey);
+    const _routeCheckerService = inject(AppTypes.IRouteCheckerService);
 
     const profileVisits = _profileService ? _profileService?.getVisits() : [];
     
@@ -141,6 +142,13 @@ export default {
       challengeMap.value?.showRoute(routes);
     }
 
+    const onTodoSelected = async (name: string) => {
+      const placeId = _mapService?.getIdForPlaceName(name) ?? '';
+      const centerPoint = await _routeCheckerService?.getCenterPointForName(name) ?? null;
+
+      challengeMap.value?.showTodoPlace(placeId, centerPoint);
+    }
+
     const onRouteSelectionRequested = () => {
       routeSelectionModal.value?.showModal();
     }
@@ -200,7 +208,7 @@ export default {
       }
     }
     
-    return { name, profileComplete, notCompleteMessage, completeMessage, visits, onError, onShowResultClick, onRouteSelectionRequested, onShowProfileClick, onProfileUpdated, resultsModal, routeSelectionModal, profileModal, buttonText, buttonProfileText, buttonProfileTextAlt, createHSpaceMessage, createHSpaceMessageMobile, createWSpaceMessage, ismobile, hasError, errorMessage, onTrackForPlaceRequested, challengeMap, spinnerModal, onSpinnerRequested, isStandalone, onRoutesRequested }
+    return { name, profileComplete, notCompleteMessage, completeMessage, visits, onError, onShowResultClick, onRouteSelectionRequested, onShowProfileClick, onProfileUpdated, resultsModal, routeSelectionModal, profileModal, buttonText, buttonProfileText, buttonProfileTextAlt, createHSpaceMessage, createHSpaceMessageMobile, createWSpaceMessage, ismobile, hasError, errorMessage, onTrackForPlaceRequested, challengeMap, spinnerModal, onSpinnerRequested, isStandalone, onRoutesRequested, onTodoSelected }
   }
 }
 </script>
