@@ -269,6 +269,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         {
             pbxBrowsing.Visible = true;
             btnRefresh.Enabled = false;
+            btnRefresh.BackgroundImage = Properties.Resources.refresh3;
         }
 
         private void webView_NavigationCompleted(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)
