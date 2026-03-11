@@ -28,5 +28,7 @@ export class GetClientSettingsTask implements ISeriveTask {
         gloClientSettings.urlTiles = clientSettings.data.urlTiles;
         gloClientSettings.standaloneVersion = clientSettings.data.standaloneVersion;
         gloClientSettings.trackZoom = clientSettings.data.trackZoom;
+        gloClientSettings.urlStravaRoutePlanner = clientSettings.data.urlStravaRoutePlanner;
+        gloClientSettings.urlRwGpsRoutePlanner = clientSettings.data.urlRwGpsRoutePlanner;
     }
 }

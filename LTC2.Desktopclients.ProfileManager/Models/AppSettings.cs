@@ -24,7 +24,6 @@
 
         public int PingDeltaInSeconds { get; set; }
 
-
         public string WebviewRoot
         {
             get

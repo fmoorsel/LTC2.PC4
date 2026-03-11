@@ -38,6 +38,8 @@
 
         public bool DisablePasswordSave { get; set; }
 
+        public List<string> SkipCookiesWhileDeleting { get; set; }
+
         public string TilesOKFile
         {
             get

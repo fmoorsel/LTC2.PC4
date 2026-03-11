@@ -29,6 +29,9 @@ class ClientSettings {
     public standaloneVersion = false;
 
     public trackZoom = 8.5;
+
+    public urlStravaRoutePlanner = "https://www.strava.com/maps/create";
+    public urlRwGpsRoutePlanner = "https://ridewithgps.com/routes/new";
 }
 
 const gloClientSettings = new ClientSettings();
