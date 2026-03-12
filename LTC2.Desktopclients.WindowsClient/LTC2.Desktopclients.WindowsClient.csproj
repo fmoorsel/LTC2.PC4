@@ -65,9 +65,6 @@
     <None Update="Resources\messages.nl.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\strava - Copy.init">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Resources\strava.init">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
