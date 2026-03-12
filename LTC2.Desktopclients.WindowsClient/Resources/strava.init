@@ -1,0 +1,120 @@
+﻿function GetMapbox() {
+    console.log('looking for mapbox element');
+
+    var elements = document.getElementsByClassName('mapboxgl-map');
+    if (elements[0] == null) {
+        console.log('mapbox element not found');
+    } else {
+        var element = elements[0];
+        Object.entries(element).find(([k, _]) => k.startsWith('__react'))[1].return.memoizedProps.mapboxRef((x) => (window.routeMap = x, x));
+
+        if (window.routeMap != null) {
+            console.log('route map found');
+
+            console.log('try adding vector layer');
+
+            window.routeMap.on('style.load', () => {
+                console.log('changed layer style re-add layer to: ' + window.routeMap.getStyle().sprite);
+
+                AddTileLayer();
+            });
+
+
+            AddTileLayer();
+
+            return '1';
+        }
+
+        console.log('route map is null try again');
+    }
+
+    return '0';
+}
+
+function AddTileLayer() {
+    if (window.routeMap != null) {
+        console.log('adding vector layer');
+        window.routeMap.addSource('ltc2tiles', {
+            'type': 'vector',
+            'tiles': [' http://localhost:50000/api/Tiles/tile/{z}/{x}/{y}.pbf'],
+            'minzoom': 3,
+            'maxzoom': 17
+        });
+        window.routeMap.addLayer({
+            'id': 'ltc2tiles',
+            'type': 'line',
+            'source': 'ltc2tiles',
+            'source-layer': 'geojsonLayer',
+            'layout': {
+                'line-cap': 'round',
+                'line-join': 'round'
+            },
+            'paint': {
+                'line-opacity': 1.0,
+                'line-color': GetColor(),
+                'line-width': 2
+            },
+            slot: 'middle'
+        });
+
+        window.routeMap.addLayer({
+            'id': 'fltc2tiles',
+            'type': 'fill',
+            'source': 'ltc2tiles',
+            'source-layer': 'geojsonLayer',
+            'paint': {
+                'fill-opacity': 0.0,
+                'fill-color': GetColor()
+            }
+        });
+
+        window.routeMap.on('mousemove', 'fltc2tiles', (event) => {
+            console.log('mouse move on tile layer');
+
+            if (event.features.length > 0) {
+                console.log(event.features[0].properties.popupContent);
+
+                if (window.chrome && window.chrome.webview) {
+                    console.log("posting message to webview");
+
+                    chrome.webview.postMessage(event.features[0].properties.popupContent);
+                }
+            }
+        });
+
+        window.routeMap.on('mousemove', (e) => {
+            const features = window.routeMap.queryRenderedFeatures(e.point, {
+                layers: ['fltc2tiles']
+            });
+
+            if (features.length <= 0) {
+                if (window.chrome && window.chrome.webview) {
+                    chrome.webview.postMessage("----");
+                }
+            }
+        });
+
+    } else {
+        console.log('route map is null cannot add tile layer');
+    }
+}
+
+function GetColor() {
+    const stryle = window.routeMap.getStyle().sprite;
+
+    if (stryle.includes('satellite')) {
+        return 'rgb(255,165,0)';
+    } else if (stryle.includes('hybrid')) {
+        return 'rgb(255,165,0)';
+    } else if (stryle.includes('dark-standard')) {
+        return 'rgb(255,165,0)';
+    } else if (stryle.includes('winter')) {
+        return 'rgb(0,0,0)';
+    } else if (stryle.includes('light')) {
+        return 'rgb(0,0,0)';
+    } else if (stryle.includes('standard')) {
+        return 'rgb(0,0,0)';
+    }
+}
+
+GetMapbox();

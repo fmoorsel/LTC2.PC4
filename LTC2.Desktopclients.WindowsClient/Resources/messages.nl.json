@@ -56,5 +56,8 @@
   "form.selectactivities": "Selecteer je MultiSport sporten",
   "groupbox.selectactivies": "Vink je sporten aan",
   "button.selectactvities.ok": "Toepassen",
-  "button.selectactvities.cancel": "Annuleren"
+  "button.selectactvities.cancel": "Annuleren",
+
+  "plugin.install.failed": "Kan de Route Builder extensie niet activeren.",
+  "plugin.install.failed.header": "Helaas..."
 }

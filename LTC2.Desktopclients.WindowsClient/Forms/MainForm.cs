@@ -9,6 +9,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
     public partial class MainForm : Form
     {
         private readonly SplashScreen _splashScreen;
+        private readonly RoutePlanner _routePlanner;
         private readonly StatusNotifier _statusNotifier;
         private readonly UpdateActivitiesForm _updateActivities;
         private readonly WebviewConnector _webviewConnector;
@@ -24,6 +25,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
         public MainForm(
             SplashScreen splashScreen,
+            RoutePlanner routePlanner,
             StatusNotifier statusNotifier,
             UpdateActivitiesForm updateActivities,
             WebviewConnector webviewConnector,
@@ -37,6 +39,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             this.AutoScaleMode = AutoScaleMode.Dpi;
 
             _splashScreen = splashScreen;
+            _routePlanner = routePlanner;
             _statusNotifier = statusNotifier;
             _updateActivities = updateActivities;
             _webviewConnector = webviewConnector;
@@ -57,6 +60,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             Show();
 
             await InitWebview();
+            await _routePlanner.InitRoutePlanner();
 
             _statusNotifier.OnStatusNotification += OnStatusNotification;
 
@@ -268,6 +272,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private void webView_NavigationStarting(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs e)
         {
             pbxBrowsing.Visible = true;
+
             btnRefresh.Enabled = false;
             btnRefresh.BackgroundImage = Properties.Resources.refresh3;
         }
@@ -300,87 +305,6 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                 {
                     btnRefresh.BackgroundImage = Properties.Resources.refresh3;
                 }
-
-                if (webView.CoreWebView2.Source.StartsWith("https://www.strava.com/maps/create"))
-                {
-                    var script = @"
-                        function GetMapbox() {
-                            console.log('looking for mapbox element');
-                        
-                            var elements = document.getElementsByClassName('mapboxgl-map');
-                            if (elements[0] == null) {
-                                console.log('mapbox element not found');
-                            } else {
-                                var element = elements[0];
-                                Object.entries(element).find(([k, _]) => k.startsWith('__react'))[1].return.memoizedProps.mapboxRef((x) => (window.routeMap = x, x));
-            
-                                if (window.routeMap != null) {
-                                    console.log('route map found');
-
-                                    console.log('try adding vector layer');
-
-                                    window.routeMap.on('style.load', () => {
-                                        console.log('changed layer style re-add layer to: ' + window.routeMap.getStyle().sprite);
-
-                                        AddTileLayer();
-                                    });
-
-                                    AddTileLayer();
-            
-                                    return '1';
-                                } 
-                            
-                                console.log('route map is null try again');
-                            }
-
-                            return '0';
-                        }
-
-                        function AddTileLayer() {
-                            if (window.routeMap != null) {
-                                console.log('adding vector layer');
-                                window.routeMap.addSource('ltc2tiles', {
-                                    'type': 'vector',
-                                    'tiles': [' http://localhost:50000/api/Tiles/tile/{z}/{x}/{y}.pbf'],
-                                    'minzoom': 3,
-                                    'maxzoom': 17
-                                });
-                                window.routeMap.addLayer({
-                                    'id': 'ltc2tiles',
-                                    'type': 'line',
-                                    'source': 'ltc2tiles',
-                                    'source-layer': 'geojsonLayer',
-                                    'layout': {
-                                        'line-cap': 'round',
-                                        'line-join': 'round'
-                                    },
-                                    'paint': {
-                                        'line-opacity': 1.0,
-                                        'line-color': 'rgb(0, 0, 0)',
-                                        'line-width': 2
-                                    },
-                                    slot: 'middle'
-                                });
-                            } else {
-                                console.log('route map is null cannot add tile layer');
-                            }
-                        }
-
-                        GetMapbox();
-                    ";
-
-                    Task.Run(async () =>
-                    {
-                        var r = await webView.ExecuteScriptAsync(script);
-
-                        while (r == null || r.Trim('"') != "1")
-                        {
-                            await Task.Delay(500);
-
-                            r = await webView.ExecuteScriptAsync(script);
-                        }
-                    });
-                }
             }
         }
 
@@ -409,6 +333,11 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private string GetUrl()
         {
             return $"{_appSettings.StartPage}?language={_translationService.CurrentLanguage}&multi={_multiSportManager.RunInMultiSportMode}&source={_multiSportManager.RunWithSource}";
+        }
+
+        private void webView_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
+        {
+            _routePlanner.ShowPlanner();
         }
     }
 }

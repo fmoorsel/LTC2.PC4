@@ -153,13 +153,11 @@ export default defineComponent({
         const onclickPlanRoute = () => {
             console.log("onclickPlanRoute");
             
-            const url = runsInRideWithGpsMode()
-                ? _clientSettings?.urlRwGpsRoutePlanner
-                : _clientSettings?.urlStravaRoutePlanner;
+            const provider = runsInRideWithGpsMode() ? "ridewithgps" : "strava";
 
-            console.log("route planner url: " + url);
+            console.log("route planner url: " + provider);
 
-            if (url) window.location.href = url;
+            (window as any).postHostMessage("routeplanner", provider);
         }
 
         const onclickCheckRoute = () => {

@@ -13,7 +13,5 @@
   "mapZoomMobile": 6.5,
   "messageTimeout": 2000,
   "urlTiles": "http://localhost:50000/api/Tiles/tile/{z}/{x}/{y}.pbf",
-  "standaloneVersion": true,
-  "urlStravaRoutePlanner": "https://www.strava.com/maps/create",
-  "urlRwGpsRoutePlanner": "https://ridewithgps.com/routes/new"
+  "standaloneVersion": true
 }
