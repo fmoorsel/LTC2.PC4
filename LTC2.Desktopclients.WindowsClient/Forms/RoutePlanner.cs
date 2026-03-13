@@ -1,6 +1,8 @@
 using LTC2.Desktopclients.WindowsClient.Models;
 using LTC2.Desktopclients.WindowsClient.Services;
+using LTC2.Shared.Http.Interfaces;
 using LTC2.Shared.Messages.Interfaces;
+using LTC2.Shared.Models.Responses;
 using Microsoft.Web.WebView2.Core;
 using System.Diagnostics;
 
@@ -11,14 +13,21 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private readonly AppSettings _appSettings;
         private readonly MultiSportManager _multiSportsManager;
         private readonly ITranslationService _translationService;
+        private readonly ILTC2HttpProxy _ltc2Proxy;
+        private readonly WebviewConnector _webviewConnector;
 
         private FormWindowState _previousWindowState;
 
         private string _initScript;
 
+        private readonly object _profileLock = new object();
+        private GetProfileResponse _profile;
+
         public RoutePlanner(
             AppSettings appSettings,
             ITranslationService translationService,
+            WebviewConnector webviewConnector,
+            ILTC2HttpProxy ltc2Proxy,
             MultiSportManager multiSportsManager)
         {
             InitializeComponent();
@@ -28,6 +37,8 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             _appSettings = appSettings;
             _multiSportsManager = multiSportsManager;
             _translationService = translationService;
+            _ltc2Proxy = ltc2Proxy;
+            _webviewConnector = webviewConnector;
 
             _previousWindowState = FormWindowState.Normal;
         }
@@ -69,10 +80,16 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                 return;
             }
 
+            if (webView.CoreWebView2.Source.StartsWith(GetStartUrl()) && GetProfile() == null)
+            {
+                UpdateProfile();
+            }
+
             if (webView.CoreWebView2.Source.StartsWith(GetBuilderPrefix()))
             {
                 Task.Run(async () =>
                 {
+                    var profile = EnsureProfile();
                     var r = await webView.ExecuteScriptAsync(_initScript);
                     var attempts = 1;
 
@@ -122,8 +139,6 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
             pnlBar_Resize(this, EventArgs.Empty);
 
-
-
             Show();
             Activate();
 
@@ -142,6 +157,54 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                 lblCurrentPlace.Text = string.Empty;
             }
 
+        }
+
+        private GetProfileResponse GetProfile()
+        {
+            lock (_profileLock)
+            {
+                return _profile;
+            }
+        }
+
+        private async Task<GetProfileResponse> EnsureProfile()
+        {
+            if (GetProfile() == null)
+            {
+                SetProfile(await RetrieveProfile());
+            }
+
+            return GetProfile();
+        }
+
+        private void SetProfile(GetProfileResponse profile)
+        {
+            lock (_profileLock)
+            {
+                _profile = profile;
+            }
+        }
+
+
+        private async Task<GetProfileResponse> RetrieveProfile()
+        {
+            var token = await _webviewConnector.Login();
+            var profile = await _ltc2Proxy.GetProfile(token);
+
+            return profile;
+        }
+
+        public void UpdateProfile()
+        {
+            Task.Run(async () =>
+            {
+                var profile = await RetrieveProfile();
+
+                lock (_profileLock)
+                {
+                    _profile = profile;
+                }
+            });
         }
 
         private string GetStartUrl()
@@ -194,7 +257,37 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
         private void webView_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
         {
-            lblCurrentPlace.Text = $"Postcode: {e.TryGetWebMessageAsString()}";
+            var parameter = e.TryGetWebMessageAsString();
+            var parts = parameter.Split(',');
+
+            var postcode = parts[0];
+            var id = parts[1].Split(':')[0];
+
+            var profile = GetProfile();
+
+            if (profile != null)
+            {
+                var visitedAlltime = profile.PlacesInAllTimeScore.FirstOrDefault(p => p.Id == id);
+                var visitedYear = profile.PlacesInYearScore.FirstOrDefault(p => p.Id == id);
+
+                if (visitedAlltime != null && visitedYear != null)
+                {
+                    lblCurrentPlace.Text = _translationService.GetMessage("#routeplanner.postcode.year", postcode);
+                }
+                else if (visitedAlltime != null)
+                {
+                    lblCurrentPlace.Text = _translationService.GetMessage("#routeplanner.postcode.visited", postcode);
+                }
+                else
+                {
+                    lblCurrentPlace.Text = _translationService.GetMessage("#routeplanner.postcode", postcode);
+                }
+            }
+            else
+            {
+                lblCurrentPlace.Text = _translationService.GetMessage("#routeplanner.postcode", postcode);
+            }
+
             lblCurrentPlace.Left = (int)(pnlPlace.Width * 0.5f - lblCurrentPlace.Width * 0.5f);
         }
 

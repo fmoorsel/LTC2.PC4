@@ -1,8 +1,10 @@
 ﻿using LTC2.Desktopclients.WindowsClient.Models;
 using LTC2.Desktopclients.WindowsClient.Services;
+using LTC2.Shared.Http.Interfaces;
 using LTC2.Shared.Messages.Interfaces;
 using LTC2.Shared.Models.Interprocess;
 using Microsoft.Web.WebView2.Core;
+using Newtonsoft.Json;
 
 namespace LTC2.Desktopclients.WindowsClient.Forms
 {
@@ -17,6 +19,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private readonly ProfileManager _profileManager;
         private readonly ITranslationService _translationService;
         private readonly MultiSportManager _multiSportManager;
+        private readonly ILTC2HttpProxy _ltc2Proxy;
 
         private bool _inFatalMode;
         private bool _isUpdating;
@@ -30,6 +33,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             UpdateActivitiesForm updateActivities,
             WebviewConnector webviewConnector,
             ProfileManager profileManager,
+            ILTC2HttpProxy ltc2Proxy,
             ITranslationService translationService,
             MultiSportManager multiSportManager,
             AppSettings appSettings)
@@ -47,6 +51,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             _appSettings = appSettings;
             _translationService = translationService;
             _multiSportManager = multiSportManager;
+            _ltc2Proxy = ltc2Proxy;
 
             _inFatalMode = false;
 
@@ -138,11 +143,15 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
                 _multiSportManager.RefreshCurrentActivityTypes();
 
+                UpdateProfile();
+
                 webView.CoreWebView2.Navigate(GetUrl());
             }
             else if (status.Status == StatusMessage.STATUS_LIMIT)
             {
                 lblUpdateProgress.Text = _translationService.GetMessage("progress.limit");
+
+                UpdateProfile();
 
                 webView.CoreWebView2.Navigate(GetUrl());
             }
@@ -161,6 +170,12 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
                 Close();
             }
+        }
+
+
+        private void UpdateProfile()
+        {
+            _routePlanner.UpdateProfile();
         }
 
         private string GetDateFromPing(string msg)
@@ -337,7 +352,28 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
         private void webView_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
         {
-            _routePlanner.ShowPlanner();
+            try
+            {
+                var message = e.WebMessageAsJson;
+
+                if (!string.IsNullOrEmpty(message))
+                {
+                    var webMessage = JsonConvert.DeserializeObject<GenericWebMessage>(message);
+
+                    if (webMessage!.Message == "routeplanner")
+                    {
+                        _routePlanner.ShowPlanner();
+                    }
+                    else if (webMessage.Message == "setprofile")
+                    {
+                        MessageBox.Show(message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }

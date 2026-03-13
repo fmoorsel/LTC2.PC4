@@ -55,9 +55,9 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             // pnlPlace
             // 
             pnlPlace.Controls.Add(lblCurrentPlace);
-            pnlPlace.Location = new Point(545, 0);
+            pnlPlace.Location = new Point(424, 0);
             pnlPlace.Name = "pnlPlace";
-            pnlPlace.Size = new Size(200, 62);
+            pnlPlace.Size = new Size(531, 62);
             pnlPlace.TabIndex = 2;
             // 
             // lblCurrentPlace

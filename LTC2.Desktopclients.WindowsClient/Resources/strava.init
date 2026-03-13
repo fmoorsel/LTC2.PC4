@@ -77,7 +77,7 @@ function AddTileLayer() {
                 if (window.chrome && window.chrome.webview) {
                     console.log("posting message to webview");
 
-                    chrome.webview.postMessage(event.features[0].properties.popupContent);
+                    chrome.webview.postMessage(event.features[0].properties.popupContent + "," + event.features[0].properties.featurePointer);
                 }
             }
         });
@@ -89,7 +89,7 @@ function AddTileLayer() {
 
             if (features.length <= 0) {
                 if (window.chrome && window.chrome.webview) {
-                    chrome.webview.postMessage("----");
+                    chrome.webview.postMessage("----,----");
                 }
             }
         });

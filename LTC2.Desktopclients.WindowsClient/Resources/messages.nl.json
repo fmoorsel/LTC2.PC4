@@ -59,5 +59,9 @@
   "button.selectactvities.cancel": "Annuleren",
 
   "plugin.install.failed": "Kan de Route Builder extensie niet activeren.",
-  "plugin.install.failed.header": "Helaas..."
+  "plugin.install.failed.header": "Helaas...",
+
+  "routeplanner.postcode": "Postcode: %0%",
+  "routeplanner.postcode.year": "Postcode: %0% (ook dit jaar afgevinkt)",
+  "routeplanner.postcode.visited": "Postcode: %0% (afgevinkt)"
 }
