@@ -129,8 +129,8 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
                 var visitedYear = profile.PlacesInYearScore
                             .Select(p => p.ScriptId).ToList();
-                var
-                    visitedAlltimeString = string.Join(",", visitedAlltime);
+
+                var visitedAlltimeString = string.Join(",", visitedAlltime);
                 var visitedYearString = string.Join(",", visitedYear);
 
                 var script = _rawInitScript.Replace("\"GetVisitedAlltime\"", visitedAlltimeString);

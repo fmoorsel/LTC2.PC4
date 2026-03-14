@@ -53,7 +53,6 @@ function AddLayers(){
         'maxzoom': 17
     });
 
-
     window.mapInstance.addLayer({
         'id': 'fltc2tiles',
         'type': 'fill',
@@ -61,7 +60,7 @@ function AddLayers(){
         'source-layer': 'geojsonLayer',
         'paint': {
             'fill-opacity': 0.3,
-            'fill-color': 'rgb(0,0,0)'
+            'fill-color': GetFillColor()
         }
     });
 
@@ -76,8 +75,52 @@ function AddLayers(){
         },
         'paint': {
             'line-opacity': 1.0,
-            'line-color': 'rgb(0,0,0)',
+            'line-color': GetColor(),
             'line-width': 2
+        }
+    });
+
+    window.mapInstance.on('mousemove', 'fltc2tiles', (event) => {
+        console.log('mouse move on tile layer');
+
+        if (event.features.length > 0) {
+            console.log(event.features[0].properties.popupContent);
+
+            if (window.chrome && window.chrome.webview) {
+                console.log("posting message to webview");
+                    
+                const id = event.features[0].properties.featurePointer.split(":")[0];
+
+                const isChecked = GetVisitedAlltime().includes(id);
+                const isCheckedYear = GetVisitedYear().includes(id);
+
+                console.log("isChecked: " + isChecked);
+                console.log("isCheckedYear: " + isCheckedYear);
+
+                chrome.webview.postMessage(event.features[0].properties.popupContent + "," + event.features[0].properties.featurePointer);
+            }
+        }
+    });
+
+    const checkExprVisitedAlltimeOpacity = [
+            'match',
+                ['slice', ['get', 'featurePointer'], 0, ['index-of', ':', ['get', 'featurePointer']]],
+                GetVisitedAlltime(), 0.25, 
+                GetVisitedYear(), 0.45, 
+                0.0              
+            ];
+
+    window.mapInstance.setPaintProperty('fltc2tiles', 'fill-opacity', checkExprVisitedAlltimeOpacity);
+
+    window.mapInstance.on('mousemove', (e) => {
+        const features = window.mapInstance.queryRenderedFeatures(e.point, {
+            layers: ['fltc2tiles']
+        });
+
+        if (features.length <= 0) {
+            if (window.chrome && window.chrome.webview) {
+                chrome.webview.postMessage("----,----");
+            }
         }
     });
 }
@@ -135,5 +178,20 @@ function LayerControl()
     }
 }
 
+function GetColor() {
+    return 'rgb(0,0,0)';
+}
+
+function GetFillColor() {
+    return 'rgb(255,165,0)';
+}
+
+function GetVisitedAlltime() {
+    return ["GetVisitedAlltime"];
+}
+
+function GetVisitedYear() {
+    return ["GetVisitedYear"];
+}
 
 Init();
