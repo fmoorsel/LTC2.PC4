@@ -95,7 +95,7 @@ export default defineComponent({
         const buttonRouteText =  _translationService?.getText("challengemap.buttonRouteText")
         const bottumProvinciesText = _translationService?.getText("challengemap.buttonProvinciesText")
 
-        const enablePlanRoute = !runsInRideWithGpsMode();
+        const enablePlanRoute = true;
 
         hasYear.value = scoreYear && scoreYear.length > 0;
 

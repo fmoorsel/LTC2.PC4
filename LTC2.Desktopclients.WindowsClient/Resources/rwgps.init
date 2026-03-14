@@ -1,0 +1,54 @@
+console.log("Start Initializing RWGPS");
+
+function addScript(url, id) {
+    console.log("Adding script: " + url);
+
+    const script = document.createElement('script');
+    script.src = url;
+    script.id = id;
+
+    document.head.appendChild(script);
+}
+
+function Init() {
+    console.log("Initializing RWGPS");
+
+    var instance = window.rwgps.MapDelegate.getMapInstance();
+    if (instance == null) {
+        return '0';
+    }
+
+    window.mapInstance = instance;
+
+    console.log("RWGPS Map Instance found");
+
+    setInterval(isMapChanged, 500);
+
+    return '1';
+}
+
+function isMapChanged() 
+{
+    var instance = window.rwgps.MapDelegate.getMapInstance();
+
+    if (instance != window.mapInstance) {
+        
+        console.log("RWGPS Map Instance changed");
+        
+        window.mapInstance = instance;
+
+        if (window.rwgps.MapDelegate.props.mapInstance.__gm) 
+        {
+            console.log("RWGPS Map Instance is now Google Maps");
+
+            if (document.getElementById("ltc2-deckgl")) {
+                console.log("Deck.gl script already added");
+            } else {
+                addScript("https://unpkg.com/deck.gl@9.2.11/dist.min.js", "ltc2-deckgl");
+            }
+        };
+    }
+}
+
+
+Init();
