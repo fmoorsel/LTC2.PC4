@@ -123,9 +123,14 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         {
             if (profile != null)
             {
-                var visitedAlltime = profile.PlacesInAllTimeScore.Select(p => p.ScriptId).ToList();
-                var visitedYear = profile.PlacesInYearScore.Select(p => p.ScriptId).ToList();
-                var visitedAlltimeString = string.Join(",", visitedAlltime);
+                var visitedAlltime = profile.PlacesInAllTimeScore
+                            .Where(p => !profile.PlacesInYearScore.Any(y => y.Id == p.Id))
+                            .Select(p => p.ScriptId).ToList();
+
+                var visitedYear = profile.PlacesInYearScore
+                            .Select(p => p.ScriptId).ToList();
+                var
+                    visitedAlltimeString = string.Join(",", visitedAlltime);
                 var visitedYearString = string.Join(",", visitedYear);
 
                 var script = _rawInitScript.Replace("\"GetVisitedAlltime\"", visitedAlltimeString);

@@ -40,6 +40,18 @@ function AddTileLayer() {
             'minzoom': 3,
             'maxzoom': 17
         });
+
+        window.routeMap.addLayer({
+            'id': 'fltc2tiles',
+            'type': 'fill',
+            'source': 'ltc2tiles',
+            'source-layer': 'geojsonLayer',
+            'paint': {
+                'fill-opacity': 0.0,
+                'fill-color': GetFillColor()
+            }
+        });
+
         window.routeMap.addLayer({
             'id': 'ltc2tiles',
             'type': 'line',
@@ -57,16 +69,6 @@ function AddTileLayer() {
             slot: 'middle'
         });
 
-        window.routeMap.addLayer({
-            'id': 'fltc2tiles',
-            'type': 'fill',
-            'source': 'ltc2tiles',
-            'source-layer': 'geojsonLayer',
-            'paint': {
-                'fill-opacity': 0.0,
-                'fill-color': GetColor()
-            }
-        });
 
         window.routeMap.on('mousemove', 'fltc2tiles', (event) => {
             console.log('mouse move on tile layer');
@@ -89,6 +91,16 @@ function AddTileLayer() {
                 }
             }
         });
+
+        const checkExprVisitedAlltimeOpacity = [
+                'match',
+                    ['slice', ['get', 'featurePointer'], 0, ['index-of', ':', ['get', 'featurePointer']]],
+                    GetVisitedAlltime(), 0.25, 
+                    GetVisitedYear(), 0.45, 
+                    0.0              
+                ];
+
+        window.routeMap.setPaintProperty('fltc2tiles', 'fill-opacity', checkExprVisitedAlltimeOpacity);
 
         window.routeMap.on('mousemove', (e) => {
             const features = window.routeMap.queryRenderedFeatures(e.point, {
@@ -122,6 +134,24 @@ function GetColor() {
         return 'rgb(0,0,0)';
     } else if (stryle.includes('standard')) {
         return 'rgb(0,0,0)';
+    }
+}
+
+function GetFillColor() {
+    const stryle = window.routeMap.getStyle().sprite;
+
+    if (stryle.includes('satellite')) {
+        return 'rgb(255,165,0)';
+    } else if (stryle.includes('hybrid')) {
+        return 'rgb(255,165,0)';
+    } else if (stryle.includes('dark-standard')) {
+        return 'rgb(255,165,0)';
+    } else if (stryle.includes('winter')) {
+        return 'rgb(255,165,0)';
+    } else if (stryle.includes('light')) {
+        return 'rgb(255,165,0)';
+    } else if (stryle.includes('standard')) {
+        return 'rgb(255,165,0)';
     }
 }
 
