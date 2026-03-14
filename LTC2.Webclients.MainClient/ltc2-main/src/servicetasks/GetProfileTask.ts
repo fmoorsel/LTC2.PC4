@@ -21,7 +21,7 @@ export class GetProfileTask implements ISeriveTask {
         }
         
         const profile = await this._profileService?.loadProfile();
-
+        
         console.log(token);
         console.log(profile?.name);
     }

@@ -681,7 +681,7 @@ export class MapHelper {
             style: function (feature) {
                 const featurePointer = feature.getProperties()["featurePointer"] as string;
                 const id = featurePointer.split(":")[0];
-
+                
                 if (id === placeId) {
                     return mapStyleHelper.getStyle(MapStyleHelper.LayerStyleSelectedPlace, map);
                 }

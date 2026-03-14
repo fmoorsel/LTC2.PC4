@@ -52,6 +52,7 @@ namespace LTC2.Desktopclients.WindowsClient
             {
                 services.AddTransient<SplashScreen>();
                 services.AddTransient<MainForm>();
+                services.AddTransient<RoutePlanner>();
                 services.AddTransient<UpdateActivitiesForm>();
                 services.AddTransient<SelectProfileForm>();
                 services.AddTransient<SelectActivitiesForm>();

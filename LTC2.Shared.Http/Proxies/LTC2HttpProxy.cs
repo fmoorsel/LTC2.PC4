@@ -1,6 +1,7 @@
 ﻿using LTC2.Shared.Http.Exceptions;
 using LTC2.Shared.Http.Interfaces;
 using LTC2.Shared.Models.Requests;
+using LTC2.Shared.Models.Responses;
 using LTC2.Shared.Models.Settings;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -42,6 +43,16 @@ namespace LTC2.Shared.Http.Proxies
             await ExecutePostRequest<UpdateMultiRequest>(uri, body, authHeader);
         }
 
+        public async Task<GetProfileResponse> GetProfile(string accessToken)
+        {
+            var authHeader = new AuthenticationHeaderValue("Bearer", accessToken);
+            var uri = $"/api/Profile/profile";
+
+            var profile = await ExecuteGetRequest<GetProfileResponse>(uri, authHeader);
+
+            return profile;
+        }
+
         public async Task<bool> HasIntermediateResult(string accessToken, bool multi)
         {
             var authHeader = new AuthenticationHeaderValue("Bearer", accessToken);
@@ -71,6 +82,5 @@ namespace LTC2.Shared.Http.Proxies
                 throw new InvalidValueException($"Content should be 'true' or 'false' but was '{content}'.");
             }
         }
-
     }
 }

@@ -5,7 +5,8 @@
     <div>{{ place }}</div>
   </div>
   <div ref="mapcontrol" style="bottom: 10px; left: .5em; width: 170px;" class="ol-unselectable ol-control">
-    <button style="width: 150px; margin:10px; margin-bottom: 3px; font-size: 16px;" @click="onclickCheckRoute()">{{ buttonCheckRouteText }}</button>
+    <button v-if="enablePlanRoute" style="width: 150px; margin:10px; margin-bottom: 3px; font-size: 16px;" @click="onclickPlanRoute()">{{ buttonPlanRouteText }}</button>
+    <button style="width: 150px; margin:10px; margin-top: 5px; margin-bottom: 3px; font-size: 16px;" @click="onclickCheckRoute()">{{ buttonCheckRouteText }}</button>
     <button v-if="isStravaRoute" style="width: 150px; margin:10px; margin-top: 5px; margin-bottom: 3px; font-size: 16px;" @click="onclickReloadRoute()">{{ buttonReloadRouteText }}</button>
     
     <button style="width: 150px; margin:10px; margin-top: 5px; margin-bottom: 3px; font-size: 16px;" @click="onclickDetails()">{{ buttonText }}</button>
@@ -43,7 +44,7 @@ import { Track } from '../models/Track';
 import { Routes } from '../models/Routes';
 
 import { MapHelper } from './helpers/MapHelpers';
-import { fromatDateAsYYYYDDMM } from '../utils/Utils';
+import { fromatDateAsYYYYDDMM, runsInRideWithGpsMode } from '../utils/Utils';
 
 export default defineComponent({
 
@@ -73,6 +74,7 @@ export default defineComponent({
         const currentYear = new Date().getFullYear();
 
         const buttonText = _translationService?.getText("challengemap.buttonText");
+        const buttonPlanRouteText = _translationService?.getText("challengemap.buttonPlanRouteText");
         const buttonCheckRouteText = _translationService?.getText("challengemap.buttonCheckRouteText");
         const bottumText = _translationService?.getText("challengemap.bottumText");
         const buttonTimelapseText = _translationService?.getText("challengemap.buttonTimelapse");
@@ -92,6 +94,8 @@ export default defineComponent({
 
         const buttonRouteText =  _translationService?.getText("challengemap.buttonRouteText")
         const bottumProvinciesText = _translationService?.getText("challengemap.buttonProvinciesText")
+
+        const enablePlanRoute = !runsInRideWithGpsMode();
 
         hasYear.value = scoreYear && scoreYear.length > 0;
 
@@ -147,9 +151,19 @@ export default defineComponent({
             } 
         }
 
+        const onclickPlanRoute = () => {
+            console.log("onclickPlanRoute");
+            
+            const provider = runsInRideWithGpsMode() ? "ridewithgps" : "strava";
+
+            console.log("route planner url: " + provider);
+
+            (window as any).postHostMessage("routeplanner", provider);
+        }
+
         const onclickCheckRoute = () => {
             console.log("onclickCheckRoute");
-            
+
             if (document.fullscreenElement) {
                 document.exitFullscreen();
             }
@@ -292,7 +306,7 @@ export default defineComponent({
             }
         }
 
-        return ({ challengeMap, popup, place, closePopup, mapcontrol, checkBoxYear, checkBoxLast, checkBoxTrack, checkBoxRoute, checkBoxProvinces, onclickDetails, onclickCheckRoute, buttonText, buttonReloadRouteText, buttonCheckRouteText, buttonRouteText, bottumYearText: bottonYearText, buttonTimelapseText, bottumText, bottumLastText: buttonLastText, bottumProvinciesText, hasYear, onShowHideYear, onShowHideLast, onShowHideTrackForPlace, onShowHideRoute, onShowHideProvinces, showTrackForPlace, showTodoPlace, onClickTimelapse, hasTrack, currentTrackDate, showRoute, hasRoutes, isStravaRoute, onclickReloadRoute } )
+        return ({ challengeMap, popup, place, closePopup, mapcontrol, checkBoxYear, checkBoxLast, checkBoxTrack, checkBoxRoute, checkBoxProvinces, onclickDetails, onclickPlanRoute, onclickCheckRoute, buttonText, buttonReloadRouteText, buttonPlanRouteText, buttonCheckRouteText, buttonRouteText, bottumYearText: bottonYearText, buttonTimelapseText, bottumText, bottumLastText: buttonLastText, bottumProvinciesText, hasYear, onShowHideYear, onShowHideLast, onShowHideTrackForPlace, onShowHideRoute, onShowHideProvinces, showTrackForPlace, showTodoPlace, onClickTimelapse, hasTrack, currentTrackDate, showRoute, hasRoutes, isStravaRoute, onclickReloadRoute, enablePlanRoute } )
     }
 })
 </script>

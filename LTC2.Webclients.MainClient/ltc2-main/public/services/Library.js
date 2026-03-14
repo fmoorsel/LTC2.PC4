@@ -10,6 +10,17 @@ function getToken() {
     return getCookie("token");;
 }
 
+function postHostMessage(message, parameter) {
+    if (window.chrome && window.chrome.webview) {
+        const messageObject = {
+            message: message,
+            parameter: parameter
+        };
+
+        chrome.webview.postMessage(messageObject);
+    }
+}
+
 function getCookie(cname) {
     var name = cname + "=";
     var decodedCookie = decodeURIComponent(document.cookie);

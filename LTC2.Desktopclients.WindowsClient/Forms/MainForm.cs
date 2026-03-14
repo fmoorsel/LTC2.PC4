@@ -1,14 +1,17 @@
 ﻿using LTC2.Desktopclients.WindowsClient.Models;
 using LTC2.Desktopclients.WindowsClient.Services;
+using LTC2.Shared.Http.Interfaces;
 using LTC2.Shared.Messages.Interfaces;
 using LTC2.Shared.Models.Interprocess;
 using Microsoft.Web.WebView2.Core;
+using Newtonsoft.Json;
 
 namespace LTC2.Desktopclients.WindowsClient.Forms
 {
     public partial class MainForm : Form
     {
         private readonly SplashScreen _splashScreen;
+        private readonly RoutePlanner _routePlanner;
         private readonly StatusNotifier _statusNotifier;
         private readonly UpdateActivitiesForm _updateActivities;
         private readonly WebviewConnector _webviewConnector;
@@ -16,6 +19,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private readonly ProfileManager _profileManager;
         private readonly ITranslationService _translationService;
         private readonly MultiSportManager _multiSportManager;
+        private readonly ILTC2HttpProxy _ltc2Proxy;
 
         private bool _inFatalMode;
         private bool _isUpdating;
@@ -24,10 +28,12 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
         public MainForm(
             SplashScreen splashScreen,
+            RoutePlanner routePlanner,
             StatusNotifier statusNotifier,
             UpdateActivitiesForm updateActivities,
             WebviewConnector webviewConnector,
             ProfileManager profileManager,
+            ILTC2HttpProxy ltc2Proxy,
             ITranslationService translationService,
             MultiSportManager multiSportManager,
             AppSettings appSettings)
@@ -37,6 +43,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             this.AutoScaleMode = AutoScaleMode.Dpi;
 
             _splashScreen = splashScreen;
+            _routePlanner = routePlanner;
             _statusNotifier = statusNotifier;
             _updateActivities = updateActivities;
             _webviewConnector = webviewConnector;
@@ -44,6 +51,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             _appSettings = appSettings;
             _translationService = translationService;
             _multiSportManager = multiSportManager;
+            _ltc2Proxy = ltc2Proxy;
 
             _inFatalMode = false;
 
@@ -57,6 +65,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             Show();
 
             await InitWebview();
+            await _routePlanner.InitRoutePlanner();
 
             _statusNotifier.OnStatusNotification += OnStatusNotification;
 
@@ -134,11 +143,15 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
                 _multiSportManager.RefreshCurrentActivityTypes();
 
+                UpdateProfile();
+
                 webView.CoreWebView2.Navigate(GetUrl());
             }
             else if (status.Status == StatusMessage.STATUS_LIMIT)
             {
                 lblUpdateProgress.Text = _translationService.GetMessage("progress.limit");
+
+                UpdateProfile();
 
                 webView.CoreWebView2.Navigate(GetUrl());
             }
@@ -157,6 +170,12 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
                 Close();
             }
+        }
+
+
+        private void UpdateProfile()
+        {
+            _routePlanner.UpdateProfile();
         }
 
         private string GetDateFromPing(string msg)
@@ -232,6 +251,13 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
             foreach (var cookie in stravaCookies)
             {
+                var cookieName = cookie.Name;
+
+                if (_appSettings.SkipCookiesWhileDeleting != null && _appSettings.SkipCookiesWhileDeleting.Contains(cookieName))
+                {
+                    continue;
+                }
+
                 webView.CoreWebView2.CookieManager.DeleteCookie(cookie);
             }
 
@@ -239,6 +265,13 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
             foreach (var cookie in rwgpsCookies)
             {
+                var cookieName = cookie.Name;
+
+                if (_appSettings.SkipCookiesWhileDeleting != null && _appSettings.SkipCookiesWhileDeleting.Contains(cookieName))
+                {
+                    continue;
+                }
+
                 webView.CoreWebView2.CookieManager.DeleteCookie(cookie);
             }
         }
@@ -254,7 +287,9 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private void webView_NavigationStarting(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs e)
         {
             pbxBrowsing.Visible = true;
+
             btnRefresh.Enabled = false;
+            btnRefresh.BackgroundImage = Properties.Resources.refresh3;
         }
 
         private void webView_NavigationCompleted(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)
@@ -263,15 +298,19 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
             if (_refreshEnabledFor != null)
             {
+                var found = false;
+
                 foreach (var url in _refreshEnabledFor)
                 {
                     if (webView.CoreWebView2.Source.StartsWith(url))
                     {
-                        btnRefresh.Enabled = true;
+                        found = true;
 
                         break;
                     }
                 }
+
+                btnRefresh.Enabled = found;
 
                 if (btnRefresh.Enabled)
                 {
@@ -293,6 +332,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private void btnRefresh_Click(object sender, EventArgs e)
         {
             _updateActivities.AdaptFormToMultiSport();
+            _routePlanner.Hide();
             _updateActivities.ShowDialog();
         }
 
@@ -309,6 +349,32 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private string GetUrl()
         {
             return $"{_appSettings.StartPage}?language={_translationService.CurrentLanguage}&multi={_multiSportManager.RunInMultiSportMode}&source={_multiSportManager.RunWithSource}";
+        }
+
+        private void webView_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
+        {
+            try
+            {
+                var message = e.WebMessageAsJson;
+
+                if (!string.IsNullOrEmpty(message))
+                {
+                    var webMessage = JsonConvert.DeserializeObject<GenericWebMessage>(message);
+
+                    if (webMessage!.Message == "routeplanner")
+                    {
+                        _routePlanner.ShowPlanner();
+                    }
+                    else if (webMessage.Message == "setprofile")
+                    {
+                        MessageBox.Show(message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }

@@ -27,6 +27,7 @@
     "profilemodal.button.close": "Sluiten",
     "profilemodal.todoLabel": "Je moet nog {0} postcodes afvinken en dat zijn de volgende postcodes:",
     "challengemap.buttonText": "Score",
+    "challengemap.buttonPlanRouteText": "Plan Route",
     "challengemap.buttonCheckRouteText": "Check Route",
     "challengemap.buttonReloadRouteText": "Herlaad Route",
     "challengemap.buttonYearText": "{0} (#{1})",

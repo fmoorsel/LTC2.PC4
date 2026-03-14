@@ -141,6 +141,7 @@
             webView.ZoomFactor = 1D;
             webView.NavigationStarting += webView_NavigationStarting;
             webView.NavigationCompleted += webView_NavigationCompleted;
+            webView.WebMessageReceived += webView_WebMessageReceived;
             // 
             // tmrKeepAlive
             // 
