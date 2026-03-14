@@ -76,6 +76,14 @@ function AddTileLayer() {
 
                 if (window.chrome && window.chrome.webview) {
                     console.log("posting message to webview");
+                    
+                    const id = event.features[0].properties.featurePointer.split(":")[0];
+
+                    const isChecked = GetVisitedAlltime().includes(id);
+                    const isCheckedYear = GetVisitedYear().includes(id);
+
+                    console.log("isChecked: " + isChecked);
+                    console.log("isCheckedYear: " + isCheckedYear);
 
                     chrome.webview.postMessage(event.features[0].properties.popupContent + "," + event.features[0].properties.featurePointer);
                 }
@@ -115,6 +123,14 @@ function GetColor() {
     } else if (stryle.includes('standard')) {
         return 'rgb(0,0,0)';
     }
+}
+
+function GetVisitedAlltime() {
+    return ["GetVisitedAlltime"];
+}
+
+function GetVisitedYear() {
+    return ["GetVisitedYear"];
 }
 
 GetMapbox();

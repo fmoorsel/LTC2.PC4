@@ -18,6 +18,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
         private FormWindowState _previousWindowState;
 
+        private string _rawInitScript;
         private string _initScript;
 
         private readonly object _profileLock = new object();
@@ -50,7 +51,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                 Directory.CreateDirectory(_appSettings.WebviewRoot);
             }
 
-            _initScript = GetInitScript();
+            _rawInitScript = GetInitScript();
 
             var env = await CoreWebView2Environment.CreateAsync(null, _appSettings.WebviewRoot, null);
 
@@ -75,7 +76,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         {
             pbxBrowsing.Visible = false;
 
-            if (string.IsNullOrEmpty(_initScript))
+            if (string.IsNullOrEmpty(_rawInitScript))
             {
                 return;
             }
@@ -89,15 +90,18 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             {
                 Task.Run(async () =>
                 {
-                    var profile = EnsureProfile();
-                    var r = await webView.ExecuteScriptAsync(_initScript);
+                    var profile = await EnsureProfile();
+
+                    var r = profile == null ? null : await webView.ExecuteScriptAsync(_initScript);
                     var attempts = 1;
 
                     while (r == null || r.Trim('"') != "1" || attempts > 20)
                     {
                         await Task.Delay(200);
 
-                        r = await webView.ExecuteScriptAsync(_initScript);
+                        profile = await EnsureProfile();
+
+                        r = profile == null ? null : await webView.ExecuteScriptAsync(_initScript);
                     }
 
                     if (r.Trim('"') != "1")
@@ -113,6 +117,24 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             {
                 lblCurrentPlace.Text = string.Empty;
             }
+        }
+
+        private string CreateScript(GetProfileResponse profile)
+        {
+            if (profile != null)
+            {
+                var visitedAlltime = profile.PlacesInAllTimeScore.Select(p => p.ScriptId).ToList();
+                var visitedYear = profile.PlacesInYearScore.Select(p => p.ScriptId).ToList();
+                var visitedAlltimeString = string.Join(",", visitedAlltime);
+                var visitedYearString = string.Join(",", visitedYear);
+
+                var script = _rawInitScript.Replace("\"GetVisitedAlltime\"", visitedAlltimeString);
+                script = script.Replace("\"GetVisitedYear\"", visitedYearString);
+
+                return script;
+            }
+
+            return _rawInitScript;
         }
 
         private void RoutePlanner_FormClosing(object sender, FormClosingEventArgs e)
@@ -182,6 +204,8 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             lock (_profileLock)
             {
                 _profile = profile;
+
+                _initScript = CreateScript(profile);
             }
         }
 
@@ -203,6 +227,8 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                 lock (_profileLock)
                 {
                     _profile = profile;
+
+                    _initScript = CreateScript(profile);
                 }
             });
         }

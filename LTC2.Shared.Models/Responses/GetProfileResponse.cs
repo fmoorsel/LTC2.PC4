@@ -27,5 +27,13 @@ namespace LTC2.Shared.Models.Responses
 
         public string Date { get; set; }
 
+        public string ScriptId
+        {
+            get
+            {
+                return '"' + Id + '"';
+            }
+        }
+
     }
 }
