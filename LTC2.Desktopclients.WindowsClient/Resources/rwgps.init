@@ -30,6 +30,10 @@ function Init() {
         LayerControl();
     });
 
+    instance.on('render', LayerControl);
+
+    setInterval(LayerControl, 200);
+
     return '1';
 }
 
@@ -47,6 +51,18 @@ function AddLayers(){
         'tiles': [' http://localhost:50000/api/Tiles/tile/{z}/{x}/{y}.pbf'],
         'minzoom': 3,
         'maxzoom': 17
+    });
+
+
+    window.mapInstance.addLayer({
+        'id': 'fltc2tiles',
+        'type': 'fill',
+        'source': 'ltc2tiles',
+        'source-layer': 'geojsonLayer',
+        'paint': {
+            'fill-opacity': 0.3,
+            'fill-color': 'rgb(0,0,0)'
+        }
     });
 
     window.mapInstance.addLayer({
@@ -83,12 +99,20 @@ function LayerControl()
             if (document.getElementById("ltc2-deckgl")) {
                 console.log("Deck.gl script already added");
             } else {
-                addScript("https://unpkg.com/deck.gl@9.2.11/dist.min.js", "ltc2-deckgl");
+                //addScript("https://unpkg.com/deck.gl@9.2.11/dist.min.js", "ltc2-deckgl");
             }
         } else {
             console.log("RWGPS Map Instance layers changed, adding layers");
             
             AddLayers();
+
+            instance.on('idle', () => {
+                console.log("RWGPS Map idle");
+        
+                LayerControl();
+            });
+
+            instance.on('render', LayerControl);
         }
     } else {
         if (!window.rwgps.MapDelegate.props.mapInstance.__gm) {
@@ -98,6 +122,14 @@ function LayerControl()
                 console.log("RWGPS Map Instance layers changed, re-adding layers");
                 
                 AddLayers();
+
+                instance.on('idle', () => {
+                    console.log("RWGPS Map idle");
+        
+                    LayerControl();
+                });
+
+                instance.on('render', LayerControl);
             }
         }
     }
