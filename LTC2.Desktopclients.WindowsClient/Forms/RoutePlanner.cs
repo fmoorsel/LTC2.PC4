@@ -276,6 +276,12 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
         private string GetInitScript()
         {
+            if (_multiSportsManager.RunWithSource == "ridewithgps")
+            {
+                // not yet supported, as the script is more complex and needs to be adapted to work with the new builder
+                return string.Empty;
+            }
+
             var fileName = _multiSportsManager.RunWithSource == "ridewithgps" ? "RideWithGps.js" : "strava.init";
             var processModule = Process.GetCurrentProcess().MainModule;
             var folder = Path.Combine(Path.GetDirectoryName(processModule?.FileName), "Resources");

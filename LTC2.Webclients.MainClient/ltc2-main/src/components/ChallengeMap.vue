@@ -5,7 +5,7 @@
     <div>{{ place }}</div>
   </div>
   <div ref="mapcontrol" style="bottom: 10px; left: .5em; width: 170px;" class="ol-unselectable ol-control">
-    <button style="width: 150px; margin:10px; margin-bottom: 3px; font-size: 16px;" @click="onclickPlanRoute()">{{ buttonPlanRouteText }}</button>
+    <button v-if="enablePlanRoute" style="width: 150px; margin:10px; margin-bottom: 3px; font-size: 16px;" @click="onclickPlanRoute()">{{ buttonPlanRouteText }}</button>
     <button style="width: 150px; margin:10px; margin-top: 5px; margin-bottom: 3px; font-size: 16px;" @click="onclickCheckRoute()">{{ buttonCheckRouteText }}</button>
     <button v-if="isStravaRoute" style="width: 150px; margin:10px; margin-top: 5px; margin-bottom: 3px; font-size: 16px;" @click="onclickReloadRoute()">{{ buttonReloadRouteText }}</button>
     
@@ -45,7 +45,6 @@ import { Routes } from '../models/Routes';
 
 import { MapHelper } from './helpers/MapHelpers';
 import { fromatDateAsYYYYDDMM, runsInRideWithGpsMode } from '../utils/Utils';
-import { C } from 'vue-router/dist/router-CWoNjPRp.mjs';
 
 export default defineComponent({
 
@@ -95,6 +94,8 @@ export default defineComponent({
 
         const buttonRouteText =  _translationService?.getText("challengemap.buttonRouteText")
         const bottumProvinciesText = _translationService?.getText("challengemap.buttonProvinciesText")
+
+        const enablePlanRoute = !runsInRideWithGpsMode();
 
         hasYear.value = scoreYear && scoreYear.length > 0;
 
@@ -305,7 +306,7 @@ export default defineComponent({
             }
         }
 
-        return ({ challengeMap, popup, place, closePopup, mapcontrol, checkBoxYear, checkBoxLast, checkBoxTrack, checkBoxRoute, checkBoxProvinces, onclickDetails, onclickPlanRoute, onclickCheckRoute, buttonText, buttonReloadRouteText, buttonPlanRouteText, buttonCheckRouteText, buttonRouteText, bottumYearText: bottonYearText, buttonTimelapseText, bottumText, bottumLastText: buttonLastText, bottumProvinciesText, hasYear, onShowHideYear, onShowHideLast, onShowHideTrackForPlace, onShowHideRoute, onShowHideProvinces, showTrackForPlace, showTodoPlace, onClickTimelapse, hasTrack, currentTrackDate, showRoute, hasRoutes, isStravaRoute, onclickReloadRoute } )
+        return ({ challengeMap, popup, place, closePopup, mapcontrol, checkBoxYear, checkBoxLast, checkBoxTrack, checkBoxRoute, checkBoxProvinces, onclickDetails, onclickPlanRoute, onclickCheckRoute, buttonText, buttonReloadRouteText, buttonPlanRouteText, buttonCheckRouteText, buttonRouteText, bottumYearText: bottonYearText, buttonTimelapseText, bottumText, bottumLastText: buttonLastText, bottumProvinciesText, hasYear, onShowHideYear, onShowHideLast, onShowHideTrackForPlace, onShowHideRoute, onShowHideProvinces, showTrackForPlace, showTodoPlace, onClickTimelapse, hasTrack, currentTrackDate, showRoute, hasRoutes, isStravaRoute, onclickReloadRoute, enablePlanRoute } )
     }
 })
 </script>
