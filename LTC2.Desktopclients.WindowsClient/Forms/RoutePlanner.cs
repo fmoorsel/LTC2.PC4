@@ -289,6 +289,14 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private void webView_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
         {
             var parameter = e.TryGetWebMessageAsString();
+
+            if (parameter.StartsWith("not supported"))
+            {
+                lblCurrentPlace.Text = _translationService.GetMessage("#routeplanner.no_map_support");
+
+                return;
+            }
+
             var parts = parameter.Split(',');
 
             var postcode = parts[0];

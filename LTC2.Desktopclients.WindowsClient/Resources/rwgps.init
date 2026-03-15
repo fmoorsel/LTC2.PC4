@@ -43,9 +43,24 @@ function AddLayers(){
     if (window.rwgps.MapDelegate.props.mapInstance.__gm) {
         console.log("RWGPS Map Instance is Google Maps, not supported yet");
 
+        if (window.chrome && window.chrome.webview) {
+            chrome.webview.postMessage("not supported");
+        }
+
         return;
-    }
-    
+    } else {
+        console.log("RWGPS Map Instance is MapLibre, adding layers");
+
+        if (window.chrome && window.chrome.webview) {
+            chrome.webview.postMessage("----,----");
+        }
+        
+        AddLayersMapLibre();
+    }    
+}
+
+function AddLayersMapLibre()
+{
     window.mapInstance.addSource('ltc2tiles', {
         'type': 'vector',
         'tiles': [' http://localhost:50000/api/Tiles/tile/{z}/{x}/{y}.pbf'],
@@ -144,6 +159,8 @@ function LayerControl()
             } else {
                 //addScript("https://unpkg.com/deck.gl@9.2.11/dist.min.js", "ltc2-deckgl");
             }
+
+            AddLayers();
         } else {
             console.log("RWGPS Map Instance layers changed, adding layers");
             
