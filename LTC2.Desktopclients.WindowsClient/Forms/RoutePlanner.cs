@@ -1,10 +1,10 @@
 using LTC2.Desktopclients.WindowsClient.Models;
 using LTC2.Desktopclients.WindowsClient.Services;
+using LTC2.Desktopclients.WindowsClient.Utils;
 using LTC2.Shared.Http.Interfaces;
 using LTC2.Shared.Messages.Interfaces;
 using LTC2.Shared.Models.Responses;
 using Microsoft.Web.WebView2.Core;
-using System.Diagnostics;
 
 namespace LTC2.Desktopclients.WindowsClient.Forms
 {
@@ -285,14 +285,14 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
         private string GetInitScript()
         {
-            var fileName = _multiSportsManager.RunWithSource == "ridewithgps" ? "rwgps.init" : "strava.init";
-            var processModule = Process.GetCurrentProcess().MainModule;
-            var folder = Path.Combine(Path.GetDirectoryName(processModule?.FileName), "Resources");
-
-            var activitiesFile = Path.Combine(folder, fileName);
-            var content = File.ReadAllText(activitiesFile);
-
-            return content;
+            if (_multiSportsManager.RunWithSource == "ridewithgps")
+            {
+                return ScriptProvider.GetRwGpsRouteBuilderScript();
+            }
+            else
+            {
+                return ScriptProvider.GetStravaRouteBuilderScript();
+            }
         }
 
         private void webView_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
