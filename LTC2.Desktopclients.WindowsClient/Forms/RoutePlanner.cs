@@ -130,11 +130,20 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                 var visitedYear = profile.PlacesInYearScore
                             .Select(p => p.ScriptId).ToList();
 
-                var visitedAlltimeString = string.Join(",", visitedAlltime);
-                var visitedYearString = string.Join(",", visitedYear);
 
-                var script = _rawInitScript.Replace("\"GetVisitedAlltime\"", visitedAlltimeString);
-                script = script.Replace("\"GetVisitedYear\"", visitedYearString);
+                var script = _rawInitScript;
+                if (visitedAlltime.Count > 0)
+                {
+                    var visitedAlltimeString = string.Join(",", visitedAlltime);
+
+                    script = script.Replace("\"GetVisitedAlltime\"", visitedAlltimeString);
+                }
+
+                if (visitedYear.Count > 0)
+                {
+                    var visitedYearString = string.Join(",", visitedYear);
+                    script = script.Replace("\"GetVisitedYear\"", visitedYearString);
+                }
 
                 return script;
             }
