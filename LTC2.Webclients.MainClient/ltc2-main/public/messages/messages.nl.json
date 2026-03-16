@@ -47,9 +47,9 @@
     "selectroutemodal.text.working": "Route wordt ingelezen en gecontroleerd",
     "selectroutemodal.text.instruction": "Selecteer het GPX bestand dat je wil controleren",
     "selectroutemodal.text.routesNotYetLoadedText": "Nog geen routes geladen....",
-    "selectroutemodal.text.noRoutesInStrava": "Geen routes in Strava gevonden!",
+    "selectroutemodal.text.noRoutesInStrava": "Geen routes gevonden!",
     "selectroutemodal.text.noRoutesInRwGps": "Geen routes in Ride with Gps gevonden!",
-    "selectroutemodal.text.loadingStravaRoutesText": "Je Strava routes worden geladen....",
-    "selectroutemodal.text.loadingStravaRouteText": "Strava route wordt geladen en gecheckt....",
+    "selectroutemodal.text.loadingStravaRoutesText": "Je routes worden geladen....",
+    "selectroutemodal.text.loadingStravaRouteText": "Route wordt geladen en gecheckt....",
     "selectroutemodal.text.noplaces": "Geen postcode gebieden gevonden in deze route!"
 }
