@@ -1,10 +1,10 @@
 using LTC2.Desktopclients.WindowsClient.Models;
 using LTC2.Desktopclients.WindowsClient.Services;
+using LTC2.Desktopclients.WindowsClient.Utils;
 using LTC2.Shared.Http.Interfaces;
 using LTC2.Shared.Messages.Interfaces;
 using LTC2.Shared.Models.Responses;
 using Microsoft.Web.WebView2.Core;
-using System.Diagnostics;
 
 namespace LTC2.Desktopclients.WindowsClient.Forms
 {
@@ -129,12 +129,21 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
                 var visitedYear = profile.PlacesInYearScore
                             .Select(p => p.ScriptId).ToList();
-                var
-                    visitedAlltimeString = string.Join(",", visitedAlltime);
-                var visitedYearString = string.Join(",", visitedYear);
 
-                var script = _rawInitScript.Replace("\"GetVisitedAlltime\"", visitedAlltimeString);
-                script = script.Replace("\"GetVisitedYear\"", visitedYearString);
+
+                var script = _rawInitScript;
+                if (visitedAlltime.Count > 0)
+                {
+                    var visitedAlltimeString = string.Join(",", visitedAlltime);
+
+                    script = script.Replace("\"GetVisitedAlltime\"", visitedAlltimeString);
+                }
+
+                if (visitedYear.Count > 0)
+                {
+                    var visitedYearString = string.Join(",", visitedYear);
+                    script = script.Replace("\"GetVisitedYear\"", visitedYearString);
+                }
 
                 return script;
             }
@@ -278,23 +287,25 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         {
             if (_multiSportsManager.RunWithSource == "ridewithgps")
             {
-                // not yet supported, as the script is more complex and needs to be adapted to work with the new builder
-                return string.Empty;
+                return ScriptProvider.GetRwGpsRouteBuilderScript();
             }
-
-            var fileName = _multiSportsManager.RunWithSource == "ridewithgps" ? "RideWithGps.js" : "strava.init";
-            var processModule = Process.GetCurrentProcess().MainModule;
-            var folder = Path.Combine(Path.GetDirectoryName(processModule?.FileName), "Resources");
-
-            var activitiesFile = Path.Combine(folder, fileName);
-            var content = File.ReadAllText(activitiesFile);
-
-            return content;
+            else
+            {
+                return ScriptProvider.GetStravaRouteBuilderScript();
+            }
         }
 
         private void webView_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
         {
             var parameter = e.TryGetWebMessageAsString();
+
+            if (parameter.StartsWith("not supported"))
+            {
+                lblCurrentPlace.Text = _translationService.GetMessage("#routeplanner.no_map_support");
+
+                return;
+            }
+
             var parts = parameter.Split(',');
 
             var postcode = parts[0];
