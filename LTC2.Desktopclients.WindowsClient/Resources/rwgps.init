@@ -4,6 +4,15 @@ function addScript(url, id) {
     console.log("Adding script: " + url);
 
     const script = document.createElement('script');
+    
+    if (id == "ltc2-deckgl") {
+        script.onload = () => {
+            console.log("Deck.gl script loaded");
+
+            AddLayers();
+        };
+    }
+
     script.src = url;
     script.id = id;
 
@@ -24,13 +33,15 @@ function Init() {
 
     console.log("RWGPS Map Instance lyer: " + window.mapInstance.getLayersOrder().length);
 
-    instance.on('idle', () => {
-        console.log("RWGPS Map idle");
+    if (!window.rwgps.MapDelegate.props.mapInstance.__gm) {
+        instance.on('idle', () => {
+            console.log("RWGPS Map idle");
         
-        LayerControl();
-    });
+            LayerControl();
+        });
 
-    instance.on('render', LayerControl);
+        instance.on('render', LayerControl);
+    }
 
     setInterval(LayerControl, 200);
 
@@ -43,9 +54,7 @@ function AddLayers(){
     if (window.rwgps.MapDelegate.props.mapInstance.__gm) {
         console.log("RWGPS Map Instance is Google Maps, not supported yet");
 
-        if (window.chrome && window.chrome.webview) {
-            chrome.webview.postMessage("not supported");
-        }
+        AddGoogleMapsLayer();
 
         return;
     } else {
@@ -57,6 +66,64 @@ function AddLayers(){
         
         AddLayersMapLibre();
     }    
+}
+
+function AddGoogleMapsLayer() {
+
+    const { GoogleMapsOverlay, MVTLayer } = deck;
+    const mvtLayer = GetGoogleMapsLayer();
+
+    const overlay = new GoogleMapsOverlay({
+    layers: [mvtLayer]
+    });
+
+    overlay.setMap(window.mapInstance);
+
+    window.mapInstance.addListener('maptypeid_changed', () => {
+        console.log("Google Maps maptypeid changed, updating layer colors");
+        window.mapOverlay.setProps({
+            layers: [ GetGoogleMapsLayer() ]
+        });
+    });
+
+    window.mapOverlay = overlay;
+}
+
+function GetGoogleMapsLayer() {
+    const layer = new deck.MVTLayer({
+        id: 'ltc2tiles',
+        data: 'http://localhost:50000/api/Tiles/tile/{z}/{x}/{y}.pbf',  
+                
+        getFillColor: feature => GetGoogleMapsFillColor(feature.properties.featurePointer),
+        getLineColor: GetGoogleMapsColor(),
+                
+        lineWidthMinPixels: 2,
+        pickable: true,
+
+        onHover: info => {
+            console.log('hover on tile layer');
+            
+            if (info.object) {
+                const properties = info.object.properties;
+      
+                const id = properties.featurePointer.split(":")[0];
+
+                const isChecked = GetVisitedAlltime().includes(id);
+                const isCheckedYear = GetVisitedYear().includes(id);
+
+                console.log("isChecked: " + isChecked);
+                console.log("isCheckedYear: " + isCheckedYear);
+
+                chrome.webview.postMessage(properties.popupContent + "," + properties.featurePointer);
+            } else {
+                if (window.chrome && window.chrome.webview) {
+                    chrome.webview.postMessage("----,----");
+                }
+            }
+        }
+    });
+
+    return layer;
 }
 
 function AddLayersMapLibre()
@@ -156,11 +223,12 @@ function LayerControl()
 
             if (document.getElementById("ltc2-deckgl")) {
                 console.log("Deck.gl script already added");
+                
+                AddLayers();
             } else {
-                //addScript("https://unpkg.com/deck.gl@9.2.11/dist.min.js", "ltc2-deckgl");
+                addScript("https://unpkg.com/deck.gl@9.2.11/dist.min.js", "ltc2-deckgl");
             }
 
-            AddLayers();
         } else {
             console.log("RWGPS Map Instance layers changed, adding layers");
             
@@ -197,6 +265,34 @@ function LayerControl()
 
 function GetColor() {
     return 'rgb(0,0,0)';
+}
+
+function GetGoogleMapsColor() {
+    var currentType = window.mapInstance.getMapTypeId();
+
+    if (currentType === 'roadmap') {
+        return [0,0,0,255];
+    } else if (currentType === 'satellite') {
+        return [255,165,0, 255];
+    } else if (currentType === 'hybrid') {
+        return [255,165,0, 255];
+    } else if (currentType === 'terrain') {
+        return [0,0,0,255];
+    }
+}
+
+function GetGoogleMapsFillColor(featurePointer) {
+    const id = featurePointer.split(":")[0];
+    const isChecked = GetVisitedAlltime().includes(id);
+    const isCheckedYear = GetVisitedYear().includes(id);
+
+    if (isCheckedYear) {
+        return [255,165,0, 115];
+    } else if (isChecked) {
+        return [255,165,0, 65];
+    } else {
+        return [255,165,0,1];
+    }
 }
 
 function GetFillColor() {
