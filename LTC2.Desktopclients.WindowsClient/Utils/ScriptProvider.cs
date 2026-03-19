@@ -24,10 +24,26 @@ function GetMapbox() {
                 console.log('changed layer style re-add layer to: ' + window.routeMap.getStyle().sprite);
 
                 AddTileLayer();
+
+                setVisibility(window.layervisible);
             });
 
 
             AddTileLayer();
+
+            window.layervisible = true;           
+            
+            window.addEventListener('message', (event) => {
+                console.log('message!');
+
+                if (event.data == 'toggleLayer') {
+                    console.log('toggleLayer message!');
+                    
+                    window.layervisible = !window.layervisible;
+
+                    setVisibility();
+                }
+            });
 
             return '1';
         }
@@ -36,6 +52,15 @@ function GetMapbox() {
     }
 
     return '0';
+}
+
+function setVisibility(visible) {
+    if (window.routeMap != null) {
+        const visibilty = window.layervisible ? 'visible' : 'none';
+        
+        window.routeMap.setLayoutProperty('ltc2tiles', 'visibility', visibilty);
+        window.routeMap.setLayoutProperty('fltc2tiles', 'visibility', visibilty);
+    }
 }
 
 function AddTileLayer() {
@@ -120,7 +145,6 @@ function AddTileLayer() {
                 }
             }
         });
-
     } else {
         console.log('route map is null cannot add tile layer');
     }
@@ -211,6 +235,8 @@ function Init() {
     console.log(""RWGPS Map Instance found"");
 
     window.mapInstance = instance;
+    window.layervisible = true;
+    window.currentvisibility = true;
 
     console.log(""RWGPS Map Instance lyer: "" + window.mapInstance.getLayersOrder().length);
 
@@ -226,7 +252,43 @@ function Init() {
 
     setInterval(LayerControl, 200);
 
+    window.addEventListener('message', (event) => {
+        console.log('message!');
+
+        if (event.data == 'toggleLayer') {
+            console.log('toggleLayer message!');
+                    
+            window.layervisible = !window.layervisible;
+
+            setVisibility(window.layervisible);
+        }
+    });
+
     return '1';
+}
+
+function setVisibility(visible) {
+    if (window.mapInstance != null) {
+        if (window.rwgps.MapDelegate.props.mapInstance.__gm) {
+            if (window.mapOverlay != null && window.currentvisibility != window.layervisible) {
+                window.mapOverlay.setProps({
+                    layers: [ GetGoogleMapsLayer() ]
+                });
+            }
+        } else {
+            const visibilty = window.layervisible ? 'visible' : 'none';
+            const currentVisibility = window.mapInstance.getLayoutProperty('ltc2tiles', 'visibility');
+
+            if (currentVisibility != visibilty) {
+                console.log('setting layer visibility to: ' + visibilty);
+
+                window.mapInstance.setLayoutProperty('ltc2tiles', 'visibility', visibilty);
+                window.mapInstance.setLayoutProperty('fltc2tiles', 'visibility', visibilty);
+            }
+        }
+
+        window.currentvisibility = visible;
+    }
 }
 
 function AddLayers(){
@@ -255,7 +317,7 @@ function AddGoogleMapsLayer() {
     const mvtLayer = GetGoogleMapsLayer();
 
     const overlay = new GoogleMapsOverlay({
-    layers: [mvtLayer]
+        layers: [mvtLayer]
     });
 
     overlay.setMap(window.mapInstance);
@@ -280,6 +342,7 @@ function GetGoogleMapsLayer() {
                 
         lineWidthMinPixels: 2,
         pickable: true,
+        visible: window.layervisible,
 
         onHover: info => {
             console.log('hover on tile layer');
@@ -442,6 +505,8 @@ function LayerControl()
             }
         }
     }
+
+    setVisibility(window.layervisible);
 }
 
 function GetColor() {
