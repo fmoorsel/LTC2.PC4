@@ -24,10 +24,32 @@ function GetMapbox() {
                 console.log('changed layer style re-add layer to: ' + window.routeMap.getStyle().sprite);
 
                 AddTileLayer();
+
+                setVisibility(window.layervisible);
             });
 
 
             AddTileLayer();
+
+            window.layervisible = true;           
+            
+            window.addEventListener('message', (event) => {
+                console.log('message!');
+
+                if (event.data == 'toggleLayer') {
+                    console.log('toggleLayer message!');
+                    
+                    window.layervisible = !window.layervisible;
+
+                    setVisibility();
+                } else if (event.data.command == 'toggleLayer') {
+                    console.log('toggleLayer message!');
+                    
+                    window.layervisible = event.data.visible;
+
+                    setVisibility();
+                }
+            });
 
             return '1';
         }
@@ -36,6 +58,15 @@ function GetMapbox() {
     }
 
     return '0';
+}
+
+function setVisibility(visible) {
+    if (window.routeMap != null) {
+        const visibilty = window.layervisible ? 'visible' : 'none';
+        
+        window.routeMap.setLayoutProperty('ltc2tiles', 'visibility', visibilty);
+        window.routeMap.setLayoutProperty('fltc2tiles', 'visibility', visibilty);
+    }
 }
 
 function AddTileLayer() {
@@ -86,15 +117,15 @@ function AddTileLayer() {
                 if (window.chrome && window.chrome.webview) {
                     console.log(""posting message to webview"");
                     
-                    const id = event.features[0].properties.featurePointer.split("":"")[0];
+                    const id = event.features[0].properties.featurePointer.split(':')[0];
 
                     const isChecked = GetVisitedAlltime().includes(id);
                     const isCheckedYear = GetVisitedYear().includes(id);
 
-                    console.log(""isChecked: "" + isChecked);
-                    console.log(""isCheckedYear: "" + isCheckedYear);
+                    console.log('isChecked: ' + isChecked);
+                    console.log('isCheckedYear: ' + isCheckedYear);
 
-                    chrome.webview.postMessage(event.features[0].properties.popupContent + "","" + event.features[0].properties.featurePointer);
+                    chrome.webview.postMessage(event.features[0].properties.popupContent + ',' + event.features[0].properties.featurePointer);
                 }
             }
         });
@@ -120,7 +151,6 @@ function AddTileLayer() {
                 }
             }
         });
-
     } else {
         console.log('route map is null cannot add tile layer');
     }
@@ -179,16 +209,16 @@ GetMapbox();
         public static string GetRwGpsRouteBuilderScript()
         {
             var script = @"
-console.log(""Start Initializing RWGPS"");
+console.log('Start Initializing RWGPS');
 
 function addScript(url, id) {
-    console.log(""Adding script: "" + url);
+    console.log('Adding script: ' + url);
 
     const script = document.createElement('script');
     
-    if (id == ""ltc2-deckgl"") {
+    if (id == 'ltc2-deckgl') {
         script.onload = () => {
-            console.log(""Deck.gl script loaded"");
+            console.log('Deck.gl script loaded');
 
             AddLayers();
         };
@@ -201,22 +231,24 @@ function addScript(url, id) {
 }
 
 function Init() {
-    console.log(""Initializing RWGPS"");
+    console.log('Initializing RWGPS');
 
     var instance = window.rwgps.MapDelegate.getMapInstance();
     if (instance == null) {
         return '0';
     }
 
-    console.log(""RWGPS Map Instance found"");
+    console.log('RWGPS Map Instance found');
 
     window.mapInstance = instance;
+    window.layervisible = true;
+    window.currentvisibility = true;
 
-    console.log(""RWGPS Map Instance lyer: "" + window.mapInstance.getLayersOrder().length);
+    console.log('RWGPS Map Instance lyer: ' + window.mapInstance.getLayersOrder().length);
 
     if (!window.rwgps.MapDelegate.props.mapInstance.__gm) {
         instance.on('idle', () => {
-            console.log(""RWGPS Map idle"");
+            console.log('RWGPS Map idle');
         
             LayerControl();
         });
@@ -226,20 +258,62 @@ function Init() {
 
     setInterval(LayerControl, 200);
 
+    window.addEventListener('message', (event) => {
+        console.log('message!');
+
+        if (event.data == 'toggleLayer') {
+            console.log('toggleLayer message!');
+                    
+            window.layervisible = !window.layervisible;
+
+            setVisibility();
+        } else if (event.data.command == 'toggleLayer') {
+            console.log('toggleLayer message!');
+                    
+            window.layervisible = event.data.visible;
+
+            setVisibility();
+        }
+    });
+
     return '1';
 }
 
+function setVisibility(visible) {
+    if (window.mapInstance != null) {
+        if (window.rwgps.MapDelegate.props.mapInstance.__gm) {
+            if (window.mapOverlay != null && window.currentvisibility != window.layervisible) {
+                window.mapOverlay.setProps({
+                    layers: [ GetGoogleMapsLayer() ]
+                });
+            }
+        } else {
+            const visibilty = window.layervisible ? 'visible' : 'none';
+            const currentVisibility = window.mapInstance.getLayoutProperty('ltc2tiles', 'visibility');
+
+            if (currentVisibility != visibilty) {
+                console.log('setting layer visibility to: ' + visibilty);
+
+                window.mapInstance.setLayoutProperty('ltc2tiles', 'visibility', visibilty);
+                window.mapInstance.setLayoutProperty('fltc2tiles', 'visibility', visibilty);
+            }
+        }
+
+        window.currentvisibility = visible;
+    }
+}
+
 function AddLayers(){
-    console.log(""Adding layers to RWGPS Map"");
+    console.log('Adding layers to RWGPS Map');
 
     if (window.rwgps.MapDelegate.props.mapInstance.__gm) {
-        console.log(""RWGPS Map Instance is Google Maps, not supported yet"");
+        console.log('RWGPS Map Instance is Google Maps, not supported yet');
 
         AddGoogleMapsLayer();
 
         return;
     } else {
-        console.log(""RWGPS Map Instance is MapLibre, adding layers"");
+        console.log('RWGPS Map Instance is MapLibre, adding layers');
 
         if (window.chrome && window.chrome.webview) {
             chrome.webview.postMessage(""----,----"");
@@ -255,13 +329,13 @@ function AddGoogleMapsLayer() {
     const mvtLayer = GetGoogleMapsLayer();
 
     const overlay = new GoogleMapsOverlay({
-    layers: [mvtLayer]
+        layers: [mvtLayer]
     });
 
     overlay.setMap(window.mapInstance);
 
     window.mapInstance.addListener('maptypeid_changed', () => {
-        console.log(""Google Maps maptypeid changed, updating layer colors"");
+        console.log('Google Maps maptypeid changed, updating layer colors');
         window.mapOverlay.setProps({
             layers: [ GetGoogleMapsLayer() ]
         });
@@ -280,6 +354,7 @@ function GetGoogleMapsLayer() {
                 
         lineWidthMinPixels: 2,
         pickable: true,
+        visible: window.layervisible,
 
         onHover: info => {
             console.log('hover on tile layer');
@@ -350,17 +425,17 @@ function AddLayersMapLibre()
             console.log(event.features[0].properties.popupContent);
 
             if (window.chrome && window.chrome.webview) {
-                console.log(""posting message to webview"");
+                console.log('posting message to webview');
                     
-                const id = event.features[0].properties.featurePointer.split("":"")[0];
+                const id = event.features[0].properties.featurePointer.split(':')[0];
 
                 const isChecked = GetVisitedAlltime().includes(id);
                 const isCheckedYear = GetVisitedYear().includes(id);
 
-                console.log(""isChecked: "" + isChecked);
-                console.log(""isCheckedYear: "" + isCheckedYear);
+                console.log('isChecked: ' + isChecked);
+                console.log('isCheckedYear: ' + isCheckedYear);
 
-                chrome.webview.postMessage(event.features[0].properties.popupContent + "","" + event.features[0].properties.featurePointer);
+                chrome.webview.postMessage(event.features[0].properties.popupContent + ',' + event.features[0].properties.featurePointer);
             }
         }
     });
@@ -382,7 +457,7 @@ function AddLayersMapLibre()
 
         if (features.length <= 0) {
             if (window.chrome && window.chrome.webview) {
-                chrome.webview.postMessage(""----,----"");
+                chrome.webview.postMessage('----,----');
             }
         }
     });
@@ -394,29 +469,29 @@ function LayerControl()
 
     if (instance != window.mapInstance) {
         
-        console.log(""RWGPS Map Instance changed"");
+        console.log('RWGPS Map Instance changed');
         
         window.mapInstance = instance;
 
         if (window.rwgps.MapDelegate.props.mapInstance.__gm) 
         {
-            console.log(""RWGPS Map Instance is now Google Maps"");
+            console.log('RWGPS Map Instance is now Google Maps');
 
-            if (document.getElementById(""ltc2-deckgl"")) {
-                console.log(""Deck.gl script already added"");
+            if (document.getElementById('ltc2-deckgl')) {
+                console.log('Deck.gl script already added');
                 
                 AddLayers();
             } else {
-                addScript(""https://unpkg.com/deck.gl@9.2.11/dist.min.js"", ""ltc2-deckgl"");
+                addScript('https://unpkg.com/deck.gl@9.2.11/dist.min.js', 'ltc2-deckgl');
             }
 
         } else {
-            console.log(""RWGPS Map Instance layers changed, adding layers"");
+            console.log('RWGPS Map Instance layers changed, adding layers');
             
             AddLayers();
 
             instance.on('idle', () => {
-                console.log(""RWGPS Map idle"");
+                console.log('RWGPS Map idle');
         
                 LayerControl();
             });
@@ -427,13 +502,13 @@ function LayerControl()
         if (!window.rwgps.MapDelegate.props.mapInstance.__gm) {
             var layers = window.mapInstance.getLayersOrder();
 
-            if (layers.length >= 1 && layers[layers.length-1] != ""ltc2tiles"") {
-                console.log(""RWGPS Map Instance layers changed, re-adding layers"");
+            if (layers.length >= 1 && layers[layers.length-1] != 'ltc2tiles') {
+                console.log('RWGPS Map Instance layers changed, re-adding layers');
                 
                 AddLayers();
 
                 instance.on('idle', () => {
-                    console.log(""RWGPS Map idle"");
+                    console.log('RWGPS Map idle');
         
                     LayerControl();
                 });
@@ -442,6 +517,8 @@ function LayerControl()
             }
         }
     }
+
+    setVisibility(window.layervisible);
 }
 
 function GetColor() {
@@ -463,7 +540,7 @@ function GetGoogleMapsColor() {
 }
 
 function GetGoogleMapsFillColor(featurePointer) {
-    const id = featurePointer.split("":"")[0];
+    const id = featurePointer.split(':')[0];
     const isChecked = GetVisitedAlltime().includes(id);
     const isCheckedYear = GetVisitedYear().includes(id);
 

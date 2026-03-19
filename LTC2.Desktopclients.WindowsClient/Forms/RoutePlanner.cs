@@ -42,6 +42,8 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             _webviewConnector = webviewConnector;
 
             _previousWindowState = FormWindowState.Normal;
+
+            _translationService.LoadMessagesForForm(this);
         }
 
         public async Task InitRoutePlanner()
@@ -112,10 +114,13 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                         MessageBox.Show(msg, header);
                     }
                 });
+
+                chkToggleVisibility.Visible = true;
             }
             else
             {
                 lblCurrentPlace.Text = string.Empty;
+                chkToggleVisibility.Visible = false;
             }
         }
 
@@ -227,7 +232,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private async Task<GetProfileResponse> RetrieveProfile()
         {
             var token = await _webviewConnector.Login();
-            var profile = await _ltc2Proxy.GetProfile(token);
+            var profile = await _ltc2Proxy.GetProfile(token, _multiSportsManager.RunInMultiSportMode);
 
             return profile;
         }
@@ -348,6 +353,14 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private void RoutePlanner_Load(object sender, EventArgs e)
         {
             pnlBar_Resize(sender, e);
+        }
+
+        private async void chkToggleVisibility_CheckedChanged(object sender, EventArgs e)
+        {
+            var value = chkToggleVisibility.Checked ? "true" : "false";
+            var script = $"window.postMessage( {{ command:'toggleLayer', visible: {value} }});";
+
+            await webView.ExecuteScriptAsync(script);
         }
     }
 }

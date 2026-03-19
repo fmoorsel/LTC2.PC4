@@ -64,5 +64,7 @@
   "routeplanner.postcode": "Postcode: %0%",
   "routeplanner.postcode.year": "Postcode: %0% (ook dit jaar afgevinkt)",
   "routeplanner.postcode.visited": "Postcode: %0% (afgevinkt)",
-  "routeplanner.no_map_support": "Kaart wordt niet ondersteund"
+  "routeplanner.no_map_support": "Kaart wordt niet ondersteund",
+
+  "check.toggle.visibility": "Toon/verberg postcode-gebieden"
 }

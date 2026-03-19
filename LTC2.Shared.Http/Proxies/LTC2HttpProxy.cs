@@ -43,10 +43,10 @@ namespace LTC2.Shared.Http.Proxies
             await ExecutePostRequest<UpdateMultiRequest>(uri, body, authHeader);
         }
 
-        public async Task<GetProfileResponse> GetProfile(string accessToken)
+        public async Task<GetProfileResponse> GetProfile(string accessToken, bool multi)
         {
             var authHeader = new AuthenticationHeaderValue("Bearer", accessToken);
-            var uri = $"/api/Profile/profile";
+            var uri = $"/api/Profile/profile?multi={multi}";
 
             var profile = await ExecuteGetRequest<GetProfileResponse>(uri, authHeader);
 

@@ -30,6 +30,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RoutePlanner));
             pnlBar = new Panel();
+            chkToggleVisibility = new CheckBox();
             pnlPlace = new Panel();
             lblCurrentPlace = new Label();
             pbxBrowsing = new PictureBox();
@@ -43,6 +44,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             // pnlBar
             // 
             pnlBar.BorderStyle = BorderStyle.Fixed3D;
+            pnlBar.Controls.Add(chkToggleVisibility);
             pnlBar.Controls.Add(pnlPlace);
             pnlBar.Controls.Add(pbxBrowsing);
             pnlBar.Dock = DockStyle.Top;
@@ -51,6 +53,20 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             pnlBar.Size = new Size(1884, 66);
             pnlBar.TabIndex = 0;
             pnlBar.Resize += pnlBar_Resize;
+            // 
+            // chkToggleVisibility
+            // 
+            chkToggleVisibility.AutoSize = true;
+            chkToggleVisibility.Checked = true;
+            chkToggleVisibility.CheckState = CheckState.Checked;
+            chkToggleVisibility.Location = new Point(114, 22);
+            chkToggleVisibility.Name = "chkToggleVisibility";
+            chkToggleVisibility.Size = new Size(147, 19);
+            chkToggleVisibility.TabIndex = 3;
+            chkToggleVisibility.Text = "#check.toggle.visibility";
+            chkToggleVisibility.UseVisualStyleBackColor = true;
+            chkToggleVisibility.Visible = false;
+            chkToggleVisibility.CheckedChanged += chkToggleVisibility_CheckedChanged;
             // 
             // pnlPlace
             // 
@@ -115,6 +131,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             Load += RoutePlanner_Load;
             Resize += RoutePlanner_Resize;
             pnlBar.ResumeLayout(false);
+            pnlBar.PerformLayout();
             pnlPlace.ResumeLayout(false);
             pnlPlace.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pbxBrowsing).EndInit();
@@ -129,5 +146,6 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private PictureBox pbxBrowsing;
         private Label lblCurrentPlace;
         private Panel pnlPlace;
+        private CheckBox chkToggleVisibility;
     }
 }
