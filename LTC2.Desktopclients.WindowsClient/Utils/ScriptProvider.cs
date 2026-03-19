@@ -42,6 +42,12 @@ function GetMapbox() {
                     window.layervisible = !window.layervisible;
 
                     setVisibility();
+                } else if (event.data.command == 'toggleLayer') {
+                    console.log('toggleLayer message!');
+                    
+                    window.layervisible = event.data.visible;
+
+                    setVisibility();
                 }
             });
 
@@ -260,7 +266,13 @@ function Init() {
                     
             window.layervisible = !window.layervisible;
 
-            setVisibility(window.layervisible);
+            setVisibility();
+        } else if (event.data.command == 'toggleLayer') {
+            console.log('toggleLayer message!');
+                    
+            window.layervisible = event.data.visible;
+
+            setVisibility();
         }
     });
 
