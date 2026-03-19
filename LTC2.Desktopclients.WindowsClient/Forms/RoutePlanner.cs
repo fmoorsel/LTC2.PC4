@@ -115,6 +115,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                     }
                 });
 
+                chkToggleVisibility.Checked = true;
                 chkToggleVisibility.Visible = true;
             }
             else
