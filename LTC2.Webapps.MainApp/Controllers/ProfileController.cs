@@ -45,7 +45,7 @@ namespace LTC2.Webapps.MainApp.Controllers
         [HttpGet]
         [Authorize]
         [Route("profile")]
-        public async Task<IActionResult> GetProfile()
+        public async Task<IActionResult> GetProfile([FromQuery] bool multi = false)
         {
             var authHeader = _tokenUtils.GetAuthenticationHeader(HttpContext.Request);
             var token = authHeader?.Parameter;
@@ -57,7 +57,7 @@ namespace LTC2.Webapps.MainApp.Controllers
                     var profile = _tokenUtils.GetProfileFormToken(token);
                     var athleteId = Convert.ToInt64(profile.AthleteId);
 
-                    var score = await _scoreRepository.GetMostRecentResult(athleteId, IsMultiRequest());
+                    var score = await _scoreRepository.GetMostRecentResult(athleteId, IsMultiRequest(multi));
 
                     profile.PlacesInAllTimeScore = score.VisitedPlacesAllTime.Values.Select(p => new ProfileVisit(p, false)).ToList();
                     profile.PlacesInYearScore = score.VisitedPlacesCurrentYear.Values.Select(p => new ProfileVisit(p, false)).ToList();
@@ -239,8 +239,13 @@ namespace LTC2.Webapps.MainApp.Controllers
             return Unauthorized();
         }
 
-        private bool IsMultiRequest()
+        private bool IsMultiRequest(bool multi = false)
         {
+            if (multi)
+            {
+                return true;
+            }
+
             var result = false;
 
             var multiCookie = HttpContext.Request.Cookies[HomeController.MULTI_COOKIE_NAME];

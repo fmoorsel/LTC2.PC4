@@ -12,6 +12,6 @@ namespace LTC2.Shared.Http.Interfaces
 
         public Task<bool> HasIntermediateResult(string accessToken, bool multi);
 
-        public Task<GetProfileResponse> GetProfile(string accessToken);
+        public Task<GetProfileResponse> GetProfile(string accessToken, bool multi);
     }
 }
