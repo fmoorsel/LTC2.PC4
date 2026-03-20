@@ -188,6 +188,29 @@ namespace LTC2.Webapps.MainApp.Controllers
             return Unauthorized();
         }
 
+        [HttpPost]
+        [Authorize]
+        [Route("checklinestrings")]
+        public IActionResult CheckLineStrings([FromBody] CheckLineStringsRequest request)
+        {
+            EnsureMapRepository();
+
+            var placeIds = new HashSet<string>();
+
+            foreach (var line in request.Lines)
+            {
+                var coordinates = line.Select(c => new List<double> { c[0], c[1] }).ToList();
+                var places = _mapRepository.CheckTrack(coordinates);
+
+                foreach (var place in places)
+                {
+                    placeIds.Add(place.Id);
+                }
+            }
+
+            return Ok(placeIds.ToList());
+        }
+
         [HttpGet]
         [Authorize]
         [Route("centerpoint")]

@@ -53,6 +53,14 @@ namespace LTC2.Shared.Http.Proxies
             return profile;
         }
 
+        public async Task<List<string>> CheckLineStrings(string accessToken, CheckLineStringsRequest request)
+        {
+            var authHeader = new AuthenticationHeaderValue("Bearer", accessToken);
+            var uri = "/api/Route/checklinestrings";
+
+            return await ExecutePostRequest<CheckLineStringsRequest, List<string>>(uri, request, authHeader);
+        }
+
         public async Task<bool> HasIntermediateResult(string accessToken, bool multi)
         {
             var authHeader = new AuthenticationHeaderValue("Bearer", accessToken);
