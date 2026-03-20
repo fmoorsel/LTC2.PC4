@@ -349,6 +349,8 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         {
             pnlPlace.Left = (int)(pnlBar.Width * 0.5f - pnlPlace.Width * 0.5f);
             lblCurrentPlace.Left = (int)(pnlPlace.Width * 0.5f - lblCurrentPlace.Width * 0.5f);
+
+            chkToggleVisibility.Left = pnlBar.Width - chkToggleVisibility.Width - 10;
         }
 
         private void RoutePlanner_Load(object sender, EventArgs e)
