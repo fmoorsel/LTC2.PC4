@@ -8,6 +8,9 @@
 function Init() {
     console.log('looking for mapbox element');
 
+    window.checkedPlaces = ['noplaces'];
+    window.checkedNewPlaces = ['nonewplaces'];
+
     var elements = document.getElementsByClassName('mapboxgl-map');
     if (elements[0] == null) {
         console.log('mapbox element not found');
@@ -50,9 +53,6 @@ function Init() {
                     setVisibility();
                 }
             });
-
-            window.checkedPlaces = ['noplaces'];
-            window.checkedNewPlaces = ['noplaces'];
 
             return '1';
         }
@@ -139,10 +139,25 @@ function AddTileLayer() {
                     ['slice', ['get', 'featurePointer'], 0, ['index-of', ':', ['get', 'featurePointer']]],
                     GetVisitedAlltime(), 0.25, 
                     GetVisitedYear(), 0.45, 
+                    GetCheckedPlaces(), 0.45,
+                    GetCheckedNewPlaces(), 0.45,
                     0.0              
                 ];
 
+        /*
+        const checkExprVisitedAlltimeColor = [
+                'match',
+                    ['slice', ['get', 'featurePointer'], 0, ['index-of', ':', ['get', 'featurePointer']]],
+                    GetVisitedAlltime(), GetFillColor(), 
+                    GetVisitedYear(), GetFillColor(),
+                    GetCheckedPlaces(), GetFillColor(),
+                    GetCheckedNewPlaces(), GetFillColor(),
+                    GetFillColor()              
+                ];
+        */
+
         window.routeMap.setPaintProperty('fltc2tiles', 'fill-opacity', checkExprVisitedAlltimeOpacity);
+        //window.routeMap.setPaintProperty('fltc2tiles', 'fill-color', checkExprVisitedAlltimeColor);
 
         window.routeMap.on('mousemove', (e) => {
             const features = window.routeMap.queryRenderedFeatures(e.point, {
@@ -196,12 +211,40 @@ function GetFillColor() {
     }
 }
 
-function GetVisitedAlltime() {
+function GetCheckedPlaces() {
+    console.log('Getting checked places');
+
+    const filteredPlaces = window.checkedPlaces.filter(p => !window.checkedNewPlaces.includes(p));
+
+    return filteredPlaces;
+}
+
+function GetCheckedNewPlaces() {
+    return window.checkedNewPlaces;
+}
+
+function GetVisitedAlltimeUnfiltered() {
     return [""GetVisitedAlltime""];
 }
 
+function GetVisitedAlltime() {
+    const alltime = GetVisitedAlltimeUnfiltered();
+
+    const filteredAlltime = alltime.filter(at => 
+        !window.checkedPlaces.includes(at) && !window.checkedNewPlaces.includes(at)
+    );
+
+    return alltime;
+}
+
 function GetVisitedYear() {
-    return [""GetVisitedYear""];
+    const year = [""GetVisitedYear""];
+    
+    const filteredYear = year.filter(y => 
+        !window.checkedPlaces.includes(y) && !window.checkedNewPlaces.includes(y)
+    );
+    
+    return filteredYear;
 }
 
 Init();
@@ -633,27 +676,41 @@ GetLines();
             var placesForScript = places.Select(p => $"'{p}'").ToList();
             var placesString = string.Join(",", placesForScript);
 
-            var setPlacesScript = places.Count > 0 ? $"window.checkedPlaces = [{placesString}];" : "window.checkedPlaces = ['noplaces'];";
+            var setPlacesScript = places.Count > 0 ? $"window.checkedPlacesTrack = [{placesString}];" : "window.checkedPlacesTrack = ['noplaces'];";
 
-            var script = setPlacesScript + @"
+            var script = setPlacesScript + @"               
 
-console.log('Places set to:', JSON.stringify(window.checkedPlaces));
-                
-function GetVisitedAlltime() {
+window.getVisitedAlltimeForTrack = function () {
     return [""GetVisitedAlltime""];
 }
 
-console.log('GetVisitedAlltime set to:', JSON.stringify(GetVisitedAlltime()));
+window.allTimeResult = window.getVisitedAlltimeForTrack();
 
-const allTimeResult = GetVisitedAlltime();
-let newPlaces = window.checkedPlaces.filter(p => !allTimeResult.includes(p));
+console.log('All time visited places:', JSON.stringify(window.allTimeResult));
+console.log('Checked places:', JSON.stringify(window.checkedPlacesTrack));
 
-window.checkedNewPlaces = newPlaces.length > 0 ? newPlaces : ['noplaces'] ;
+window.newPlaces = window.checkedPlacesTrack.filter(p => !window.allTimeResult.includes(p));
 
+console.log('New places:', JSON.stringify(window.newPlaces));
+
+window.checkedNewPlaces = window.newPlaces.length > 0 ? window.newPlaces : ['nonewplaces'] ;
+
+window.filterCheckedPlaces = window.checkedPlacesTrack.filter(p => !window.checkedNewPlaces.includes(p));
+window.checkedPlaces = window.filterCheckedPlaces.length > 0 ? window.filterCheckedPlaces : ['noplaces'];
+
+console.log('Places set to:', JSON.stringify(window.checkedPlaces));
 console.log('New Places set to:', JSON.stringify(window.checkedNewPlaces));
+
+window.newPlaces = null;
+window.allTimeResult = null;
+window.checkedPlacesTrack = null;
+window.filterCheckedPlaces = null;
+window.getVisitedAlltimeForTrack = null;
 
 ";
 
+
+            //script = "console.log('>>> Updating track with new places');" + setPlacesScript;
             return script;
         }
     }
