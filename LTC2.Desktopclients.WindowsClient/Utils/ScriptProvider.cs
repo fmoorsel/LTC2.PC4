@@ -63,17 +63,31 @@ function Init() {
     return '0';
 }
 
-window.createCheckExprVisitedAlltimeOpacity = function() {
+window.createCheckExprOpacity = function() {
     var expr = [
         'match',
             ['slice', ['get', 'featurePointer'], 0, ['index-of', ':', ['get', 'featurePointer']]],
             GetVisitedAlltime(), 0.25, 
             GetVisitedYear(), 0.45, 
-            GetCheckedPlaces(), 0.45,
-            GetCheckedNewPlaces(), 0.45,
+            GetCheckedPlaces(), 0.25,
+            GetCheckedNewPlaces(), 0.25,
             0.0
     ];
 
+    return expr;
+}
+
+window.createCheckExprColor = function() {
+    var expr = [
+        'match',
+            ['slice', ['get', 'featurePointer'], 0, ['index-of', ':', ['get', 'featurePointer']]],
+            GetVisitedAlltime(), GetFillColor(), 
+            GetVisitedYear(), GetFillColor(),
+            GetCheckedPlaces(), GetFillColorOnTrack(),
+            GetCheckedNewPlaces(), GetFillColorOnTrackNew(),
+            GetFillColor()              
+    ];
+        
     return expr;
 }
 
@@ -148,22 +162,11 @@ function AddTileLayer() {
             }
         });
 
-        const checkExprVisitedAlltimeOpacity = window.createCheckExprVisitedAlltimeOpacity();
+        const checkExprOpacity = window.createCheckExprOpacity();        
+        const checkExprColor = window.createCheckExprColor();
 
-        /*
-        const checkExprVisitedAlltimeColor = [
-                'match',
-                    ['slice', ['get', 'featurePointer'], 0, ['index-of', ':', ['get', 'featurePointer']]],
-                    GetVisitedAlltime(), GetFillColor(), 
-                    GetVisitedYear(), GetFillColor(),
-                    GetCheckedPlaces(), GetFillColor(),
-                    GetCheckedNewPlaces(), GetFillColor(),
-                    GetFillColor()              
-                ];
-        */
-
-        window.routeMap.setPaintProperty('fltc2tiles', 'fill-opacity', checkExprVisitedAlltimeOpacity);
-        //window.routeMap.setPaintProperty('fltc2tiles', 'fill-color', checkExprVisitedAlltimeColor);
+        window.routeMap.setPaintProperty('fltc2tiles', 'fill-opacity', checkExprOpacity);
+        window.routeMap.setPaintProperty('fltc2tiles', 'fill-color', checkExprColor);
 
         window.routeMap.on('mousemove', (e) => {
             const features = window.routeMap.queryRenderedFeatures(e.point, {
@@ -214,6 +217,43 @@ function GetFillColor() {
         return 'rgb(255,165,0)';
     } else if (stryle.includes('standard')) {
         return 'rgb(255,165,0)';
+    }
+}
+
+function GetFillColorOnTrack() {
+    const stryle = window.routeMap.getStyle().sprite;
+
+    if (stryle.includes('satellite')) {
+        return 'rgb(0, 100, 0)';
+    } else if (stryle.includes('hybrid')) {
+        return 'rgb(0, 100, 0)';
+    } else if (stryle.includes('dark-standard')) {
+        return 'rgb(0, 100, 0)';
+    } else if (stryle.includes('winter')) {
+        return 'rgb(0, 100, 0)';
+    } else if (stryle.includes('light')) {
+        return 'rgb(0, 100, 0)';
+    } else if (stryle.includes('standard')) {
+        return 'rgb(0, 100, 0)';
+    }
+}
+
+
+function GetFillColorOnTrackNew() {
+    const stryle = window.routeMap.getStyle().sprite;
+
+    if (stryle.includes('satellite')) {
+        return 'rgb(0, 255, 0)';
+    } else if (stryle.includes('hybrid')) {
+        return 'rgb(0, 255, 0)';
+    } else if (stryle.includes('dark-standard')) {
+        return 'rgb(0, 255, 0)';
+    } else if (stryle.includes('winter')) {
+        return 'rgb(0, 255, 0)';
+    } else if (stryle.includes('light')) {
+        return 'rgb(0, 255, 0)';
+    } else if (stryle.includes('standard')) {
+        return 'rgb(0, 255, 0)';
     }
 }
 
@@ -497,7 +537,7 @@ function AddLayersMapLibre()
         }
     });
 
-    const checkExprVisitedAlltimeOpacity = [
+    const checkExprOpacity = [
             'match',
                 ['slice', ['get', 'featurePointer'], 0, ['index-of', ':', ['get', 'featurePointer']]],
                 GetVisitedAlltime(), 0.25, 
@@ -505,7 +545,7 @@ function AddLayersMapLibre()
                 0.0              
             ];
 
-    window.mapInstance.setPaintProperty('fltc2tiles', 'fill-opacity', checkExprVisitedAlltimeOpacity);
+    window.mapInstance.setPaintProperty('fltc2tiles', 'fill-opacity', checkExprOpacity);
 
     window.mapInstance.on('mousemove', (e) => {
         const features = window.mapInstance.queryRenderedFeatures(e.point, {
@@ -691,9 +731,11 @@ function GetVisitedAlltimeForTrack () {
 }
 
 function UpdateMap() {
-    var checkExprVisitedAlltimeOpacity = window.createCheckExprVisitedAlltimeOpacity();
+    const checkExprOpacity = window.createCheckExprOpacity();        
+    const checkExprColor = window.createCheckExprColor();
 
-    window.routeMap.setPaintProperty('fltc2tiles', 'fill-opacity', checkExprVisitedAlltimeOpacity);
+    window.routeMap.setPaintProperty('fltc2tiles', 'fill-opacity', checkExprOpacity);
+    window.routeMap.setPaintProperty('fltc2tiles', 'fill-color', checkExprColor);
 
     window.routeMap.triggerRepaint();
 
