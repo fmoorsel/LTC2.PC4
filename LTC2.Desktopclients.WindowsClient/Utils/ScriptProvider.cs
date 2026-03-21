@@ -63,6 +63,20 @@ function Init() {
     return '0';
 }
 
+window.createCheckExprVisitedAlltimeOpacity = function() {
+    var expr = [
+        'match',
+            ['slice', ['get', 'featurePointer'], 0, ['index-of', ':', ['get', 'featurePointer']]],
+            GetVisitedAlltime(), 0.25, 
+            GetVisitedYear(), 0.45, 
+            GetCheckedPlaces(), 0.45,
+            GetCheckedNewPlaces(), 0.45,
+            0.0
+    ];
+
+    return expr;
+}
+
 function setVisibility(visible) {
     if (window.routeMap != null) {
         const visibilty = window.layervisible ? 'visible' : 'none';
@@ -134,15 +148,7 @@ function AddTileLayer() {
             }
         });
 
-        const checkExprVisitedAlltimeOpacity = [
-                'match',
-                    ['slice', ['get', 'featurePointer'], 0, ['index-of', ':', ['get', 'featurePointer']]],
-                    GetVisitedAlltime(), 0.25, 
-                    GetVisitedYear(), 0.45, 
-                    GetCheckedPlaces(), 0.45,
-                    GetCheckedNewPlaces(), 0.45,
-                    0.0              
-                ];
+        const checkExprVisitedAlltimeOpacity = window.createCheckExprVisitedAlltimeOpacity();
 
         /*
         const checkExprVisitedAlltimeColor = [
@@ -234,7 +240,7 @@ function GetVisitedAlltime() {
         !window.checkedPlaces.includes(at) && !window.checkedNewPlaces.includes(at)
     );
 
-    return alltime;
+    return filteredAlltime;
 }
 
 function GetVisitedYear() {
@@ -680,37 +686,42 @@ GetLines();
 
             var script = setPlacesScript + @"               
 
-window.getVisitedAlltimeForTrack = function () {
+function GetVisitedAlltimeForTrack () {
     return [""GetVisitedAlltime""];
 }
 
-window.allTimeResult = window.getVisitedAlltimeForTrack();
+function UpdateMap() {
+    var checkExprVisitedAlltimeOpacity = window.createCheckExprVisitedAlltimeOpacity();
 
-console.log('All time visited places:', JSON.stringify(window.allTimeResult));
-console.log('Checked places:', JSON.stringify(window.checkedPlacesTrack));
+    window.routeMap.setPaintProperty('fltc2tiles', 'fill-opacity', checkExprVisitedAlltimeOpacity);
 
-window.newPlaces = window.checkedPlacesTrack.filter(p => !window.allTimeResult.includes(p));
+    window.routeMap.triggerRepaint();
 
-console.log('New places:', JSON.stringify(window.newPlaces));
+    console.log('Map updated with new places');
+}
 
-window.checkedNewPlaces = window.newPlaces.length > 0 ? window.newPlaces : ['nonewplaces'] ;
+function UpdatePlacesOnTrack() {
+    const allTimeResult = GetVisitedAlltimeForTrack();
+    const newPlaces = window.checkedPlacesTrack.filter(p => !allTimeResult.includes(p));
 
-window.filterCheckedPlaces = window.checkedPlacesTrack.filter(p => !window.checkedNewPlaces.includes(p));
-window.checkedPlaces = window.filterCheckedPlaces.length > 0 ? window.filterCheckedPlaces : ['noplaces'];
+    console.log('All time visited places:', JSON.stringify(allTimeResult));
+    console.log('Checked places:', JSON.stringify(window.checkedPlacesTrack));
+    console.log('New places:', JSON.stringify(newPlaces));
 
-console.log('Places set to:', JSON.stringify(window.checkedPlaces));
-console.log('New Places set to:', JSON.stringify(window.checkedNewPlaces));
+    window.checkedNewPlaces = newPlaces.length > 0 ? newPlaces : ['nonewplaces'] ;
 
-window.newPlaces = null;
-window.allTimeResult = null;
-window.checkedPlacesTrack = null;
-window.filterCheckedPlaces = null;
-window.getVisitedAlltimeForTrack = null;
+    const filterCheckedPlaces = window.checkedPlacesTrack.filter(p => !window.checkedNewPlaces.includes(p));
+    window.checkedPlaces = filterCheckedPlaces.length > 0 ? filterCheckedPlaces : ['noplaces'];
 
+    console.log('Places set to:', JSON.stringify(window.checkedPlaces));
+    console.log('New Places set to:', JSON.stringify(window.checkedNewPlaces));
+
+    UpdateMap();
+}
+
+UpdatePlacesOnTrack();
 ";
 
-
-            //script = "console.log('>>> Updating track with new places');" + setPlacesScript;
             return script;
         }
     }
