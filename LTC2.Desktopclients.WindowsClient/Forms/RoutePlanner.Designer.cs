@@ -30,6 +30,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RoutePlanner));
             pnlBar = new Panel();
+            btnUnCheckRoute = new Button();
             btnCheckRoute = new Button();
             chkToggleVisibility = new CheckBox();
             pnlPlace = new Panel();
@@ -45,6 +46,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             // pnlBar
             // 
             pnlBar.BorderStyle = BorderStyle.Fixed3D;
+            pnlBar.Controls.Add(btnUnCheckRoute);
             pnlBar.Controls.Add(btnCheckRoute);
             pnlBar.Controls.Add(chkToggleVisibility);
             pnlBar.Controls.Add(pnlPlace);
@@ -56,11 +58,22 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             pnlBar.TabIndex = 0;
             pnlBar.Resize += pnlBar_Resize;
             // 
+            // btnUnCheckRoute
+            // 
+            btnUnCheckRoute.Location = new Point(1109, 10);
+            btnUnCheckRoute.Name = "btnUnCheckRoute";
+            btnUnCheckRoute.Size = new Size(95, 40);
+            btnUnCheckRoute.TabIndex = 5;
+            btnUnCheckRoute.Text = "#button.uncheckroute";
+            btnUnCheckRoute.UseVisualStyleBackColor = true;
+            btnUnCheckRoute.Visible = false;
+            btnUnCheckRoute.Click += btnUnCheckRoute_Click;
+            // 
             // btnCheckRoute
             // 
-            btnCheckRoute.Location = new Point(267, 10);
+            btnCheckRoute.Location = new Point(971, 10);
             btnCheckRoute.Name = "btnCheckRoute";
-            btnCheckRoute.Size = new Size(129, 39);
+            btnCheckRoute.Size = new Size(95, 40);
             btnCheckRoute.TabIndex = 4;
             btnCheckRoute.Text = "#button.checkroute";
             btnCheckRoute.UseVisualStyleBackColor = true;
@@ -161,5 +174,6 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private Panel pnlPlace;
         private CheckBox chkToggleVisibility;
         private Button btnCheckRoute;
+        private Button btnUnCheckRoute;
     }
 }

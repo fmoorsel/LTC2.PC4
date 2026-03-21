@@ -120,12 +120,14 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                 chkToggleVisibility.Checked = true;
                 chkToggleVisibility.Visible = true;
                 btnCheckRoute.Visible = true;
+                btnUnCheckRoute.Visible = true;
             }
             else
             {
                 lblCurrentPlace.Text = string.Empty;
                 chkToggleVisibility.Visible = false;
                 btnCheckRoute.Visible = false;
+                btnUnCheckRoute.Visible = false;
             }
         }
 
@@ -367,8 +369,9 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             pnlPlace.Left = (int)(pnlBar.Width * 0.5f - pnlPlace.Width * 0.5f);
             lblCurrentPlace.Left = (int)(pnlPlace.Width * 0.5f - lblCurrentPlace.Width * 0.5f);
 
-            btnCheckRoute.Left = pnlBar.Width - btnCheckRoute.Width - 10;
-            chkToggleVisibility.Left = btnCheckRoute.Left - chkToggleVisibility.Width - 10;
+            btnUnCheckRoute.Left = pnlBar.Width - btnUnCheckRoute.Width - 10;
+            btnCheckRoute.Left = btnUnCheckRoute.Left - btnCheckRoute.Width - 5;
+            chkToggleVisibility.Left = btnCheckRoute.Left - chkToggleVisibility.Width - 5;
         }
 
         private void RoutePlanner_Load(object sender, EventArgs e)
@@ -384,6 +387,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             await webView.ExecuteScriptAsync(script);
 
             btnCheckRoute.Enabled = chkToggleVisibility.Checked;
+            btnUnCheckRoute.Enabled = chkToggleVisibility.Checked;
         }
 
         private async void btnCheckRoute_Click(object sender, EventArgs e)
@@ -414,10 +418,10 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
                         var updateScript = ScriptProvider.GetStravaTrackUpdateScript(places);
 
-                        var visiedAlltimeReplacement = GetVisitedAlltimeReplacement(_profile, true);
-                        if (!string.IsNullOrEmpty(visiedAlltimeReplacement))
+                        var visitedAlltimeReplacement = GetVisitedAlltimeReplacement(_profile, true);
+                        if (!string.IsNullOrEmpty(visitedAlltimeReplacement))
                         {
-                            updateScript = updateScript.Replace("\"GetVisitedAlltime\"", visiedAlltimeReplacement);
+                            updateScript = updateScript.Replace("\"GetVisitedAlltime\"", visitedAlltimeReplacement);
                         }
 
                         await webView.ExecuteScriptAsync(updateScript);
@@ -426,6 +430,40 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                     {
                         //ingore
                     }
+                }
+                else
+                {
+                    try
+                    {
+                        var updateScript = ScriptProvider.GetStravaTrackUpdateScript([]);
+
+                        await webView.ExecuteScriptAsync(updateScript);
+                    }
+                    catch
+                    {
+                        //ingore
+                    }
+                }
+            }
+        }
+
+        private async void btnUnCheckRoute_Click(object sender, EventArgs e)
+        {
+            if (_multiSportsManager.RunWithSource == "ridewithgps")
+            {
+
+            }
+            else
+            {
+                try
+                {
+                    var updateScript = ScriptProvider.GetStravaTrackUpdateScript([]);
+
+                    await webView.ExecuteScriptAsync(updateScript);
+                }
+                catch
+                {
+                    //ingore
                 }
             }
         }

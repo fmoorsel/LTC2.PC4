@@ -67,5 +67,7 @@
   "routeplanner.no_map_support": "Kaart wordt niet ondersteund",
 
   "check.toggle.visibility": "Toon/verberg postcode-gebieden",
-  "button.checkroute": "Check route"
+  "button.checkroute": "Check route",
+  "button.uncheckroute": "Verberg check"
+
 }
