@@ -30,6 +30,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RoutePlanner));
             pnlBar = new Panel();
+            btnCheckRoute = new Button();
             chkToggleVisibility = new CheckBox();
             pnlPlace = new Panel();
             lblCurrentPlace = new Label();
@@ -44,6 +45,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             // pnlBar
             // 
             pnlBar.BorderStyle = BorderStyle.Fixed3D;
+            pnlBar.Controls.Add(btnCheckRoute);
             pnlBar.Controls.Add(chkToggleVisibility);
             pnlBar.Controls.Add(pnlPlace);
             pnlBar.Controls.Add(pbxBrowsing);
@@ -54,12 +56,23 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             pnlBar.TabIndex = 0;
             pnlBar.Resize += pnlBar_Resize;
             // 
+            // btnCheckRoute
+            // 
+            btnCheckRoute.Location = new Point(267, 10);
+            btnCheckRoute.Name = "btnCheckRoute";
+            btnCheckRoute.Size = new Size(129, 39);
+            btnCheckRoute.TabIndex = 4;
+            btnCheckRoute.Text = "#button.checkroute";
+            btnCheckRoute.UseVisualStyleBackColor = true;
+            btnCheckRoute.Visible = false;
+            btnCheckRoute.Click += btnCheckRoute_Click;
+            // 
             // chkToggleVisibility
             // 
             chkToggleVisibility.AutoSize = true;
             chkToggleVisibility.Checked = true;
             chkToggleVisibility.CheckState = CheckState.Checked;
-            chkToggleVisibility.Location = new Point(114, 22);
+            chkToggleVisibility.Location = new Point(114, 21);
             chkToggleVisibility.Name = "chkToggleVisibility";
             chkToggleVisibility.Size = new Size(147, 19);
             chkToggleVisibility.TabIndex = 3;
@@ -147,5 +160,6 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private Label lblCurrentPlace;
         private Panel pnlPlace;
         private CheckBox chkToggleVisibility;
+        private Button btnCheckRoute;
     }
 }

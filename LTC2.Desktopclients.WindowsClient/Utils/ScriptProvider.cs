@@ -5,7 +5,7 @@
         public static string GetStravaRouteBuilderScript()
         {
             var script = @"
-function GetMapbox() {
+function Init() {
     console.log('looking for mapbox element');
 
     var elements = document.getElementsByClassName('mapboxgl-map');
@@ -50,6 +50,9 @@ function GetMapbox() {
                     setVisibility();
                 }
             });
+
+            window.checkedPlaces = ['noplaces'];
+            window.checkedNewPlaces = ['noplaces'];
 
             return '1';
         }
@@ -113,11 +116,12 @@ function AddTileLayer() {
 
             if (event.features.length > 0) {
                 console.log(event.features[0].properties.popupContent);
+                console.log(event.features[0].properties.featurePointer);
 
                 if (window.chrome && window.chrome.webview) {
                     console.log(""posting message to webview"");
                     
-                    const id = event.features[0].properties.featurePointer.split(':')[0];
+                    const id = event.features[0].properties.featurePointer.split(':')[0];                  
 
                     const isChecked = GetVisitedAlltime().includes(id);
                     const isCheckedYear = GetVisitedYear().includes(id);
@@ -200,7 +204,7 @@ function GetVisitedYear() {
     return [""GetVisitedYear""];
 }
 
-GetMapbox();
+Init();
             ";
 
             return script;
@@ -361,6 +365,9 @@ function GetGoogleMapsLayer() {
             
             if (info.object) {
                 const properties = info.object.properties;
+
+                console.log(properties.popupContent);
+                console.log(properties.featurePointer);
       
                 const id = properties.featurePointer.split("":"")[0];
 
@@ -423,6 +430,7 @@ function AddLayersMapLibre()
 
         if (event.features.length > 0) {
             console.log(event.features[0].properties.popupContent);
+            console.log(event.features[0].properties.featurePointer);
 
             if (window.chrome && window.chrome.webview) {
                 console.log('posting message to webview');
@@ -567,6 +575,84 @@ function GetVisitedYear() {
 
 Init();            
             ";
+
+            return script;
+        }
+
+        public static string GetStravaTrackRetrievalScript()
+        {
+            var script = @"
+
+function GetLines() {
+    console.log('Retrieving line coordinates');
+
+    let lineCoordinates = [];
+
+    const layers = window.routeMap.getStyle().layers.filter(function (layer) {
+        return layer.id.match(/^route-.*-polyline/);
+    });
+
+    let coordinateSources = new Set();
+
+    layers.forEach(layer => {
+        if (!coordinateSources.has(layer.source)) {
+            coordinateSources.add(layer.source);
+        }
+    });
+
+
+    coordinateSources.forEach(source => {
+        const sourceData = window.routeMap.getSource(source)._data;
+
+        if (sourceData.features) {
+            sourceData.features.forEach(feature => {
+                if (feature.geometry.type == 'LineString') {
+                    lineCoordinates.push(feature.geometry.coordinates);
+                }
+            });
+        }
+    });
+
+
+    console.log('Retrieved line coordinates:', JSON.stringify(lineCoordinates));
+
+    return lineCoordinates;
+
+}
+
+console.log('>>> Retrieving line coordinates');
+
+GetLines();
+            ";
+
+            return script;
+        }
+
+        public static string GetStravaTrackUpdateScript(List<string> places)
+        {
+            var placesForScript = places.Select(p => $"'{p}'").ToList();
+            var placesString = string.Join(",", placesForScript);
+
+            var setPlacesScript = places.Count > 0 ? $"window.checkedPlaces = [{placesString}];" : "window.checkedPlaces = ['noplaces'];";
+
+            var script = setPlacesScript + @"
+
+console.log('Places set to:', JSON.stringify(window.checkedPlaces));
+                
+function GetVisitedAlltime() {
+    return [""GetVisitedAlltime""];
+}
+
+console.log('GetVisitedAlltime set to:', JSON.stringify(GetVisitedAlltime()));
+
+const allTimeResult = GetVisitedAlltime();
+let newPlaces = window.checkedPlaces.filter(p => !allTimeResult.includes(p));
+
+window.checkedNewPlaces = newPlaces.length > 0 ? newPlaces : ['noplaces'] ;
+
+console.log('New Places set to:', JSON.stringify(window.checkedNewPlaces));
+
+";
 
             return script;
         }

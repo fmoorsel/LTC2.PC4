@@ -66,5 +66,6 @@
   "routeplanner.postcode.visited": "Postcode: %0% (afgevinkt)",
   "routeplanner.no_map_support": "Kaart wordt niet ondersteund",
 
-  "check.toggle.visibility": "Toon/verberg postcode-gebieden"
+  "check.toggle.visibility": "Toon/verberg postcode-gebieden",
+  "button.checkroute": "Check route"
 }

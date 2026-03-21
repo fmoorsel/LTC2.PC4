@@ -3,8 +3,10 @@ using LTC2.Desktopclients.WindowsClient.Services;
 using LTC2.Desktopclients.WindowsClient.Utils;
 using LTC2.Shared.Http.Interfaces;
 using LTC2.Shared.Messages.Interfaces;
+using LTC2.Shared.Models.Requests;
 using LTC2.Shared.Models.Responses;
 using Microsoft.Web.WebView2.Core;
+using Newtonsoft.Json;
 
 namespace LTC2.Desktopclients.WindowsClient.Forms
 {
@@ -117,11 +119,13 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
                 chkToggleVisibility.Checked = true;
                 chkToggleVisibility.Visible = true;
+                btnCheckRoute.Visible = true;
             }
             else
             {
                 lblCurrentPlace.Text = string.Empty;
                 chkToggleVisibility.Visible = false;
+                btnCheckRoute.Visible = false;
             }
         }
 
@@ -129,20 +133,16 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         {
             if (profile != null)
             {
-                var visitedAlltime = profile.PlacesInAllTimeScore
-                            .Where(p => !profile.PlacesInYearScore.Any(y => y.Id == p.Id))
-                            .Select(p => p.ScriptId).ToList();
+                var visiedAlltimeReplacement = GetVisitedAlltimeReplacement(profile, false);
 
                 var visitedYear = profile.PlacesInYearScore
                             .Select(p => p.ScriptId).ToList();
 
 
                 var script = _rawInitScript;
-                if (visitedAlltime.Count > 0)
+                if (!string.IsNullOrEmpty(visiedAlltimeReplacement))
                 {
-                    var visitedAlltimeString = string.Join(",", visitedAlltime);
-
-                    script = script.Replace("\"GetVisitedAlltime\"", visitedAlltimeString);
+                    script = script.Replace("\"GetVisitedAlltime\"", visiedAlltimeReplacement);
                 }
 
                 if (visitedYear.Count > 0)
@@ -155,6 +155,23 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             }
 
             return _rawInitScript;
+        }
+
+        public string GetVisitedAlltimeReplacement(GetProfileResponse profile, bool includeYear)
+        {
+            var visitedAlltime = profile.PlacesInAllTimeScore
+                        .Where(p => includeYear || !profile.PlacesInYearScore.Any(y => y.Id == p.Id))
+                        .Select(p => p.ScriptId).ToList()
+                        .OrderBy(id => id).ToList();
+
+            if (visitedAlltime.Count > 0)
+            {
+                return string.Join(",", visitedAlltime);
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
 
         private void RoutePlanner_FormClosing(object sender, FormClosingEventArgs e)
@@ -350,7 +367,8 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             pnlPlace.Left = (int)(pnlBar.Width * 0.5f - pnlPlace.Width * 0.5f);
             lblCurrentPlace.Left = (int)(pnlPlace.Width * 0.5f - lblCurrentPlace.Width * 0.5f);
 
-            chkToggleVisibility.Left = pnlBar.Width - chkToggleVisibility.Width - 10;
+            btnCheckRoute.Left = pnlBar.Width - btnCheckRoute.Width - 10;
+            chkToggleVisibility.Left = btnCheckRoute.Left - chkToggleVisibility.Width - 10;
         }
 
         private void RoutePlanner_Load(object sender, EventArgs e)
@@ -364,6 +382,53 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             var script = $"window.postMessage( {{ command:'toggleLayer', visible: {value} }});";
 
             await webView.ExecuteScriptAsync(script);
+
+            btnCheckRoute.Enabled = chkToggleVisibility.Checked;
+        }
+
+        private async void btnCheckRoute_Click(object sender, EventArgs e)
+        {
+            if (_multiSportsManager.RunWithSource == "ridewithgps")
+            {
+
+            }
+            else
+            {
+                var script = ScriptProvider.GetStravaTrackRetrievalScript();
+
+                var coordinates = await webView.ExecuteScriptAsync(script);
+
+                if (!string.IsNullOrEmpty(coordinates) && coordinates != "[]")
+                {
+                    try
+                    {
+                        var trackPoints = JsonConvert.DeserializeObject<List<List<double[]>>>(coordinates);
+
+                        var request = new CheckLineStringsRequest()
+                        {
+                            Lines = trackPoints
+                        };
+
+                        var token = await _webviewConnector.Login();
+                        var places = await _ltc2Proxy.CheckLineStrings(token, request);
+
+                        var updateScript = ScriptProvider.GetStravaTrackUpdateScript(places);
+
+                        var visiedAlltimeReplacement = GetVisitedAlltimeReplacement(_profile, true);
+                        if (!string.IsNullOrEmpty(visiedAlltimeReplacement))
+                        {
+                            updateScript = updateScript.Replace("\"GetVisitedAlltime\"", visiedAlltimeReplacement);
+                        }
+
+                        await webView.ExecuteScriptAsync(updateScript);
+                    }
+                    catch
+                    {
+                        //ingore
+                    }
+                }
+            }
         }
     }
 }
+

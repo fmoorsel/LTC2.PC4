@@ -2,7 +2,6 @@ using LTC2.Shared.ActivityFormats.Gpx.Utils;
 using LTC2.Shared.Common.Interfaces;
 using LTC2.Shared.Models.Domain;
 using LTC2.Shared.Models.Requests;
-using LTC2.Shared.Models.Responses;
 using LTC2.Shared.Repositories.Interfaces;
 using LTC2.Shared.StravaConnector.Exceptions;
 using LTC2.Shared.StravaConnector.Interfaces;
