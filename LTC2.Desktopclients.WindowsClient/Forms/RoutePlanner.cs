@@ -23,6 +23,8 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private string _rawInitScript;
         private string _initScript;
 
+        private bool _oldUncheckedState;
+
         private readonly object _profileLock = new object();
         private GetProfileResponse _profile;
 
@@ -121,6 +123,9 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                 chkToggleVisibility.Visible = true;
                 btnCheckRoute.Visible = true;
                 btnUnCheckRoute.Visible = true;
+                btnUnCheckRoute.Enabled = false;
+
+                _oldUncheckedState = false;
             }
             else
             {
@@ -128,6 +133,9 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                 chkToggleVisibility.Visible = false;
                 btnCheckRoute.Visible = false;
                 btnUnCheckRoute.Visible = false;
+                btnUnCheckRoute.Enabled = false;
+
+                _oldUncheckedState = false;
             }
         }
 
@@ -386,8 +394,12 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
             await webView.ExecuteScriptAsync(script);
 
+            var oldUncheckedState = btnUnCheckRoute.Enabled;
+
             btnCheckRoute.Enabled = chkToggleVisibility.Checked;
-            btnUnCheckRoute.Enabled = chkToggleVisibility.Checked;
+            btnUnCheckRoute.Enabled = _oldUncheckedState;
+
+            _oldUncheckedState = oldUncheckedState;
         }
 
         private async void btnCheckRoute_Click(object sender, EventArgs e)
@@ -416,6 +428,8 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                         var token = await _webviewConnector.Login();
                         var places = await _ltc2Proxy.CheckLineStrings(token, request);
 
+                        btnUnCheckRoute.Enabled = places.Count > 0;
+
                         var updateScript = ScriptProvider.GetStravaTrackUpdateScript(places);
 
                         var visitedAlltimeReplacement = GetVisitedAlltimeReplacement(_profile, true);
@@ -433,6 +447,8 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                 }
                 else
                 {
+                    btnUnCheckRoute.Enabled = false;
+
                     try
                     {
                         var updateScript = ScriptProvider.GetStravaTrackUpdateScript([]);
@@ -449,6 +465,8 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
         private async void btnUnCheckRoute_Click(object sender, EventArgs e)
         {
+            btnUnCheckRoute.Enabled = false;
+
             if (_multiSportsManager.RunWithSource == "ridewithgps")
             {
 

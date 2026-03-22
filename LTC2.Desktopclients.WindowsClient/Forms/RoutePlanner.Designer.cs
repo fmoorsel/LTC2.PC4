@@ -60,6 +60,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             // 
             // btnUnCheckRoute
             // 
+            btnUnCheckRoute.Enabled = false;
             btnUnCheckRoute.Location = new Point(1109, 10);
             btnUnCheckRoute.Name = "btnUnCheckRoute";
             btnUnCheckRoute.Size = new Size(95, 40);
