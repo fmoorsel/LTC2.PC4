@@ -92,7 +92,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                 UpdateProfile();
             }
 
-            if (webView.CoreWebView2.Source.StartsWith(GetBuilderPrefix()))
+            if (IsBuilderUrl(webView.CoreWebView2.Source))
             {
                 Task.Run(async () =>
                 {
@@ -217,7 +217,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
                 webView.CoreWebView2.Navigate(GetStartUrl());
             }
-            else if (webView.CoreWebView2.Source.ToString().StartsWith(GetBuilderPrefix()))
+            else if (IsBuilderUrl(webView.CoreWebView2.Source))
             {
                 lblCurrentPlace.Text = "Postcode: ----";
             }
@@ -292,15 +292,31 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             }
         }
 
-        private string GetBuilderPrefix()
+        private bool IsBuilderUrl(string completeUrl)
         {
+            var urlParts = completeUrl.Split('?');
+            var url = urlParts[0];
+
             if (_multiSportsManager.RunWithSource == "ridewithgps")
             {
-                return _appSettings.RideWithGpsRouteBuilderPrefix;
+
+                if (url.StartsWith(_appSettings.RideWithGpsRouteBuilderPrefix))
+                {
+                    return true;
+                }
+                else if (_appSettings.RideWithGpsRouteBuilderPrefixPostfix != null && _appSettings.RideWithGpsRouteBuilderPrefixPostfix.IndexOf(',') > 0)
+                {
+                    var parts = _appSettings.RideWithGpsRouteBuilderPrefixPostfix.Split(',');
+                    return url.StartsWith(parts[0]) && url.EndsWith(parts[1]);
+                }
+                else
+                {
+                    return false;
+                }
             }
             else
             {
-                return _appSettings.StravaRouteBuilderPrefix;
+                return url.StartsWith(_appSettings.StravaRouteBuilderPrefix);
             }
         }
 
@@ -406,59 +422,120 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         {
             if (_multiSportsManager.RunWithSource == "ridewithgps")
             {
-
+                await DoCheckRouteRwGps();
             }
             else
             {
-                var script = ScriptProvider.GetStravaTrackRetrievalScript();
+                await DoCheckRouteStrava();
+            }
+        }
 
-                var coordinates = await webView.ExecuteScriptAsync(script);
+        private async Task DoCheckRouteRwGps()
+        {
+            var script = ScriptProvider.GetRwGpsTrackRetrievalScript();
 
-                if (!string.IsNullOrEmpty(coordinates) && coordinates != "[]")
+            var coordinates = await webView.ExecuteScriptAsync(script);
+
+            if (!string.IsNullOrEmpty(coordinates) && coordinates != "[]")
+            {
+                try
                 {
-                    try
+                    var trackPoints = JsonConvert.DeserializeObject<List<double[]>>(coordinates);
+
+                    var trackPointsList = new List<List<double[]>> { trackPoints };
+
+                    var request = new CheckLineStringsRequest()
                     {
-                        var trackPoints = JsonConvert.DeserializeObject<List<List<double[]>>>(coordinates);
+                        Lines = trackPointsList
+                    };
 
-                        var request = new CheckLineStringsRequest()
-                        {
-                            Lines = trackPoints
-                        };
+                    var token = await _webviewConnector.Login();
+                    var places = await _ltc2Proxy.CheckLineStrings(token, request);
 
-                        var token = await _webviewConnector.Login();
-                        var places = await _ltc2Proxy.CheckLineStrings(token, request);
+                    btnUnCheckRoute.Enabled = places.Count > 0;
 
-                        btnUnCheckRoute.Enabled = places.Count > 0;
+                    //var updateScript = ScriptProvider.GetStravaTrackUpdateScript(places);
 
-                        var updateScript = ScriptProvider.GetStravaTrackUpdateScript(places);
+                    //var visitedAlltimeReplacement = GetVisitedAlltimeReplacement(_profile, true);
+                    //if (!string.IsNullOrEmpty(visitedAlltimeReplacement))
+                    //{
+                    //    updateScript = updateScript.Replace("\"GetVisitedAlltime\"", visitedAlltimeReplacement);
+                    //}
 
-                        var visitedAlltimeReplacement = GetVisitedAlltimeReplacement(_profile, true);
-                        if (!string.IsNullOrEmpty(visitedAlltimeReplacement))
-                        {
-                            updateScript = updateScript.Replace("\"GetVisitedAlltime\"", visitedAlltimeReplacement);
-                        }
-
-                        await webView.ExecuteScriptAsync(updateScript);
-                    }
-                    catch
-                    {
-                        //ingore
-                    }
+                    //await webView.ExecuteScriptAsync(updateScript);
                 }
-                else
+                catch
                 {
-                    btnUnCheckRoute.Enabled = false;
+                    //ingore
+                }
+            }
+            else
+            {
+                btnUnCheckRoute.Enabled = false;
 
-                    try
-                    {
-                        var updateScript = ScriptProvider.GetStravaTrackUpdateScript([]);
+                try
+                {
+                    //var updateScript = ScriptProvider.GetStravaTrackUpdateScript([]);
 
-                        await webView.ExecuteScriptAsync(updateScript);
-                    }
-                    catch
+                    //await webView.ExecuteScriptAsync(updateScript);
+                }
+                catch
+                {
+                    //ingore
+                }
+            }
+        }
+
+        private async Task DoCheckRouteStrava()
+        {
+            var script = ScriptProvider.GetStravaTrackRetrievalScript();
+
+            var coordinates = await webView.ExecuteScriptAsync(script);
+
+            if (!string.IsNullOrEmpty(coordinates) && coordinates != "[]")
+            {
+                try
+                {
+                    var trackPoints = JsonConvert.DeserializeObject<List<List<double[]>>>(coordinates);
+
+                    var request = new CheckLineStringsRequest()
                     {
-                        //ingore
+                        Lines = trackPoints
+                    };
+
+                    var token = await _webviewConnector.Login();
+                    var places = await _ltc2Proxy.CheckLineStrings(token, request);
+
+                    btnUnCheckRoute.Enabled = places.Count > 0;
+
+                    var updateScript = ScriptProvider.GetStravaTrackUpdateScript(places);
+
+                    var visitedAlltimeReplacement = GetVisitedAlltimeReplacement(_profile, true);
+                    if (!string.IsNullOrEmpty(visitedAlltimeReplacement))
+                    {
+                        updateScript = updateScript.Replace("\"GetVisitedAlltime\"", visitedAlltimeReplacement);
                     }
+
+                    await webView.ExecuteScriptAsync(updateScript);
+                }
+                catch
+                {
+                    //ingore
+                }
+            }
+            else
+            {
+                btnUnCheckRoute.Enabled = false;
+
+                try
+                {
+                    var updateScript = ScriptProvider.GetStravaTrackUpdateScript([]);
+
+                    await webView.ExecuteScriptAsync(updateScript);
+                }
+                catch
+                {
+                    //ingore
                 }
             }
         }

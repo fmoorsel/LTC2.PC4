@@ -772,5 +772,42 @@ UpdatePlacesOnTrack();
 
             return script;
         }
+
+        public static string GetRwGpsTrackRetrievalScript()
+        {
+            var script = @"
+
+function GetLines() {
+    console.log('Retrieving line coordinates');
+
+    let lineCoordinates = [];
+    
+    const mapCoordinatesSources = Routes.sampleGraph._data._points;
+    
+    mapCoordinatesSources.forEach(source => {
+
+        console.log('Processing source');
+
+        if (source.point && source.point.lng && source.point.lat) {
+
+            console.log('Source has point, adding to line coordinates');
+
+            const coordinates = [ source.point.lng, source.point.lat];
+
+            lineCoordinates.push(coordinates);
+        }
+    });
+
+    console.log('Retrieved line coordinates:', JSON.stringify(lineCoordinates));
+
+    return lineCoordinates;    
+}
+
+GetLines();
+            ";
+
+            return script;
+        }
+
     }
 }
