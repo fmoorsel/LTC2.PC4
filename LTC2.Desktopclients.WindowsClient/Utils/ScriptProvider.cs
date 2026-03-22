@@ -224,11 +224,11 @@ function GetFillColorOnTrack() {
     const stryle = window.routeMap.getStyle().sprite;
 
     if (stryle.includes('satellite')) {
-        return 'rgb(0, 100, 0)';
+        return 'rgb(0, 0, 255)';
     } else if (stryle.includes('hybrid')) {
-        return 'rgb(0, 100, 0)';
+        return 'rgb(0, 0, 255)';
     } else if (stryle.includes('dark-standard')) {
-        return 'rgb(0, 100, 0)';
+        return 'rgb(0, 0, 255)';
     } else if (stryle.includes('winter')) {
         return 'rgb(0, 100, 0)';
     } else if (stryle.includes('light')) {
@@ -243,11 +243,11 @@ function GetFillColorOnTrackNew() {
     const stryle = window.routeMap.getStyle().sprite;
 
     if (stryle.includes('satellite')) {
-        return 'rgb(0, 255, 0)';
+        return 'rgb(0, 255, 255)';
     } else if (stryle.includes('hybrid')) {
-        return 'rgb(0, 255, 0)';
+        return 'rgb(0, 255, 255)';
     } else if (stryle.includes('dark-standard')) {
-        return 'rgb(0, 255, 0)';
+        return 'rgb(0, 255, 255)';
     } else if (stryle.includes('winter')) {
         return 'rgb(0, 255, 0)';
     } else if (stryle.includes('light')) {
@@ -746,7 +746,7 @@ function UpdatePlacesOnTrack() {
     const allTimeResult = GetVisitedAlltimeForTrack();
     const newPlaces = window.checkedPlacesTrack.filter(p => !allTimeResult.includes(p));
 
-console.log('New places on track:', JSON.stringify(newPlaces));
+    console.log('New places on track:', JSON.stringify(newPlaces));
 
     console.log('All time visited places:', JSON.stringify(allTimeResult));
     console.log('Checked places:', JSON.stringify(window.checkedPlacesTrack));
@@ -754,12 +754,12 @@ console.log('New places on track:', JSON.stringify(newPlaces));
 
     window.checkedNewPlaces = newPlaces.length > 0 ? newPlaces : ['nonewplaces'];
 
-console.log('>>Checked new places set to:', JSON.stringify(window.checkedNewPlaces));
+    console.log('>>Checked new places set to:', JSON.stringify(window.checkedNewPlaces));
 
     const filterCheckedPlaces = window.checkedPlacesTrack.filter(p => !window.checkedNewPlaces.includes(p));
-console.log('>>Checked filterCheckedPlaces set to:', JSON.stringify(filterCheckedPlaces));
-console.log('>>Checked filterCheckedPlaces set to:' + filterCheckedPlaces.length);
-    window.checkedPlaces = filterCheckedPlaces.length > 0 ? filterCheckedPlaces : ['justaplaces'];
+    console.log('>>Checked filterCheckedPlaces set to:', JSON.stringify(filterCheckedPlaces));
+
+    window.checkedPlaces = filterCheckedPlaces.length > 0 ? filterCheckedPlaces : ['justaplace'];
 
     console.log('Places set to:', JSON.stringify(window.checkedPlaces));
     console.log('New Places set to:', JSON.stringify(window.checkedNewPlaces));
