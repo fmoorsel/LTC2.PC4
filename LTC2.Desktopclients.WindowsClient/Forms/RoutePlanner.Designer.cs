@@ -28,6 +28,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RoutePlanner));
             pnlBar = new Panel();
             btnUnCheckRoute = new Button();
@@ -37,6 +38,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             lblCurrentPlace = new Label();
             pbxBrowsing = new PictureBox();
             webView = new Microsoft.Web.WebView2.WinForms.WebView2();
+            timer1 = new System.Windows.Forms.Timer(components);
             pnlBar.SuspendLayout();
             pnlPlace.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbxBrowsing).BeginInit();
@@ -142,6 +144,12 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             webView.NavigationCompleted += webView_NavigationCompleted;
             webView.WebMessageReceived += webView_WebMessageReceived;
             // 
+            // timer1
+            // 
+            timer1.Enabled = true;
+            timer1.Interval = 500;
+            timer1.Tick += timer1_Tick;
+            // 
             // RoutePlanner
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -176,5 +184,6 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private CheckBox chkToggleVisibility;
         private Button btnCheckRoute;
         private Button btnUnCheckRoute;
+        private System.Windows.Forms.Timer timer1;
     }
 }

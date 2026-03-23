@@ -24,6 +24,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private string _initScript;
 
         private bool _oldUncheckedState;
+        private DateTime? _invokeBuilderTimestamp;
 
         private readonly object _profileLock = new object();
         private GetProfileResponse _profile;
@@ -76,11 +77,21 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private void webView_NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
         {
             pbxBrowsing.Visible = true;
+
+            if (IsBuilderUrl(e.Uri))
+            {
+                _invokeBuilderTimestamp = DateTime.UtcNow;
+            }
+            else
+            {
+                _invokeBuilderTimestamp = null;
+            }
         }
 
         private void webView_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
         {
             pbxBrowsing.Visible = false;
+            _invokeBuilderTimestamp = null;
 
             if (string.IsNullOrEmpty(_rawInitScript))
             {
@@ -117,6 +128,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
                         MessageBox.Show(msg, header);
                     }
+
                 });
 
                 chkToggleVisibility.Checked = true;
@@ -560,6 +572,17 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                 {
                     //ingore
                 }
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            // mainly due some strange unresponsiveness in the strava routebuilder maximize the builder load time
+            if (_invokeBuilderTimestamp.HasValue && DateTime.UtcNow.Subtract(_invokeBuilderTimestamp.Value).TotalSeconds > 10)
+            {
+                _invokeBuilderTimestamp = null;
+
+                MessageBox.Show(_translationService.GetMessage("#routeplanner.builder_load_failed"), _translationService.GetMessage("#routeplanner.builder_load_failed_header"), MessageBoxButtons.OK, MessageBoxIcon.Stop);
             }
         }
     }
