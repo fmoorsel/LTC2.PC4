@@ -304,23 +304,34 @@ function setVisibility(visible) {
 }
 
 function AddLayers(){
-    console.log('Adding layers to RWGPS Map');
-
-    if (window.rwgps.MapDelegate.props.mapInstance.__gm) {
-        console.log('RWGPS Map Instance is Google Maps, not supported yet');
-
-        AddGoogleMapsLayer();
-
+    if (window.addinglayers) {
         return;
-    } else {
-        console.log('RWGPS Map Instance is MapLibre, adding layers');
+    }
 
-        if (window.chrome && window.chrome.webview) {
-            chrome.webview.postMessage(""----,----"");
-        }
+    window.addinglayers = true;
+    
+    console.log('Adding layers to RWGPS Map');
+    try {
+        if (window.rwgps.MapDelegate.props.mapInstance.__gm) {
+            console.log('RWGPS Map Instance is Google Maps, not supported yet');
+
+            AddGoogleMapsLayer();
+
+            return;
+        } else {
+            console.log('RWGPS Map Instance is MapLibre, adding layers');
+
+            if (window.chrome && window.chrome.webview) {
+                chrome.webview.postMessage(""----,----"");
+            }
         
-        AddLayersMapLibre();
-    }    
+            AddLayersMapLibre();
+        }    
+    } catch (error) {
+        console.log('Error adding layers: ' + error);
+    } finally {
+        window.addinglayers = null;
+    }
 }
 
 function AddGoogleMapsLayer() {
@@ -400,7 +411,8 @@ function AddLayersMapLibre()
             'fill-opacity': 0.3,
             'fill-color': GetFillColor()
         }
-    });
+    },
+    'global_heatmap');
 
     window.mapInstance.addLayer({
         'id': 'ltc2tiles',
@@ -502,7 +514,7 @@ function LayerControl()
         if (!window.rwgps.MapDelegate.props.mapInstance.__gm) {
             var layers = window.mapInstance.getLayersOrder();
 
-            if (layers.length >= 1 && layers[layers.length-1] != 'ltc2tiles') {
+            if (layers.length >= 1 && !layers.includes('ltc2tiles')) {
                 console.log('RWGPS Map Instance layers changed, re-adding layers');
                 
                 AddLayers();
