@@ -145,7 +145,7 @@ function AddTileLayer() {
                 'line-join': 'round'
             },
             'paint': {
-                'line-opacity': 1.0,
+                'line-opacity': 0.5,
                 'line-color': GetColor(),
                 'line-width': 2
             },
@@ -537,7 +537,7 @@ function AddLayersMapLibre()
             'line-join': 'round'
         },
         'paint': {
-            'line-opacity': 1.0,
+            'line-opacity': 0.5,
             'line-color': GetColor(),
             'line-width': 2
         }
@@ -655,13 +655,13 @@ function GetGoogleMapsColor() {
     var currentType = window.mapInstance.getMapTypeId();
 
     if (currentType === 'roadmap') {
-        return [0,0,0,255];
+        return [0,0,0, 128];
     } else if (currentType === 'satellite') {
-        return [255,165,0, 255];
+        return [255,165,0, 128];
     } else if (currentType === 'hybrid') {
-        return [255,165,0, 255];
+        return [255,165,0, 128];
     } else if (currentType === 'terrain') {
-        return [0,0,0,255];
+        return [0,0,0, 128];
     }
 }
 
