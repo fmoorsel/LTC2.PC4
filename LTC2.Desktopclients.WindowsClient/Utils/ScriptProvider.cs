@@ -31,6 +31,10 @@ function Init() {
                 setVisibility(window.layervisible);
             });
 
+            window.routeMap.on('idle', () => {
+                EnsureLayerOrder();        
+            });
+
 
             AddTileLayer();
 
@@ -61,6 +65,15 @@ function Init() {
     }
 
     return '0';
+}
+
+function EnsureLayerOrder() {
+    const layers = window.routeMap.getStyle().layers;
+
+    if (layers && layers.map(l => l.id).includes('fltc2tiles') && layers.map(l => l.id).includes('z-index-1'))
+    {    
+        window.routeMap.moveLayer('fltc2tiles', 'z-index-1');
+    }
 }
 
 window.createCheckExprOpacity = function() {
@@ -118,7 +131,8 @@ function AddTileLayer() {
             'paint': {
                 'fill-opacity': 0.0,
                 'fill-color': GetFillColor()
-            }
+            },
+            slot: 'middle'
         });
 
         window.routeMap.addLayer({
@@ -332,6 +346,9 @@ function Init() {
     }
 
     console.log('RWGPS Map Instance found');
+
+    window.checkedPlaces = ['noplaces'];
+    window.checkedNewPlaces = ['nonewplaces'];
 
     window.mapInstance = instance;
     window.layervisible = true;
