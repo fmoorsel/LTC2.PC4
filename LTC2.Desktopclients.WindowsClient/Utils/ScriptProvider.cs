@@ -814,15 +814,8 @@ function GetLines() {
     const mapCoordinatesSources = Routes.sampleGraph._data._points;
     
     mapCoordinatesSources.forEach(source => {
-
-        console.log('Processing source');
-
         if (source.point && source.point.lng && source.point.lat) {
-
-            console.log('Source has point, adding to line coordinates');
-
             const coordinates = [ source.point.lng, source.point.lat];
-
             lineCoordinates.push(coordinates);
         }
     });
