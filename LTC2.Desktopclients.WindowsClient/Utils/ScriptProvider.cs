@@ -340,6 +340,9 @@ function addScript(url, id) {
 function Init() {
     console.log('Initializing RWGPS');
 
+    window.checkedPlaces = ['noplaces'];
+    window.checkedNewPlaces = ['nonewplaces'];
+
     var instance = window.rwgps.MapDelegate.getMapInstance();
     if (instance == null) {
         return '0';
@@ -566,15 +569,12 @@ function AddLayersMapLibre()
         }
     });
 
-    const checkExprOpacity = [
-            'match',
-                ['slice', ['get', 'featurePointer'], 0, ['index-of', ':', ['get', 'featurePointer']]],
-                GetVisitedAlltime(), 0.25, 
-                GetVisitedYear(), 0.45, 
-                0.0              
-            ];
+
+    const checkExprOpacity = window.createCheckExprOpacity();        
+    const checkExprColor = window.createCheckExprColor();
 
     window.mapInstance.setPaintProperty('fltc2tiles', 'fill-opacity', checkExprOpacity);
+    window.mapInstance.setPaintProperty('fltc2tiles', 'fill-color', checkExprColor);
 
     window.mapInstance.on('mousemove', (e) => {
         const features = window.mapInstance.queryRenderedFeatures(e.point, {
@@ -587,6 +587,34 @@ function AddLayersMapLibre()
             }
         }
     });
+}
+
+window.createCheckExprOpacity = function() {
+    var expr = [
+        'match',
+            ['slice', ['get', 'featurePointer'], 0, ['index-of', ':', ['get', 'featurePointer']]],
+            GetVisitedAlltime(), 0.25, 
+            GetVisitedYear(), 0.45, 
+            GetCheckedPlaces(), 0.25,
+            GetCheckedNewPlaces(), 0.25,
+            0.0
+    ];
+
+    return expr;
+}
+
+window.createCheckExprColor = function() {
+    var expr = [
+        'match',
+            ['slice', ['get', 'featurePointer'], 0, ['index-of', ':', ['get', 'featurePointer']]],
+            GetVisitedAlltime(), GetFillColor(), 
+            GetVisitedYear(), GetFillColor(),
+            GetCheckedPlaces(), GetFillColorOnTrack(),
+            GetCheckedNewPlaces(), GetFillColorOnTrackNew(),
+            GetFillColor()              
+    ];
+        
+    return expr;
 }
 
 function LayerControl() 
@@ -683,12 +711,48 @@ function GetFillColor() {
     return 'rgb(255,165,0)';
 }
 
-function GetVisitedAlltime() {
+function GetFillColorOnTrack() {
+    return 'rgb(0, 100, 0)';
+}
+
+function GetFillColorOnTrackNew() {
+    return 'rgb(0, 255, 0)';
+}
+
+function GetCheckedPlaces() {
+    console.log('Getting checked places');
+
+    const filteredPlaces = window.checkedPlaces.filter(p => !window.checkedNewPlaces.includes(p));
+
+    return filteredPlaces;
+}
+
+function GetCheckedNewPlaces() {
+    return window.checkedNewPlaces;
+}
+
+function GetVisitedAlltimeUnfiltered() {
     return [""GetVisitedAlltime""];
 }
 
+function GetVisitedAlltime() {
+    const alltime = GetVisitedAlltimeUnfiltered();
+
+    const filteredAlltime = alltime.filter(at => 
+        !window.checkedPlaces.includes(at) && !window.checkedNewPlaces.includes(at)
+    );
+
+    return filteredAlltime;
+}
+
 function GetVisitedYear() {
-    return [""GetVisitedYear""];
+    const year = [""GetVisitedYear""];
+    
+    const filteredYear = year.filter(y => 
+        !window.checkedPlaces.includes(y) && !window.checkedNewPlaces.includes(y)
+    );
+    
+    return filteredYear;
 }
 
 Init();            
@@ -831,5 +895,69 @@ GetLines();
             return script;
         }
 
+        public static string GetRwGpsTrackUpdateScript(List<string> places)
+        {
+            var placesForScript = places.Select(p => $"'{p}'").ToList();
+            var placesString = string.Join(",", placesForScript);
+
+            var setPlacesScript = places.Count > 0 ? $"window.checkedPlacesTrack = [{placesString}];" : "window.checkedPlacesTrack = ['noplaces'];";
+
+            var script = setPlacesScript + @"               
+
+function GetVisitedAlltimeForTrack () {
+    return [""GetVisitedAlltime""];
+}
+
+function UpdateMapMapLibre() {
+    const checkExprOpacity = window.createCheckExprOpacity();        
+    const checkExprColor = window.createCheckExprColor();
+
+    window.mapInstance.setPaintProperty('fltc2tiles', 'fill-opacity', checkExprOpacity);
+    window.mapInstance.setPaintProperty('fltc2tiles', 'fill-color', checkExprColor);
+
+    window.mapInstance.triggerRepaint();
+
+    console.log('Map updated with new places');
+}
+
+function UpdatePlacesOnTrack() {
+
+    if (window.rwgps.MapDelegate.props.mapInstance.__gm) {
+        console.log('RWGPS Map Instance is Google Maps, skipping track place update');
+
+
+    } else {
+        console.log('RWGPS Map Instance is MapLibre, updating track places');
+
+        const allTimeResult = GetVisitedAlltimeForTrack();
+        const newPlaces = window.checkedPlacesTrack.filter(p => !allTimeResult.includes(p));
+
+        console.log('New places on track:', JSON.stringify(newPlaces));
+
+        console.log('All time visited places:', JSON.stringify(allTimeResult));
+        console.log('Checked places:', JSON.stringify(window.checkedPlacesTrack));
+        console.log('New places:', JSON.stringify(newPlaces));
+
+        window.checkedNewPlaces = newPlaces.length > 0 ? newPlaces : ['nonewplaces'];
+
+        console.log('>>Checked new places set to:', JSON.stringify(window.checkedNewPlaces));
+
+        const filterCheckedPlaces = window.checkedPlacesTrack.filter(p => !window.checkedNewPlaces.includes(p));
+        console.log('>>Checked filterCheckedPlaces set to:', JSON.stringify(filterCheckedPlaces));
+
+        window.checkedPlaces = filterCheckedPlaces.length > 0 ? filterCheckedPlaces : ['justaplace'];
+
+        console.log('Places set to:', JSON.stringify(window.checkedPlaces));
+        console.log('New Places set to:', JSON.stringify(window.checkedNewPlaces));
+
+        UpdateMapMapLibre();
+    }
+}
+
+UpdatePlacesOnTrack();
+";
+
+            return script;
+        }
     }
 }

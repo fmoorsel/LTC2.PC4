@@ -466,15 +466,15 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
                     btnUnCheckRoute.Enabled = places.Count > 0;
 
-                    //var updateScript = ScriptProvider.GetStravaTrackUpdateScript(places);
+                    var updateScript = ScriptProvider.GetRwGpsTrackUpdateScript(places);
 
-                    //var visitedAlltimeReplacement = GetVisitedAlltimeReplacement(_profile, true);
-                    //if (!string.IsNullOrEmpty(visitedAlltimeReplacement))
-                    //{
-                    //    updateScript = updateScript.Replace("\"GetVisitedAlltime\"", visitedAlltimeReplacement);
-                    //}
+                    var visitedAlltimeReplacement = GetVisitedAlltimeReplacement(_profile, true);
+                    if (!string.IsNullOrEmpty(visitedAlltimeReplacement))
+                    {
+                        updateScript = updateScript.Replace("\"GetVisitedAlltime\"", visitedAlltimeReplacement);
+                    }
 
-                    //await webView.ExecuteScriptAsync(updateScript);
+                    await webView.ExecuteScriptAsync(updateScript);
                 }
                 catch
                 {
@@ -487,9 +487,9 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
                 try
                 {
-                    //var updateScript = ScriptProvider.GetStravaTrackUpdateScript([]);
+                    var updateScript = ScriptProvider.GetRwGpsTrackUpdateScript([]);
 
-                    //await webView.ExecuteScriptAsync(updateScript);
+                    await webView.ExecuteScriptAsync(updateScript);
                 }
                 catch
                 {
@@ -556,22 +556,15 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         {
             btnUnCheckRoute.Enabled = false;
 
-            if (_multiSportsManager.RunWithSource == "ridewithgps")
-            {
+            var updateScript = _multiSportsManager.RunWithSource == "ridewithgps" ? ScriptProvider.GetRwGpsTrackUpdateScript([]) : ScriptProvider.GetStravaTrackUpdateScript([]);
 
+            try
+            {
+                await webView.ExecuteScriptAsync(updateScript);
             }
-            else
+            catch
             {
-                try
-                {
-                    var updateScript = ScriptProvider.GetStravaTrackUpdateScript([]);
-
-                    await webView.ExecuteScriptAsync(updateScript);
-                }
-                catch
-                {
-                    //ingore
-                }
+                //ingore
             }
         }
 
