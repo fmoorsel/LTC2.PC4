@@ -82,8 +82,8 @@ window.createCheckExprOpacity = function() {
             ['slice', ['get', 'featurePointer'], 0, ['index-of', ':', ['get', 'featurePointer']]],
             GetVisitedAlltime(), 0.25, 
             GetVisitedYear(), 0.45, 
-            GetCheckedPlaces(), 0.25,
-            GetCheckedNewPlaces(), 0.25,
+            GetCheckedPlaces(), 0.45,
+            GetCheckedNewPlaces(), 0.45,
             0.0
     ];
 
@@ -601,8 +601,8 @@ window.createCheckExprOpacity = function() {
             ['slice', ['get', 'featurePointer'], 0, ['index-of', ':', ['get', 'featurePointer']]],
             GetVisitedAlltime(), 0.25, 
             GetVisitedYear(), 0.45, 
-            GetCheckedPlaces(), 0.25,
-            GetCheckedNewPlaces(), 0.25,
+            GetCheckedPlaces(), 0.45,
+            GetCheckedNewPlaces(), 0.45,
             0.0
     ];
 
@@ -714,9 +714,9 @@ function GetGoogleMapsFillColor(featurePointer) {
     } else if (isChecked) {
         return [255,165,0, 65];
     } else if (isCheckedOnTrack) {
-        return isDarkType ? [0, 0, 255, 65] : [0, 100, 0, 65];
+        return isDarkType ? [0, 0, 255, 115] : [0, 100, 0, 115];
     } else if (isCheckedOnTrackNew) {
-        return isDarkType ? [0, 255, 255, 65] : [0, 255, 0, 65];
+        return isDarkType ? [0, 255, 255, 115] : [0, 255, 0, 115];
     } else {
         return [255,165,0,1];
     }
