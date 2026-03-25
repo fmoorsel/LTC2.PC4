@@ -50,6 +50,8 @@
 
         public string RideWithGpsSitePrefix { get; set; }
 
+        public string RideWithGpsRouteBuilderPrefixPostfix { get; set; }
+
         public List<string> SkipCookiesWhileDeleting { get; set; }
 
         public string TilesOKFile

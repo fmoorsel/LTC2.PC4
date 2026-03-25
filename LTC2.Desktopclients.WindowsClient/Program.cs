@@ -109,11 +109,22 @@ namespace LTC2.Desktopclients.WindowsClient
             var processModule = Process.GetCurrentProcess().MainModule;
             var appSettingsFolder = Path.GetDirectoryName(processModule?.FileName);
 
-            var configuration = new ConfigurationBuilder().SetBasePath(appSettingsFolder)
-                        .AddJsonFile("appsettings.json", true, true)
-                        .Build();
+            if (File.Exists(Path.Combine(appSettingsFolder, "appsettings.Development.json")))
+            {
+                var configuration = new ConfigurationBuilder().SetBasePath(appSettingsFolder)
+                            .AddJsonFile("appsettings.json", true, true)
+                            .AddJsonFile("appsettings.Development.json", true, true)
+                            .Build();
+                return configuration;
+            }
+            else
+            {
+                var configuration = new ConfigurationBuilder().SetBasePath(appSettingsFolder)
+                            .AddJsonFile("appsettings.json", true, true)
+                            .Build();
 
-            return configuration;
+                return configuration;
+            }
         }
 
 

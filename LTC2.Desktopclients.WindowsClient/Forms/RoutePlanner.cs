@@ -3,8 +3,10 @@ using LTC2.Desktopclients.WindowsClient.Services;
 using LTC2.Desktopclients.WindowsClient.Utils;
 using LTC2.Shared.Http.Interfaces;
 using LTC2.Shared.Messages.Interfaces;
+using LTC2.Shared.Models.Requests;
 using LTC2.Shared.Models.Responses;
 using Microsoft.Web.WebView2.Core;
+using Newtonsoft.Json;
 
 namespace LTC2.Desktopclients.WindowsClient.Forms
 {
@@ -20,6 +22,9 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
         private string _rawInitScript;
         private string _initScript;
+
+        private bool _oldUncheckedState;
+        private DateTime? _invokeBuilderTimestamp;
 
         private readonly object _profileLock = new object();
         private GetProfileResponse _profile;
@@ -72,11 +77,21 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private void webView_NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
         {
             pbxBrowsing.Visible = true;
+
+            if (IsBuilderUrl(e.Uri))
+            {
+                _invokeBuilderTimestamp = DateTime.UtcNow;
+            }
+            else
+            {
+                _invokeBuilderTimestamp = null;
+            }
         }
 
         private void webView_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
         {
             pbxBrowsing.Visible = false;
+            _invokeBuilderTimestamp = null;
 
             if (string.IsNullOrEmpty(_rawInitScript))
             {
@@ -88,7 +103,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                 UpdateProfile();
             }
 
-            if (webView.CoreWebView2.Source.StartsWith(GetBuilderPrefix()))
+            if (IsBuilderUrl(webView.CoreWebView2.Source))
             {
                 Task.Run(async () =>
                 {
@@ -113,15 +128,26 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
                         MessageBox.Show(msg, header);
                     }
+
                 });
 
                 chkToggleVisibility.Checked = true;
                 chkToggleVisibility.Visible = true;
+                btnCheckRoute.Visible = true;
+                btnUnCheckRoute.Visible = true;
+                btnUnCheckRoute.Enabled = false;
+
+                _oldUncheckedState = false;
             }
             else
             {
                 lblCurrentPlace.Text = string.Empty;
                 chkToggleVisibility.Visible = false;
+                btnCheckRoute.Visible = false;
+                btnUnCheckRoute.Visible = false;
+                btnUnCheckRoute.Enabled = false;
+
+                _oldUncheckedState = false;
             }
         }
 
@@ -129,20 +155,16 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         {
             if (profile != null)
             {
-                var visitedAlltime = profile.PlacesInAllTimeScore
-                            .Where(p => !profile.PlacesInYearScore.Any(y => y.Id == p.Id))
-                            .Select(p => p.ScriptId).ToList();
+                var visiedAlltimeReplacement = GetVisitedAlltimeReplacement(profile, false);
 
                 var visitedYear = profile.PlacesInYearScore
                             .Select(p => p.ScriptId).ToList();
 
 
                 var script = _rawInitScript;
-                if (visitedAlltime.Count > 0)
+                if (!string.IsNullOrEmpty(visiedAlltimeReplacement))
                 {
-                    var visitedAlltimeString = string.Join(",", visitedAlltime);
-
-                    script = script.Replace("\"GetVisitedAlltime\"", visitedAlltimeString);
+                    script = script.Replace("\"GetVisitedAlltime\"", visiedAlltimeReplacement);
                 }
 
                 if (visitedYear.Count > 0)
@@ -155,6 +177,23 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             }
 
             return _rawInitScript;
+        }
+
+        public string GetVisitedAlltimeReplacement(GetProfileResponse profile, bool includeYear)
+        {
+            var visitedAlltime = profile.PlacesInAllTimeScore
+                        .Where(p => includeYear || !profile.PlacesInYearScore.Any(y => y.Id == p.Id))
+                        .Select(p => p.ScriptId).ToList()
+                        .OrderBy(id => id).ToList();
+
+            if (visitedAlltime.Count > 0)
+            {
+                return string.Join(",", visitedAlltime);
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
 
         private void RoutePlanner_FormClosing(object sender, FormClosingEventArgs e)
@@ -190,7 +229,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
                 webView.CoreWebView2.Navigate(GetStartUrl());
             }
-            else if (webView.CoreWebView2.Source.ToString().StartsWith(GetBuilderPrefix()))
+            else if (IsBuilderUrl(webView.CoreWebView2.Source))
             {
                 lblCurrentPlace.Text = "Postcode: ----";
             }
@@ -265,15 +304,31 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             }
         }
 
-        private string GetBuilderPrefix()
+        private bool IsBuilderUrl(string completeUrl)
         {
+            var urlParts = completeUrl.Split('?');
+            var url = urlParts[0];
+
             if (_multiSportsManager.RunWithSource == "ridewithgps")
             {
-                return _appSettings.RideWithGpsRouteBuilderPrefix;
+
+                if (url.StartsWith(_appSettings.RideWithGpsRouteBuilderPrefix))
+                {
+                    return true;
+                }
+                else if (_appSettings.RideWithGpsRouteBuilderPrefixPostfix != null && _appSettings.RideWithGpsRouteBuilderPrefixPostfix.IndexOf(',') > 0)
+                {
+                    var parts = _appSettings.RideWithGpsRouteBuilderPrefixPostfix.Split(',');
+                    return url.StartsWith(parts[0]) && url.EndsWith(parts[1]);
+                }
+                else
+                {
+                    return false;
+                }
             }
             else
             {
-                return _appSettings.StravaRouteBuilderPrefix;
+                return url.StartsWith(_appSettings.StravaRouteBuilderPrefix);
             }
         }
 
@@ -350,7 +405,9 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             pnlPlace.Left = (int)(pnlBar.Width * 0.5f - pnlPlace.Width * 0.5f);
             lblCurrentPlace.Left = (int)(pnlPlace.Width * 0.5f - lblCurrentPlace.Width * 0.5f);
 
-            chkToggleVisibility.Left = pnlBar.Width - chkToggleVisibility.Width - 10;
+            btnUnCheckRoute.Left = pnlBar.Width - btnUnCheckRoute.Width - 10;
+            btnCheckRoute.Left = btnUnCheckRoute.Left - btnCheckRoute.Width - 5;
+            chkToggleVisibility.Left = btnCheckRoute.Left - chkToggleVisibility.Width - 5;
         }
 
         private void RoutePlanner_Load(object sender, EventArgs e)
@@ -364,6 +421,163 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             var script = $"window.postMessage( {{ command:'toggleLayer', visible: {value} }});";
 
             await webView.ExecuteScriptAsync(script);
+
+            var oldUncheckedState = btnUnCheckRoute.Enabled;
+
+            btnCheckRoute.Enabled = chkToggleVisibility.Checked;
+            btnUnCheckRoute.Enabled = _oldUncheckedState;
+
+            _oldUncheckedState = oldUncheckedState;
+        }
+
+        private async void btnCheckRoute_Click(object sender, EventArgs e)
+        {
+            if (_multiSportsManager.RunWithSource == "ridewithgps")
+            {
+                await DoCheckRouteRwGps();
+            }
+            else
+            {
+                await DoCheckRouteStrava();
+            }
+        }
+
+        private async Task DoCheckRouteRwGps()
+        {
+            var script = ScriptProvider.GetRwGpsTrackRetrievalScript();
+
+            var coordinates = await webView.ExecuteScriptAsync(script);
+
+            if (!string.IsNullOrEmpty(coordinates) && coordinates != "[]")
+            {
+                try
+                {
+                    var trackPoints = JsonConvert.DeserializeObject<List<double[]>>(coordinates);
+
+                    var trackPointsList = new List<List<double[]>> { trackPoints };
+
+                    var request = new CheckLineStringsRequest()
+                    {
+                        Lines = trackPointsList
+                    };
+
+                    var token = await _webviewConnector.Login();
+                    var places = await _ltc2Proxy.CheckLineStrings(token, request);
+
+                    btnUnCheckRoute.Enabled = places.Count > 0;
+
+                    var updateScript = ScriptProvider.GetRwGpsTrackUpdateScript(places);
+
+                    var visitedAlltimeReplacement = GetVisitedAlltimeReplacement(_profile, true);
+                    if (!string.IsNullOrEmpty(visitedAlltimeReplacement))
+                    {
+                        updateScript = updateScript.Replace("\"GetVisitedAlltime\"", visitedAlltimeReplacement);
+                    }
+
+                    await webView.ExecuteScriptAsync(updateScript);
+                }
+                catch
+                {
+                    //ingore
+                }
+            }
+            else
+            {
+                btnUnCheckRoute.Enabled = false;
+
+                try
+                {
+                    var updateScript = ScriptProvider.GetRwGpsTrackUpdateScript([]);
+
+                    await webView.ExecuteScriptAsync(updateScript);
+                }
+                catch
+                {
+                    //ingore
+                }
+            }
+        }
+
+        private async Task DoCheckRouteStrava()
+        {
+            var script = ScriptProvider.GetStravaTrackRetrievalScript();
+
+            var coordinates = await webView.ExecuteScriptAsync(script);
+
+            if (!string.IsNullOrEmpty(coordinates) && coordinates != "[]")
+            {
+                try
+                {
+                    var trackPoints = JsonConvert.DeserializeObject<List<List<double[]>>>(coordinates);
+
+                    var request = new CheckLineStringsRequest()
+                    {
+                        Lines = trackPoints
+                    };
+
+                    var token = await _webviewConnector.Login();
+                    var places = await _ltc2Proxy.CheckLineStrings(token, request);
+
+                    btnUnCheckRoute.Enabled = places.Count > 0;
+
+                    var updateScript = ScriptProvider.GetStravaTrackUpdateScript(places);
+
+                    var visitedAlltimeReplacement = GetVisitedAlltimeReplacement(_profile, true);
+                    if (!string.IsNullOrEmpty(visitedAlltimeReplacement))
+                    {
+                        updateScript = updateScript.Replace("\"GetVisitedAlltime\"", visitedAlltimeReplacement);
+                    }
+
+                    await webView.ExecuteScriptAsync(updateScript);
+                }
+                catch
+                {
+                    //ingore
+                }
+            }
+            else
+            {
+                btnUnCheckRoute.Enabled = false;
+
+                try
+                {
+                    var updateScript = ScriptProvider.GetStravaTrackUpdateScript([]);
+
+                    await webView.ExecuteScriptAsync(updateScript);
+                }
+                catch
+                {
+                    //ingore
+                }
+            }
+        }
+
+        private async void btnUnCheckRoute_Click(object sender, EventArgs e)
+        {
+            btnUnCheckRoute.Enabled = false;
+
+            var updateScript = _multiSportsManager.RunWithSource == "ridewithgps" ? ScriptProvider.GetRwGpsTrackUpdateScript([]) : ScriptProvider.GetStravaTrackUpdateScript([]);
+
+            try
+            {
+                await webView.ExecuteScriptAsync(updateScript);
+            }
+            catch
+            {
+                //ingore
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            // mainly due some strange unresponsiveness in the strava routebuilder maximize the builder load time
+            if (_invokeBuilderTimestamp.HasValue && DateTime.UtcNow.Subtract(_invokeBuilderTimestamp.Value).TotalSeconds > 10)
+            {
+                _invokeBuilderTimestamp = null;
+
+                MessageBox.Show(_translationService.GetMessage("#routeplanner.builder_load_failed"), _translationService.GetMessage("#routeplanner.builder_load_failed_header"), MessageBoxButtons.OK, MessageBoxIcon.Stop);
+            }
         }
     }
 }
+

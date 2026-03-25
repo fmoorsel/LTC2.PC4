@@ -66,5 +66,10 @@
   "routeplanner.postcode.visited": "Postcode: %0% (afgevinkt)",
   "routeplanner.no_map_support": "Kaart wordt niet ondersteund",
 
-  "check.toggle.visibility": "Toon/verberg postcode-gebieden"
+  "check.toggle.visibility": "Toon/verberg postcode-gebieden",
+  "button.checkroute": "Check route",
+  "button.uncheckroute": "Verberg check",
+  "routeplanner.builder_load_failed": "De Route Builder kon niet tijdig worden geladen en is waarschijnlijk vastgelopen.\n\nSluit de applicatie af en probeer het daarna nogmaals, wacht steeds tot de pagina's volledig geladen zijn.",
+  "routeplanner.builder_load_failed_header": "Oops..."
+
 }

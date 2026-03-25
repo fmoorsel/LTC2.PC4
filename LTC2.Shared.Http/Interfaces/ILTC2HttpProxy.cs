@@ -1,4 +1,5 @@
-﻿using LTC2.Shared.Models.Responses;
+﻿using LTC2.Shared.Models.Requests;
+using LTC2.Shared.Models.Responses;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -13,5 +14,7 @@ namespace LTC2.Shared.Http.Interfaces
         public Task<bool> HasIntermediateResult(string accessToken, bool multi);
 
         public Task<GetProfileResponse> GetProfile(string accessToken, bool multi);
+
+        public Task<List<string>> CheckLineStrings(string accessToken, CheckLineStringsRequest request);
     }
 }

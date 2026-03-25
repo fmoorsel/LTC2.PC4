@@ -8,8 +8,8 @@
 
   "groupbox.profile.details": "Profiel details",
   "button.test.profiel": "Test profiel",
-  "button.show.secret": "Toon Secret",
-  "button.hide.secret": "Verberg Secret",
+  "button.show.secret": "Toon secret",
+  "button.hide.secret": "Verberg secret",
   "label.profile.name": "Profiel naam:",
   "label.strava.client.id": "Strava Client ID:",
   "label.strava.client.secret": "Strava Client Secret:",

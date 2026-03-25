@@ -28,13 +28,17 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RoutePlanner));
             pnlBar = new Panel();
+            btnUnCheckRoute = new Button();
+            btnCheckRoute = new Button();
             chkToggleVisibility = new CheckBox();
             pnlPlace = new Panel();
             lblCurrentPlace = new Label();
             pbxBrowsing = new PictureBox();
             webView = new Microsoft.Web.WebView2.WinForms.WebView2();
+            timer1 = new System.Windows.Forms.Timer(components);
             pnlBar.SuspendLayout();
             pnlPlace.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbxBrowsing).BeginInit();
@@ -44,6 +48,8 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             // pnlBar
             // 
             pnlBar.BorderStyle = BorderStyle.Fixed3D;
+            pnlBar.Controls.Add(btnUnCheckRoute);
+            pnlBar.Controls.Add(btnCheckRoute);
             pnlBar.Controls.Add(chkToggleVisibility);
             pnlBar.Controls.Add(pnlPlace);
             pnlBar.Controls.Add(pbxBrowsing);
@@ -54,12 +60,35 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             pnlBar.TabIndex = 0;
             pnlBar.Resize += pnlBar_Resize;
             // 
+            // btnUnCheckRoute
+            // 
+            btnUnCheckRoute.Enabled = false;
+            btnUnCheckRoute.Location = new Point(1109, 10);
+            btnUnCheckRoute.Name = "btnUnCheckRoute";
+            btnUnCheckRoute.Size = new Size(95, 40);
+            btnUnCheckRoute.TabIndex = 5;
+            btnUnCheckRoute.Text = "#button.uncheckroute";
+            btnUnCheckRoute.UseVisualStyleBackColor = true;
+            btnUnCheckRoute.Visible = false;
+            btnUnCheckRoute.Click += btnUnCheckRoute_Click;
+            // 
+            // btnCheckRoute
+            // 
+            btnCheckRoute.Location = new Point(971, 10);
+            btnCheckRoute.Name = "btnCheckRoute";
+            btnCheckRoute.Size = new Size(95, 40);
+            btnCheckRoute.TabIndex = 4;
+            btnCheckRoute.Text = "#button.checkroute";
+            btnCheckRoute.UseVisualStyleBackColor = true;
+            btnCheckRoute.Visible = false;
+            btnCheckRoute.Click += btnCheckRoute_Click;
+            // 
             // chkToggleVisibility
             // 
             chkToggleVisibility.AutoSize = true;
             chkToggleVisibility.Checked = true;
             chkToggleVisibility.CheckState = CheckState.Checked;
-            chkToggleVisibility.Location = new Point(114, 22);
+            chkToggleVisibility.Location = new Point(114, 21);
             chkToggleVisibility.Name = "chkToggleVisibility";
             chkToggleVisibility.Size = new Size(147, 19);
             chkToggleVisibility.TabIndex = 3;
@@ -115,6 +144,12 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             webView.NavigationCompleted += webView_NavigationCompleted;
             webView.WebMessageReceived += webView_WebMessageReceived;
             // 
+            // timer1
+            // 
+            timer1.Enabled = true;
+            timer1.Interval = 500;
+            timer1.Tick += timer1_Tick;
+            // 
             // RoutePlanner
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -147,5 +182,8 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
         private Label lblCurrentPlace;
         private Panel pnlPlace;
         private CheckBox chkToggleVisibility;
+        private Button btnCheckRoute;
+        private Button btnUnCheckRoute;
+        private System.Windows.Forms.Timer timer1;
     }
 }

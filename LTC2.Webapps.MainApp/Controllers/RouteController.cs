@@ -2,7 +2,6 @@ using LTC2.Shared.ActivityFormats.Gpx.Utils;
 using LTC2.Shared.Common.Interfaces;
 using LTC2.Shared.Models.Domain;
 using LTC2.Shared.Models.Requests;
-using LTC2.Shared.Models.Responses;
 using LTC2.Shared.Repositories.Interfaces;
 using LTC2.Shared.StravaConnector.Exceptions;
 using LTC2.Shared.StravaConnector.Interfaces;
@@ -186,6 +185,29 @@ namespace LTC2.Webapps.MainApp.Controllers
             }
 
             return Unauthorized();
+        }
+
+        [HttpPost]
+        [Authorize]
+        [Route("checklinestrings")]
+        public IActionResult CheckLineStrings([FromBody] CheckLineStringsRequest request)
+        {
+            EnsureMapRepository();
+
+            var placeIds = new HashSet<string>();
+
+            foreach (var line in request.Lines)
+            {
+                var coordinates = line.Select(c => new List<double> { c[0], c[1] }).ToList();
+                var places = _mapRepository.CheckTrack(coordinates);
+
+                foreach (var place in places)
+                {
+                    placeIds.Add(place.Id);
+                }
+            }
+
+            return Ok(placeIds.ToList());
         }
 
         [HttpGet]
