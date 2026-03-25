@@ -460,11 +460,13 @@ function AddGoogleMapsLayer() {
 
     window.mapInstance.addListener('maptypeid_changed', () => {
         console.log('Google Maps maptypeid changed, updating layer colors');
+        window.currentStatus = Date.now();
         window.mapOverlay.setProps({
             layers: [ GetGoogleMapsLayer() ]
         });
     });
 
+    window.currentStatus = Date.now();
     window.mapOverlay = overlay;
 }
 
@@ -479,6 +481,10 @@ function GetGoogleMapsLayer() {
         lineWidthMinPixels: 2,
         pickable: true,
         visible: window.layervisible,
+
+        updateTriggers: {
+            getFillColor: [window.currentStatus]
+        },
 
         onHover: info => {
             console.log('hover on tile layer');
@@ -680,7 +686,7 @@ function GetColor() {
 }
 
 function GetGoogleMapsColor() {
-    var currentType = window.mapInstance.getMapTypeId();
+    const currentType = window.mapInstance.getMapTypeId();
 
     if (currentType === 'roadmap') {
         return [0,0,0, 128];
@@ -697,11 +703,20 @@ function GetGoogleMapsFillColor(featurePointer) {
     const id = featurePointer.split(':')[0];
     const isChecked = GetVisitedAlltime().includes(id);
     const isCheckedYear = GetVisitedYear().includes(id);
+    const isCheckedOnTrack = GetCheckedPlaces().includes(id);
+    const isCheckedOnTrackNew = GetCheckedNewPlaces().includes(id);
+
+    const currentType = window.mapInstance.getMapTypeId();
+    const isDarkType = (currentType === 'satellite' || currentType === 'hybrid');
 
     if (isCheckedYear) {
         return [255,165,0, 115];
     } else if (isChecked) {
         return [255,165,0, 65];
+    } else if (isCheckedOnTrack) {
+        return isDarkType ? [0, 0, 255, 65] : [0, 100, 0, 65];
+    } else if (isCheckedOnTrackNew) {
+        return isDarkType ? [0, 255, 255, 65] : [0, 255, 0, 65];
     } else {
         return [255,165,0,1];
     }
@@ -920,36 +935,45 @@ function UpdateMapMapLibre() {
     console.log('Map updated with new places');
 }
 
+function UpdateMapGoogleMaps() {
+    console.log('Start Updating Google Maps layer with new places');
+
+    if (window.mapOverlay != null) {
+        console.log('Updating Google Maps layer with new places');
+        window.currentStatus = Date.now(); // trigger updateTriggers in deck.gl layer
+        window.mapOverlay.setProps({
+            layers: [ GetGoogleMapsLayer() ]
+        });
+    }
+}
+
 function UpdatePlacesOnTrack() {
+    console.log('RWGPS Map Instance is MapLibre, updating track places');
+
+    const allTimeResult = GetVisitedAlltimeForTrack();
+    const newPlaces = window.checkedPlacesTrack.filter(p => !allTimeResult.includes(p));
+
+    console.log('New places on track:', JSON.stringify(newPlaces));
+
+    console.log('All time visited places:', JSON.stringify(allTimeResult));
+    console.log('Checked places:', JSON.stringify(window.checkedPlacesTrack));
+    console.log('New places:', JSON.stringify(newPlaces));
+
+    window.checkedNewPlaces = newPlaces.length > 0 ? newPlaces : ['nonewplaces'];
+
+    console.log('>>Checked new places set to:', JSON.stringify(window.checkedNewPlaces));
+
+    const filterCheckedPlaces = window.checkedPlacesTrack.filter(p => !window.checkedNewPlaces.includes(p));
+    console.log('>>Checked filterCheckedPlaces set to:', JSON.stringify(filterCheckedPlaces));
+
+    window.checkedPlaces = filterCheckedPlaces.length > 0 ? filterCheckedPlaces : ['justaplace'];
+
+    console.log('Places set to:', JSON.stringify(window.checkedPlaces));
+    console.log('New Places set to:', JSON.stringify(window.checkedNewPlaces));
 
     if (window.rwgps.MapDelegate.props.mapInstance.__gm) {
-        console.log('RWGPS Map Instance is Google Maps, skipping track place update');
-
-
+        UpdateMapGoogleMaps();
     } else {
-        console.log('RWGPS Map Instance is MapLibre, updating track places');
-
-        const allTimeResult = GetVisitedAlltimeForTrack();
-        const newPlaces = window.checkedPlacesTrack.filter(p => !allTimeResult.includes(p));
-
-        console.log('New places on track:', JSON.stringify(newPlaces));
-
-        console.log('All time visited places:', JSON.stringify(allTimeResult));
-        console.log('Checked places:', JSON.stringify(window.checkedPlacesTrack));
-        console.log('New places:', JSON.stringify(newPlaces));
-
-        window.checkedNewPlaces = newPlaces.length > 0 ? newPlaces : ['nonewplaces'];
-
-        console.log('>>Checked new places set to:', JSON.stringify(window.checkedNewPlaces));
-
-        const filterCheckedPlaces = window.checkedPlacesTrack.filter(p => !window.checkedNewPlaces.includes(p));
-        console.log('>>Checked filterCheckedPlaces set to:', JSON.stringify(filterCheckedPlaces));
-
-        window.checkedPlaces = filterCheckedPlaces.length > 0 ? filterCheckedPlaces : ['justaplace'];
-
-        console.log('Places set to:', JSON.stringify(window.checkedPlaces));
-        console.log('New Places set to:', JSON.stringify(window.checkedNewPlaces));
-
         UpdateMapMapLibre();
     }
 }
