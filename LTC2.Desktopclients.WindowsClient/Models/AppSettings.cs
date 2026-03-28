@@ -40,17 +40,15 @@
 
         public string StravaRouteBuilderEntryPoint { get; set; }
 
-        public string StravaRouteBuilderPrefix { get; set; }
+        public string StravaRouteBuilderRegex { get; set; }
 
         public string StravaSitePrefix { get; set; }
 
         public string RideWithGpsRouteBuilderEntryPoint { get; set; }
 
-        public string RideWithGpsRouteBuilderPrefix { get; set; }
+        public string RideWithGpsRouteBuilderRegex { get; set; }
 
         public string RideWithGpsSitePrefix { get; set; }
-
-        public string RideWithGpsRouteBuilderPrefixPostfix { get; set; }
 
         public List<string> SkipCookiesWhileDeleting { get; set; }
 
