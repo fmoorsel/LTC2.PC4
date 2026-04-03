@@ -118,7 +118,7 @@ function AddTileLayer() {
         console.log('adding vector layer');
         window.routeMap.addSource('ltc2tiles', {
             'type': 'vector',
-            'tiles': [' http://localhost:50000/api/Tiles/tile/{z}/{x}/{y}.pbf'],
+            'tiles': ['http://localhost:50000/api/Tiles/tile/{z}/{x}/{y}.pbf'],
             'minzoom': 3,
             'maxzoom': 17
         });
@@ -519,7 +519,7 @@ function AddLayersMapLibre()
 {
     window.mapInstance.addSource('ltc2tiles', {
         'type': 'vector',
-        'tiles': [' http://localhost:50000/api/Tiles/tile/{z}/{x}/{y}.pbf'],
+        'tiles': ['http://localhost:50000/api/Tiles/tile/{z}/{x}/{y}.pbf'],
         'minzoom': 3,
         'maxzoom': 17
     });
