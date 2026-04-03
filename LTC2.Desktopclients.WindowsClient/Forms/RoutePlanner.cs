@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using LTC2.Desktopclients.WindowsClient.Models;
 using LTC2.Desktopclients.WindowsClient.Services;
 using LTC2.Desktopclients.WindowsClient.Utils;
@@ -306,29 +307,17 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
 
         private bool IsBuilderUrl(string completeUrl)
         {
-            var urlParts = completeUrl.Split('?');
-            var url = urlParts[0];
+            var url = completeUrl.Split('?')[0];
 
             if (_multiSportsManager.RunWithSource == "ridewithgps")
             {
-
-                if (url.StartsWith(_appSettings.RideWithGpsRouteBuilderPrefix))
-                {
-                    return true;
-                }
-                else if (_appSettings.RideWithGpsRouteBuilderPrefixPostfix != null && _appSettings.RideWithGpsRouteBuilderPrefixPostfix.IndexOf(',') > 0)
-                {
-                    var parts = _appSettings.RideWithGpsRouteBuilderPrefixPostfix.Split(',');
-                    return url.StartsWith(parts[0]) && url.EndsWith(parts[1]);
-                }
-                else
-                {
-                    return false;
-                }
+                return _appSettings.RideWithGpsRouteBuilderRegex != null
+                    && Regex.IsMatch(url, _appSettings.RideWithGpsRouteBuilderRegex);
             }
             else
             {
-                return url.StartsWith(_appSettings.StravaRouteBuilderPrefix);
+                return _appSettings.StravaRouteBuilderRegex != null
+                    && Regex.IsMatch(url, _appSettings.StravaRouteBuilderRegex);
             }
         }
 

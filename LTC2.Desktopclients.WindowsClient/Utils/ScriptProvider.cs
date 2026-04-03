@@ -28,7 +28,7 @@ function Init() {
 
                 AddTileLayer();
 
-                setVisibility(window.layervisible);
+                setVisibility();
             });
 
             window.routeMap.on('idle', () => {
@@ -104,7 +104,7 @@ window.createCheckExprColor = function() {
     return expr;
 }
 
-function setVisibility(visible) {
+function setVisibility() {
     if (window.routeMap != null) {
         const visibilty = window.layervisible ? 'visible' : 'none';
         
@@ -678,7 +678,7 @@ function LayerControl()
         }
     }
 
-    setVisibility(window.layervisible);
+    setVisibility();
 }
 
 function GetColor() {
