@@ -30,11 +30,11 @@
     </div>
 
     <div>
-        <input type="checkbox" ref="checkBoxProvinces" class="focus:ring-0 focus:ring-offset-0 focus:shadow-none" style="margin-left: 10px; margin-right: 2px; vertical-align: middle;position: relative;" @click="onShowHideProvinces()"><a href="#" style="vertical-align: middle;position: relative;" @click="onShowHideProvinces()"> {{ bottumProvinciesText }}</a>
+        <input type="checkbox" ref="checkBoxAllRides" class="focus:ring-0 focus:ring-offset-0 focus:shadow-none" style="margin-left: 10px; margin-right: 2px; vertical-align: middle;position: relative;" @click="onShowHideAllRides()"><a href="#" style="vertical-align: middle;position: relative;" @click="onShowHideAllRides()"> {{ buttonAllRidesText }}</a>
     </div>
 
     <div>
-        <input type="checkbox" ref="checkBoxAllRides" class="focus:ring-0 focus:ring-offset-0 focus:shadow-none" style="margin-left: 10px; margin-right: 2px; vertical-align: middle;position: relative;" @click="onShowHideAllRides()"><a href="#" style="vertical-align: middle;position: relative;" @click="onShowHideAllRides()"> {{ buttonAllRidesText }}</a>
+        <input type="checkbox" ref="checkBoxProvinces" class="focus:ring-0 focus:ring-offset-0 focus:shadow-none" style="margin-left: 10px; margin-right: 2px; vertical-align: middle;position: relative;" @click="onShowHideProvinces()"><a href="#" style="vertical-align: middle;position: relative;" @click="onShowHideProvinces()"> {{ bottumProvinciesText }}</a>
     </div>
 
     <p style="margin-left: 10px; margin-top: 5px; font-size: 12px;">{{ bottumText }}</p>
@@ -86,8 +86,7 @@ export default defineComponent({
         const buttonReloadRouteText = _translationService?.getText("challengemap.buttonReloadRouteText");
 
         let mapHelper: MapHelper;
-        let _allTimeTracks: Track[] | undefined;
-        
+
         const score = _profileService?.getProfile()?.placesInAllTimeScore;
         const scoreYear = _profileService?.getProfile()?.placesInYearScore;
         const scoreLast = _profileService?.getProfile()?.placesInLastRideScore;
@@ -248,12 +247,10 @@ export default defineComponent({
                 emit('spinnerRequested');
 
                 try {
-                    if (!_allTimeTracks) {
-                        _allTimeTracks = await _profileService?.getAlltimeTracks();
-                    }
+                    const tracks =  await _profileService?.getAlltimeTracks();
 
-                    if (_allTimeTracks) {
-                        mapHelper.showHideAllRides(_allTimeTracks);
+                    if (tracks) {
+                        mapHelper.showHideAllRides(tracks);
                         doCheckBoxes(5);
                     }
                 } catch (error) {
