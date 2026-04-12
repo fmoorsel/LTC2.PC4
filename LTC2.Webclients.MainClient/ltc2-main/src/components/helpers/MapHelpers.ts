@@ -347,6 +347,10 @@ export class MapHelper {
     private _todoLayer: VectorTileLayer | undefined;
     private _showTodo = false;
 
+    private _allRidesPlacesLayer: VectorTileLayer | undefined;
+    private _allRidesLineLayer: VectorLayer<VectorSource> | undefined;
+    private _showAllRides = false;
+
     private _timelapseRunning = false;
     private _timelapseBreakRequested = false;
 
@@ -442,6 +446,7 @@ export class MapHelper {
         this.removeTimelapseLayers();
         this.removeRouteLayers();
         this.removeTodoLayer();
+        this.removeAllRidesLayer();
 
         if (this._showYear) {
             this._map.addLayer(this._yearLayer);
@@ -464,6 +469,7 @@ export class MapHelper {
         this.removeTimelapseLayers();
         this.removeRouteLayers();
         this.removeTodoLayer();
+        this.removeAllRidesLayer();
 
         if (this._showLast) {
             this._map.addLayer(this._lastRidePlacesLayer);
@@ -487,6 +493,7 @@ export class MapHelper {
         this.removeTimelapseLayers();
         this.removeRouteLayers();
         this.removeTodoLayer();
+        this.removeAllRidesLayer();
 
         if (this._showYear) {
             this._map.removeLayer(this._yearLayer);
@@ -513,6 +520,7 @@ export class MapHelper {
         this.removeTimelapseLayers();
         this.removeRouteLayers();
         this.removeTodoLayer();
+        this.removeAllRidesLayer();
 
         if (this._showYear) {
             this._map.removeLayer(this._yearLayer);
@@ -654,6 +662,88 @@ export class MapHelper {
 
     public getShowTodo(): boolean {
         return this._showTodo;
+    }
+
+    public getShowAllRides(): boolean {
+        return this._showAllRides;
+    }
+
+    private removeAllRidesLayer() {
+        if (this._showAllRides) {
+            if (this._allRidesLineLayer) {
+                this._map.removeLayer(this._allRidesLineLayer);
+            }
+
+            if (this._allRidesPlacesLayer) {
+                this._map.removeLayer(this._allRidesPlacesLayer);
+            }
+
+            this._allRidesLineLayer = undefined;
+            this._allRidesPlacesLayer = undefined;
+            this._showAllRides = false;
+        }
+    }
+
+    public showHideAllRides(tracks: Track[]) {
+        if (this._showAllRides) {
+            this.removeAllRidesLayer();
+        } else {
+            this.removeTimelapseLayers();
+            this.removeTrackLayers();
+            this.removeRouteLayers();
+            this.removeTodoLayer();
+
+            if (this._showYear) {
+                this._map.removeLayer(this._yearLayer);
+                this._showYear = false;
+            }
+
+            if (this._showLast) {
+                this._map.removeLayer(this._lastRideLineLayer);
+                this._map.removeLayer(this._lastRidePlacesLayer);
+                this._showLast = false;
+            }
+
+            const mapStyleHelper = this._mapStyleHelper;
+            const score = this._score;
+            const map = this._map;
+
+            const placesLayer = new VectorTileLayer({
+                source: this._vectorTileSource,
+                style: function (feature) {
+                    const featurePointer = feature.getProperties()["featurePointer"] as string;
+                    const id = featurePointer.split(":")[0];
+
+                    if (score && score.some(s => s.id === id)) {
+                        return mapStyleHelper.getStyle(MapStyleHelper.LayerStyleVisitedTrack, map);
+                    }
+
+                    return new Style();
+                }
+            });
+
+            const lineFeatures = tracks.map((track, index) => {
+                const feature = new Feature(new LineString(track.coordinates).transform('EPSG:4326', 'EPSG:3857'));
+                feature.setProperties({ "index": index });
+                return feature;
+            });
+
+            const linesLayer = new VectorLayer({
+                source: new VectorSource({ features: lineFeatures }),
+                style: mapStyleHelper.getStyle(MapStyleHelper.LayerStyleTimelapseLine, undefined)
+            });
+
+            this._allRidesPlacesLayer = placesLayer;
+            this._allRidesLineLayer = linesLayer;
+
+            this._map.addLayer(this._allRidesPlacesLayer);
+            this._map.once('rendercomplete', () => {
+                if (this._allRidesPlacesLayer && this._showAllRides) {
+                    this._map.addLayer(this._allRidesLineLayer!);
+                }
+            });
+            this._showAllRides = true;
+        }
     }
 
     public showTodoPlace(placeId: string, centerPoint: number[] | null) {
@@ -877,7 +967,8 @@ export class MapHelper {
         this.removeTrackLayers();
         this.removeRouteLayers();
         this.removeTodoLayer();
-    
+        this.removeAllRidesLayer();
+
         if (this._showYear) {
             this._map.removeLayer(this._yearLayer);
             this._showYear = false;

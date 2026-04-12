@@ -33,6 +33,10 @@
         <input type="checkbox" ref="checkBoxProvinces" class="focus:ring-0 focus:ring-offset-0 focus:shadow-none" style="margin-left: 10px; margin-right: 2px; vertical-align: middle;position: relative;" @click="onShowHideProvinces()"><a href="#" style="vertical-align: middle;position: relative;" @click="onShowHideProvinces()"> {{ bottumProvinciesText }}</a>
     </div>
 
+    <div>
+        <input type="checkbox" ref="checkBoxAllRides" class="focus:ring-0 focus:ring-offset-0 focus:shadow-none" style="margin-left: 10px; margin-right: 2px; vertical-align: middle;position: relative;" @click="onShowHideAllRides()"><a href="#" style="vertical-align: middle;position: relative;" @click="onShowHideAllRides()"> {{ buttonAllRidesText }}</a>
+    </div>
+
     <p style="margin-left: 10px; margin-top: 5px; font-size: 12px;">{{ bottumText }}</p>
   </div>
 </template>
@@ -65,6 +69,7 @@ export default defineComponent({
         const checkBoxTrack = ref<HTMLInputElement>();
         const checkBoxRoute = ref<HTMLInputElement>();
         const checkBoxProvinces = ref<HTMLInputElement>();
+        const checkBoxAllRides = ref<HTMLInputElement>();
         const place = ref<string>("");
         const hasYear = ref<boolean>();
         const hasTrack = ref<boolean>();
@@ -81,6 +86,7 @@ export default defineComponent({
         const buttonReloadRouteText = _translationService?.getText("challengemap.buttonReloadRouteText");
 
         let mapHelper: MapHelper;
+        let _allTimeTracks: Track[] | undefined;
         
         const score = _profileService?.getProfile()?.placesInAllTimeScore;
         const scoreYear = _profileService?.getProfile()?.placesInYearScore;
@@ -94,6 +100,7 @@ export default defineComponent({
 
         const buttonRouteText =  _translationService?.getText("challengemap.buttonRouteText")
         const bottumProvinciesText = _translationService?.getText("challengemap.buttonProvinciesText")
+        const buttonAllRidesText = _translationService?.getText("challengemap.buttonAllRidesText")
 
         const enablePlanRoute = true;
 
@@ -191,6 +198,10 @@ export default defineComponent({
                 const checkBoxElement = checkBoxRoute.value;
                 checkBoxElement.checked = which == 4 ? mapHelper.getShowRoute() : false;
             }
+
+            if (checkBoxAllRides?.value) {
+                checkBoxAllRides.value.checked = which == 5 ? mapHelper.getShowAllRides() : false;
+            }
         }
 
         const onShowHideYear = () => {
@@ -226,6 +237,32 @@ export default defineComponent({
 
             if (checkBoxProvinces.value) {
                 checkBoxProvinces.value.checked = mapHelper.getShowProvinces();
+            }
+        }
+
+        const onShowHideAllRides = async () => {
+            if (mapHelper.getShowAllRides()) {
+                mapHelper.showHideAllRides([]);
+                doCheckBoxes(0);
+            } else {
+                emit('spinnerRequested');
+
+                try {
+                    if (!_allTimeTracks) {
+                        _allTimeTracks = await _profileService?.getAlltimeTracks();
+                    }
+
+                    if (_allTimeTracks) {
+                        mapHelper.showHideAllRides(_allTimeTracks);
+                        doCheckBoxes(5);
+                    }
+                } catch (error) {
+                    console.log("error when loading all rides: " + error);
+
+                    emit('error', error);
+                } finally {
+                    emit('spinnerRequested');
+                }
             }
         }
 
@@ -306,7 +343,7 @@ export default defineComponent({
             }
         }
 
-        return ({ challengeMap, popup, place, closePopup, mapcontrol, checkBoxYear, checkBoxLast, checkBoxTrack, checkBoxRoute, checkBoxProvinces, onclickDetails, onclickPlanRoute, onclickCheckRoute, buttonText, buttonReloadRouteText, buttonPlanRouteText, buttonCheckRouteText, buttonRouteText, bottumYearText: bottonYearText, buttonTimelapseText, bottumText, bottumLastText: buttonLastText, bottumProvinciesText, hasYear, onShowHideYear, onShowHideLast, onShowHideTrackForPlace, onShowHideRoute, onShowHideProvinces, showTrackForPlace, showTodoPlace, onClickTimelapse, hasTrack, currentTrackDate, showRoute, hasRoutes, isStravaRoute, onclickReloadRoute, enablePlanRoute } )
+        return ({ challengeMap, popup, place, closePopup, mapcontrol, checkBoxYear, checkBoxLast, checkBoxTrack, checkBoxRoute, checkBoxProvinces, checkBoxAllRides, onclickDetails, onclickPlanRoute, onclickCheckRoute, buttonText, buttonReloadRouteText, buttonPlanRouteText, buttonCheckRouteText, buttonRouteText, bottumYearText: bottonYearText, buttonTimelapseText, bottumText, bottumLastText: buttonLastText, bottumProvinciesText, buttonAllRidesText, hasYear, onShowHideYear, onShowHideLast, onShowHideTrackForPlace, onShowHideRoute, onShowHideProvinces, onShowHideAllRides, showTrackForPlace, showTodoPlace, onClickTimelapse, hasTrack, currentTrackDate, showRoute, hasRoutes, isStravaRoute, onclickReloadRoute, enablePlanRoute } )
     }
 })
 </script>
