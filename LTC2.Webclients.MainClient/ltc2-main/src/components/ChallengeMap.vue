@@ -250,8 +250,6 @@ export default defineComponent({
                 try {
                     if (!_allTimeTracks) {
                         _allTimeTracks = await _profileService?.getAlltimeTracks();
-                    } else {
-                        await nextTick();
                     }
 
                     if (_allTimeTracks) {
