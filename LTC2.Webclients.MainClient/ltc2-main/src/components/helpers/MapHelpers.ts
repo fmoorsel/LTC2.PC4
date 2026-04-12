@@ -751,6 +751,7 @@ export class MapHelper {
         this.removeTrackLayers();
         this.removeTimelapseLayers();
         this.removeRouteLayers();
+        this.removeAllRidesLayer();
 
         if (this._showYear) {
             this._map.removeLayer(this._yearLayer);
@@ -796,6 +797,18 @@ export class MapHelper {
         this.removeTimelapseLayers();
         this.removeRouteLayers();
         this.removeTodoLayer();
+        this.removeAllRidesLayer();
+
+        if (this._showYear) {
+            this._map.removeLayer(this._yearLayer);
+            this._showYear = false;
+        }
+
+        if (this._showLast) {
+            this._map.removeLayer(this._lastRideLineLayer);
+            this._map.removeLayer(this._lastRidePlacesLayer);
+            this._showLast = false;
+        }
 
         this._currentTrack = track;
         this._currentPlace = placeId;
@@ -889,7 +902,19 @@ export class MapHelper {
             this.removeTimelapseLayers();
             this.removeRouteLayers();
             this.removeTodoLayer();
-    
+            this.removeAllRidesLayer();
+
+            if (this._showYear) {
+                this._map.removeLayer(this._yearLayer);
+                this._showYear = false;
+            }
+
+            if (this._showLast) {
+                this._map.removeLayer(this._lastRideLineLayer);
+                this._map.removeLayer(this._lastRidePlacesLayer);
+                this._showLast = false;
+            }
+
             this._currentRoutes = routes;
 
             const mapStyleHelper = this._mapStyleHelper;
