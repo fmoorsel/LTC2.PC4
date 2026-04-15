@@ -77,7 +77,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, inject } from 'vue';
+import { defineComponent, ref, onMounted, inject, nextTick } from 'vue';
 import { Modal } from 'flowbite';
 
 import { AppTypes } from '../types/AppTypes';
@@ -151,6 +151,13 @@ export default defineComponent ({
             filter.value = '';
             todoLines.value = toDos.map(line => line.split(', ').map(n => n.trim()).filter(n => n));
             modal.show();
+            nextTick(() => {
+                if (isNotStandalone.value) {
+                    emailInput.value?.focus();
+                } else {
+                    inputElement.value?.focus();
+                }
+            });
         }
 
         const groupIntoLines = (names: string[], maxLength: number): string[][] => {
