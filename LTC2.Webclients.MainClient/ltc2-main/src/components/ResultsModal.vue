@@ -19,11 +19,17 @@
 
             <div class="pb-0 pt-2 px-2 bg-white dark:bg-gray-900">
                 <label for="table-search" class="sr-only">Search</label>
-                <div class="relative mt-1">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
+                <div class="flex items-center gap-2 mt-1">
+                    <div class="relative flex-1">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <input type="text" v-model="filter" ref="inputElement" @keyup="keyUp" class="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-full bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="texthint">
                     </div>
-                    <input type="text" v-model="filter" ref="inputElement" @keyup="keyUp" class="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="texthint">
+                    <select v-model="selectedDistrict" @change="onDistrictChange" class="w-52 shrink-0 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <option value="">{{ allProvincesLabel }}</option>
+                        <option v-for="district in districtOptions" :key="district" :value="district">{{ district }}</option>
+                    </select>
                 </div>
             </div>
 
@@ -67,6 +73,7 @@
 <script lang="ts">
 import { defineComponent, PropType, ref, onMounted, inject, nextTick } from 'vue';
 import { Visit } from '../models/Visit';
+import { DistrictMapping } from '../models/DistrictMapping';
 import { Modal } from 'flowbite';
 
 import { AppTypes } from '../types/AppTypes';
@@ -86,6 +93,7 @@ export default defineComponent({
 
         const _translationService = inject(AppTypes.ITranslationServiceKey);
         const _profileService = inject(AppTypes.IProfileServiceKey);
+        const _mapService = inject(AppTypes.IMapServiceKey);
        
         const modalElement = ref<HTMLElement>();
         const tableContainer = ref<HTMLDivElement>();
@@ -94,10 +102,20 @@ export default defineComponent({
         const sortOnNameIndiciator = ref(true);
         const filter = ref("");
 
+        let districtMappings: DistrictMapping[] = [];
+        try {
+            districtMappings = _mapService?.getDistrictsMapping() ?? [];
+        } catch {
+            districtMappings = [];
+        }
+        const districtOptions = [...new Set(districtMappings.map(d => d.district))].sort();
+        const selectedDistrict = ref('');
+
         const header = _translationService?.getText("resultsmodal.header");
         const buttonOnName = _translationService?.getText("resultsmodal.button.onname");
         const buttonOnDate = _translationService?.getText("resultsmodal.button.ondate");
         const texthint = _translationService?.getText("resultsmodal.text.hint");
+        const allProvincesLabel = _translationService?.getText("profilemodal.allprovinces");
 
         let modal: Modal;
         let requestingTrackInProgress = false;
@@ -108,10 +126,11 @@ export default defineComponent({
 
         const showModal = () => {
             filter.value = '';
+            selectedDistrict.value = '';
             filteredVisits = [...props.visits];
 
             sortOnName(true);
-            
+
             modal.show();
         }
 
@@ -151,16 +170,31 @@ export default defineComponent({
             }
         }
 
+        const districtNameSet = (district: string): Set<string> => {
+            return new Set(districtMappings.filter(d => d.district === district).map(d => d.mapName));
+        }
+
         const keyUp = () => {
             doFilter();
         }
 
+        const onDistrictChange = () => {
+            doFilter();
+        }
+
         const doFilter = () => {
-            if (filter.value && filter.value != '') {
-                filteredVisits = [...props.visits].filter(v => { return v.name.toLowerCase().includes(filter.value.toLowerCase()) })
-            } else {
-                filteredVisits = [...props.visits]
+            let filtered = [...props.visits];
+
+            if (selectedDistrict.value) {
+                const allowed = districtNameSet(selectedDistrict.value);
+                filtered = filtered.filter(v => allowed.has(v.name));
             }
+
+            if (filter.value && filter.value != '') {
+                filtered = filtered.filter(v => v.name.toLowerCase().includes(filter.value.toLowerCase()));
+            }
+
+            filteredVisits = filtered;
 
             if (sortOnNameIndiciator.value) {
                 sortOnName(false);
@@ -194,7 +228,7 @@ export default defineComponent({
             }
         }
 
-        return { sortedVisits, showModal, hideModal, sortOnDate, sortOnName, sortOnNameIndiciator, modalElement, header, buttonOnName, buttonOnDate, tableContainer, texthint, keyUp, filter, inputElement, doShowPlaceAndRoute }
+        return { sortedVisits, showModal, hideModal, sortOnDate, sortOnName, sortOnNameIndiciator, modalElement, header, buttonOnName, buttonOnDate, tableContainer, texthint, keyUp, filter, inputElement, doShowPlaceAndRoute, selectedDistrict, districtOptions, allProvincesLabel, onDistrictChange }
     }
 })
 

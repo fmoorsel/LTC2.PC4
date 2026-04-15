@@ -1,8 +1,10 @@
 import {GeoJSON } from "geojson"
+import { DistrictMapping } from '../models/DistrictMapping'
 
 export interface IMapService {
     getMap(): GeoJSON;
     getDistrictsMap(): GeoJSON;
+    getDistrictsMapping(): DistrictMapping[];
     loadMap(): Promise<void>;
 
     getPlaceName(placeId: string): string;

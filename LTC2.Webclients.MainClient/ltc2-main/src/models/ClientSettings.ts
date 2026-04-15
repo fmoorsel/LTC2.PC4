@@ -17,6 +17,7 @@ class ClientSettings {
     public urlPbfGeoJsonMap = "./maps/PLsmallgeojson2022-1.0.pbf";
     public urlPbdfGeoJsonAcurateMap = "./maps/PLallgeojson2022-1.0.pbf";
     public urlGeoJsonDistrictsMap = "./maps/PL-districtsborders2022-1.0.json"
+    public urlGeoJsonDistrictsMapping = "./maps/PC4-districtsmapping2022-1.0.json"
 
     public mapCenter = [5.277420, 52.1];
     public mapZoom = 7.5;

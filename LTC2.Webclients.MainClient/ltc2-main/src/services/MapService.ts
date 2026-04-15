@@ -1,4 +1,5 @@
 import type { IMapService } from "../interfaces/IMapService";
+import { DistrictMapping } from '../models/DistrictMapping';
 
 import { emptyString } from '../models/Constants'
 
@@ -19,6 +20,7 @@ export class MapService implements IMapService {
 
     private _map? : GeoJSON;
     private _mapDistricts? : GeoJSON;
+    private _districtsMapping?: DistrictMapping[];
     
     private _nameDictionary = new Map<string, string>();
     private _idDictionary = new Map<string, string>();
@@ -35,8 +37,16 @@ export class MapService implements IMapService {
         if (this._mapDistricts){
             return this._mapDistricts;
         }
-              
+
         throw new Error("Map not loaded");
+    }
+
+    getDistrictsMapping(): DistrictMapping[] {
+        if (this._districtsMapping) {
+            return this._districtsMapping;
+        }
+
+        throw new Error("Districts mapping not loaded");
     }
 
     getPlaceCount(): number {
@@ -162,10 +172,21 @@ export class MapService implements IMapService {
             throw new Error("Url not set");
         }
     }
-   
+
+    async getGeoJsonDistrictsMapping(): Promise<void> {
+        if (this._clientSetting?.urlGeoJsonDistrictsMapping) {
+            const response = await axios.get<DistrictMapping[]>(this._clientSetting.urlGeoJsonDistrictsMapping, { timeout: this._clientSetting?.requestTimeout });
+
+            this._districtsMapping = response.data;
+        } else {
+            throw new Error("Url not set");
+        }
+    }
+
     async loadMap(): Promise<void> {
         await this.getGeoJsonMap();
         await this.getGeoJsonMapDistricts();
+        await this.getGeoJsonDistrictsMapping();
     }
     
 }

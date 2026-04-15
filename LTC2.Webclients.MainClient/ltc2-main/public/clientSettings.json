@@ -6,6 +6,7 @@
   "requestTimeout": 15000,
   "urlGeoJsonMap": "./maps/PC4smallgeojson2024.1.0.json",
   "urlGeoJsonDistrictsMap": "./maps/PL-districtsborders2022-1.0.json",
+  "urlGeoJsonDistrictsMapping": "./maps/PC4-districtsmapping2022-1.0.json",
   "urlPbfGeoJsonMap": "./maps/PLsmallgeojson2022-1.0.pbf",
   "urlPbdfGeoJsonAcurateMap": "./maps/PLallgeojson2022-1.0.pbf",
   "mapCenter": [ 5.277420, 52.17 ],

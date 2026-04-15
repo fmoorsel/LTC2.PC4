@@ -21,6 +21,7 @@ export class GetClientSettingsTask implements ISeriveTask {
         gloClientSettings.urlGeoJsonMap = clientSettings.data.urlGeoJsonMap;
         gloClientSettings.urlPbfGeoJsonMap = clientSettings.data.urlPbfGeoJsonMap;
         gloClientSettings.urlGeoJsonDistrictsMap = clientSettings.data.urlGeoJsonDistrictsMap;
+        gloClientSettings.urlGeoJsonDistrictsMapping = clientSettings.data.urlGeoJsonDistrictsMapping;
         gloClientSettings.urlPbdfGeoJsonAcurateMap = clientSettings.data.urlPbdfGeoJsonAcurateMap;
         gloClientSettings.mapCenter = clientSettings.data.mapCenter;
         gloClientSettings.mapZoom = clientSettings.data.mapZoom;
