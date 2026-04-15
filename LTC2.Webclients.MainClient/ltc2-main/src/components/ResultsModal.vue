@@ -100,6 +100,8 @@ export default defineComponent({
         const inputElement = ref<HTMLInputElement>();
         const sortedVisits = ref(filteredVisits);
         const sortOnNameIndiciator = ref(true);
+        const sortNameAscending = ref(true);
+        const sortDateAscending = ref(true);
         const filter = ref("");
 
         let districtMappings: DistrictMapping[] = [];
@@ -128,6 +130,9 @@ export default defineComponent({
             filter.value = '';
             selectedDistrict.value = '';
             filteredVisits = [...props.visits];
+            sortNameAscending.value = true;
+            sortDateAscending.value = true;
+            sortOnNameIndiciator.value = false; // ensure sortOnName below starts ascending without toggling
 
             sortOnName(true);
 
@@ -151,9 +156,12 @@ export default defineComponent({
         }
 
         const sortOnDate = (scrollReset: boolean) => {
-            const visitsToSort = [...filteredVisits];
+            if (scrollReset) {
+                sortDateAscending.value = !sortOnNameIndiciator.value ? !sortDateAscending.value : true;
+            }
 
-            sortedVisits.value = visitsToSort.sort((a, b) => { return a.date > b.date ? 1 : -1})
+            const direction = sortDateAscending.value ? 1 : -1;
+            sortedVisits.value = [...filteredVisits].sort((a, b) => a.date > b.date ? direction : a.date < b.date ? -direction : 0);
             sortOnNameIndiciator.value = false;
 
             if (scrollReset) {
@@ -162,8 +170,17 @@ export default defineComponent({
         }
 
         const sortOnName = (scrollReset: boolean) => {
-            sortedVisits.value  = [...filteredVisits].sort((a, b) => { return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1 });
-            sortOnNameIndiciator.value = true;            
+            if (scrollReset) {
+                sortNameAscending.value = sortOnNameIndiciator.value ? !sortNameAscending.value : true;
+            }
+
+            const direction = sortNameAscending.value ? 1 : -1;
+            sortedVisits.value = [...filteredVisits].sort((a, b) => {
+                const an = a.name.toLowerCase();
+                const bn = b.name.toLowerCase();
+                return an > bn ? direction : an < bn ? -direction : 0;
+            });
+            sortOnNameIndiciator.value = true;
 
             if (scrollReset) {
                 toTop();
