@@ -358,6 +358,8 @@ export class MapHelper {
 
     private _timelapseFeatures : Feature[] = [];
 
+    private _timelapseCallback: ((count: number | null, date: string | null) => void) | undefined;
+
     constructor (
         placeholder: HTMLElement | undefined, 
         popupPlaceHolder: HTMLElement | undefined,
@@ -634,7 +636,7 @@ export class MapHelper {
 
     public removeTimelapseLayers() {
         this._timelapseBreakRequested = this._timelapseRunning;
-        
+
         if (this._linesTimelapseLayer) {
             this._map.removeLayer(this._linesTimelapseLayer);
         }
@@ -647,6 +649,8 @@ export class MapHelper {
         this._timelapseLayer = undefined;
 
         this._showTimelapse = false;
+
+        this._timelapseCallback?.(null, null);
     }
 
     public removeTodoLayer() {
@@ -1093,13 +1097,16 @@ export class MapHelper {
     private doTrackForTimelapse(tracks: Track[], places: Set<string>, newPlaces: Set<string>) {
         if (this._timelapseIndex <= tracks.length && !this._timelapseBreakRequested) {            
             if (this._timelapseIndex < tracks.length) {
-                this.addPlaces(tracks[this._timelapseIndex].places, places, newPlaces);
+                const currentTrack = tracks[this._timelapseIndex];
+                this.addPlaces(currentTrack.places, places, newPlaces);
                 this.addTrack(this);
 
                 this._timelapseIndex++;
-    
-                setTimeout( () => {                
-                    this.doTrackForTimelapse(tracks, places, newPlaces);    
+
+                this._timelapseCallback?.(places.size, currentTrack.visitedOn);
+
+                setTimeout( () => {
+                    this.doTrackForTimelapse(tracks, places, newPlaces);
                 }, 200);
             } else {
                 this._timelapseIndex = -1;
@@ -1110,8 +1117,8 @@ export class MapHelper {
                 this._timelapseBreakRequested = false;
                 this._timelapseRunning = false;
 
-                setTimeout( () => {                
-                    this.performTimelapse(tracks);    
+                setTimeout( () => {
+                    this.performTimelapse(tracks);
                 }, 200);
             }
         } else {
@@ -1120,10 +1127,13 @@ export class MapHelper {
         }
     }
 
-    public performTimelapse(tracks: Track[] | undefined) {
+    public performTimelapse(tracks: Track[] | undefined, callback?: (count: number | null, date: string | null) => void) {
         if (this._timelapseRunning || !tracks) {
             this._timelapseBreakRequested = true;
         } else {
+            if (callback !== undefined) {
+                this._timelapseCallback = callback;
+            }
             this.removeNonTimelapseLayers();
             this.removeTimelapseLayers();
     

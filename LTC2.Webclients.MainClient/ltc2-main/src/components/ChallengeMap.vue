@@ -5,6 +5,10 @@
     <div>{{ place }}</div>
   </div>
   <div ref="mapcontrol" style="bottom: 10px; left: .5em; width: 170px;" class="ol-unselectable ol-control">
+    <div v-if="timelapseCount !== null" style="text-align: center; margin: 6px 4px 4px 4px; padding: 4px 0;">
+      <div style="font-size: 36px; font-weight: bold; color: black; line-height: 1;">{{ timelapseCount }}</div>
+      <div style="font-size: 16px; font-weight: bold; color: black; margin-top: 2px;">{{ timelapseDate }}</div>
+    </div>
     <button v-if="enablePlanRoute" style="width: 150px; margin:10px; margin-bottom: 3px; font-size: 16px;" @click="onclickPlanRoute()">{{ buttonPlanRouteText }}</button>
     <button style="width: 150px; margin:10px; margin-top: 5px; margin-bottom: 3px; font-size: 16px;" @click="onclickCheckRoute()">{{ buttonCheckRouteText }}</button>
     <button v-if="isStravaRoute" style="width: 150px; margin:10px; margin-top: 5px; margin-bottom: 3px; font-size: 16px;" @click="onclickReloadRoute()">{{ buttonReloadRouteText }}</button>
@@ -48,7 +52,7 @@ import { Track } from '../models/Track';
 import { Routes } from '../models/Routes';
 
 import { MapHelper } from './helpers/MapHelpers';
-import { fromatDateAsYYYYDDMM, runsInRideWithGpsMode } from '../utils/Utils';
+import { fromatDateAsYYYYDDMM, leftpad, runsInRideWithGpsMode } from '../utils/Utils';
 
 export default defineComponent({
 
@@ -72,6 +76,8 @@ export default defineComponent({
         const checkBoxAllRides = ref<HTMLInputElement>();
         const place = ref<string>("");
         const hasYear = ref<boolean>();
+        const timelapseCount = ref<number | null>(null);
+        const timelapseDate = ref<string | null>(null);
         const hasTrack = ref<boolean>();
         const hasRoutes = ref<boolean>();
         const isStravaRoute = ref<boolean>();
@@ -314,6 +320,16 @@ export default defineComponent({
             });
         }
 
+        const onTimelapseUpdate = (count: number | null, date: string | null) => {
+            timelapseCount.value = count;
+            if (date) {
+                const nd = new Date(date);
+                timelapseDate.value = leftpad(nd.getDate(), 2) + '-' + leftpad(nd.getMonth() + 1, 2) + '-' + nd.getFullYear();
+            } else {
+                timelapseDate.value = null;
+            }
+        }
+
         const onClickTimelapse = async () => {
             console.log("onClickTimelapse");
 
@@ -330,7 +346,7 @@ export default defineComponent({
                     if (tracks) {
                         doCheckBoxes(0);
 
-                        mapHelper.performTimelapse(tracks);
+                        mapHelper.performTimelapse(tracks, onTimelapseUpdate);
                     }
                 }
 
@@ -340,7 +356,7 @@ export default defineComponent({
             }
         }
 
-        return ({ challengeMap, popup, place, closePopup, mapcontrol, checkBoxYear, checkBoxLast, checkBoxTrack, checkBoxRoute, checkBoxProvinces, checkBoxAllRides, onclickDetails, onclickPlanRoute, onclickCheckRoute, buttonText, buttonReloadRouteText, buttonPlanRouteText, buttonCheckRouteText, buttonRouteText, bottumYearText: bottonYearText, buttonTimelapseText, bottumText, bottumLastText: buttonLastText, bottumProvinciesText, buttonAllRidesText, hasYear, onShowHideYear, onShowHideLast, onShowHideTrackForPlace, onShowHideRoute, onShowHideProvinces, onShowHideAllRides, showTrackForPlace, showTodoPlace, onClickTimelapse, hasTrack, currentTrackDate, showRoute, hasRoutes, isStravaRoute, onclickReloadRoute, enablePlanRoute } )
+        return ({ challengeMap, popup, place, closePopup, mapcontrol, checkBoxYear, checkBoxLast, checkBoxTrack, checkBoxRoute, checkBoxProvinces, checkBoxAllRides, onclickDetails, onclickPlanRoute, onclickCheckRoute, buttonText, buttonReloadRouteText, buttonPlanRouteText, buttonCheckRouteText, buttonRouteText, bottumYearText: bottonYearText, buttonTimelapseText, bottumText, bottumLastText: buttonLastText, bottumProvinciesText, buttonAllRidesText, hasYear, onShowHideYear, onShowHideLast, onShowHideTrackForPlace, onShowHideRoute, onShowHideProvinces, onShowHideAllRides, showTrackForPlace, showTodoPlace, onClickTimelapse, hasTrack, currentTrackDate, showRoute, hasRoutes, isStravaRoute, onclickReloadRoute, enablePlanRoute, timelapseCount, timelapseDate } )
     }
 })
 </script>
