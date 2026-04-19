@@ -249,6 +249,8 @@ export default defineComponent({
             if (mapHelper.getShowAllRides()) {
                 mapHelper.showHideAllRides([]);
                 doCheckBoxes(0);
+                timelapseCount.value = null;
+                timelapseDate.value = null;
             } else {
                 emit('spinnerRequested');
 
@@ -258,6 +260,17 @@ export default defineComponent({
                     if (tracks) {
                         mapHelper.showHideAllRides(tracks);
                         doCheckBoxes(5);
+
+                        timelapseCount.value = tracks.length;
+                        if (tracks.length > 0) {
+                            const lastTrack = tracks.reduce((latest, t) =>
+                                new Date(t.visitedOn) > new Date(latest.visitedOn) ? t : latest
+                            );
+                            const nd = new Date(lastTrack.visitedOn);
+                            timelapseDate.value = leftpad(nd.getDate(), 2) + '-' + leftpad(nd.getMonth() + 1, 2) + '-' + nd.getFullYear();
+                        } else {
+                            timelapseDate.value = null;
+                        }
                     }
                 } catch (error) {
                     console.log("error when loading all rides: " + error);
