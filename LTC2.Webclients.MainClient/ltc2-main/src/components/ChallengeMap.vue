@@ -261,7 +261,7 @@ export default defineComponent({
                         mapHelper.showHideAllRides(tracks);
                         doCheckBoxes(5);
 
-                        timelapseCount.value = tracks.length;
+                        timelapseCount.value = score?.length ?? 0;
                         if (tracks.length > 0) {
                             const lastTrack = tracks.reduce((latest, t) =>
                                 new Date(t.visitedOn) > new Date(latest.visitedOn) ? t : latest
