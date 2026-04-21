@@ -4,8 +4,8 @@ import { LimitsInfo } from './LimitsInfo';
 
 export class Routes {
 
-    public isStravaRoute: boolean = false;
-    public stravaRouteId: string = emptyString;
+    public isPlannerRoute: boolean = false;
+    public plannerRouteId: string = emptyString;
     public limitInfo : LimitsInfo | undefined = undefined;
 
     public routeCollection: Route[] = [];

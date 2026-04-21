@@ -11,7 +11,7 @@
     </div>
     <button v-if="enablePlanRoute" style="width: 150px; margin:10px; margin-bottom: 3px; font-size: 16px;" @click="onclickPlanRoute()">{{ buttonPlanRouteText }}</button>
     <button style="width: 150px; margin:10px; margin-top: 5px; margin-bottom: 3px; font-size: 16px;" @click="onclickCheckRoute()">{{ buttonCheckRouteText }}</button>
-    <button v-if="isStravaRoute" style="width: 150px; margin:10px; margin-top: 5px; margin-bottom: 3px; font-size: 16px;" @click="onclickReloadRoute()">{{ buttonReloadRouteText }}</button>
+    <button v-if="isPlannerRoute" style="width: 150px; margin:10px; margin-top: 5px; margin-bottom: 3px; font-size: 16px;" @click="onclickReloadRoute()">{{ buttonReloadRouteText }}</button>
     
     <button style="width: 150px; margin:10px; margin-top: 5px; margin-bottom: 3px; font-size: 16px;" @click="onclickDetails()">{{ buttonText }}</button>
     <button style="width: 150px; margin:10px; margin-top: 5px; margin-bottom: 5px; font-size: 16px;" @click="onClickTimelapse">{{ buttonTimelapseText }}</button>
@@ -80,7 +80,7 @@ export default defineComponent({
         const timelapseDate = ref<string | null>(null);
         const hasTrack = ref<boolean>();
         const hasRoutes = ref<boolean>();
-        const isStravaRoute = ref<boolean>();
+        const isPlannerRoute = ref<boolean>();
         const currentTrackDate = ref<string>(""); 
         const currentYear = new Date().getFullYear();
 
@@ -147,8 +147,9 @@ export default defineComponent({
             try {
                 const routes = mapHelper.getCurrentRoutes();
 
-                if (routes && routes.isStravaRoute) {
-                    const newRoutes = await _routeCheckerService?.checkRoute(routes.stravaRouteId);
+                if (routes && routes.isPlannerRoute) {
+                    const provider = runsInRideWithGpsMode() ? "ridewithgps" : "strava";
+                    const newRoutes = await _routeCheckerService?.checkRoute(routes.plannerRouteId, provider);
 
                     if (newRoutes?.routeCollection && newRoutes.routeCollection.length > 0) {
                         showRoute(newRoutes, false);
@@ -296,7 +297,7 @@ export default defineComponent({
             mapHelper.showRoute(routes, doZoom);
 
             hasRoutes.value = mapHelper.getShowRoute();
-            isStravaRoute.value = mapHelper.isStravaRoute();
+            isPlannerRoute.value = mapHelper.isPlannerRoute();
         
             nextTick(() => {
                 doCheckBoxes(4);
@@ -369,7 +370,7 @@ export default defineComponent({
             }
         }
 
-        return ({ challengeMap, popup, place, closePopup, mapcontrol, checkBoxYear, checkBoxLast, checkBoxTrack, checkBoxRoute, checkBoxProvinces, checkBoxAllRides, onclickDetails, onclickPlanRoute, onclickCheckRoute, buttonText, buttonReloadRouteText, buttonPlanRouteText, buttonCheckRouteText, buttonRouteText, bottumYearText: bottonYearText, buttonTimelapseText, bottumText, bottumLastText: buttonLastText, bottumProvinciesText, buttonAllRidesText, hasYear, onShowHideYear, onShowHideLast, onShowHideTrackForPlace, onShowHideRoute, onShowHideProvinces, onShowHideAllRides, showTrackForPlace, showTodoPlace, onClickTimelapse, hasTrack, currentTrackDate, showRoute, hasRoutes, isStravaRoute, onclickReloadRoute, enablePlanRoute, timelapseCount, timelapseDate } )
+        return ({ challengeMap, popup, place, closePopup, mapcontrol, checkBoxYear, checkBoxLast, checkBoxTrack, checkBoxRoute, checkBoxProvinces, checkBoxAllRides, onclickDetails, onclickPlanRoute, onclickCheckRoute, buttonText, buttonReloadRouteText, buttonPlanRouteText, buttonCheckRouteText, buttonRouteText, bottumYearText: bottonYearText, buttonTimelapseText, bottumText, bottumLastText: buttonLastText, bottumProvinciesText, buttonAllRidesText, hasYear, onShowHideYear, onShowHideLast, onShowHideTrackForPlace, onShowHideRoute, onShowHideProvinces, onShowHideAllRides, showTrackForPlace, showTodoPlace, onClickTimelapse, hasTrack, currentTrackDate, showRoute, hasRoutes, isPlannerRoute, onclickReloadRoute, enablePlanRoute, timelapseCount, timelapseDate } )
     }
 })
 </script>

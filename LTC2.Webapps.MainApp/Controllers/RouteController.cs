@@ -156,8 +156,8 @@ namespace LTC2.Webapps.MainApp.Controllers
                             var gpxFile = WriteGpxFile(gpx.Gpx);
                             var response = CheckGpxFile(gpxFile);
 
-                            response.IsStravaRoute = true;
-                            response.StravaRouteId = routeId;
+                            response.IsPlannerRoute = true;
+                            response.PlannerRouteId = routeId;
 
                             return Ok(response);
                         }

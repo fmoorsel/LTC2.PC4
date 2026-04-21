@@ -442,71 +442,38 @@ export class MapHelper {
     }
 
     public showHideYear() {
-        this._showYear = !this._showYear;
+        const currentlyShowed = this._showYear;
+        const shouldShow = !currentlyShowed;
 
-        this.removeTrackLayers();
-        this.removeTimelapseLayers();
-        this.removeRouteLayers();
-        this.removeTodoLayer();
-        this.removeAllRidesLayer();
+        this.removeAllLayers();
+
+        this._showYear = shouldShow;
 
         if (this._showYear) {
             this._map.addLayer(this._yearLayer);
-        } else {
-            this._map.removeLayer(this._yearLayer);
         }
-
-        if (this._showLast && this._showYear) {
-            this._map.removeLayer(this._lastRideLineLayer);
-            this._map.removeLayer(this._lastRidePlacesLayer);
-        }
-
-        this._showLast = false;
     }
 
     public showHideLastRide() {
-        this._showLast = !this._showLast;
+        const currentlyShowed = this._showLast;
+        const shouldShow = !currentlyShowed;
 
-        this.removeTrackLayers();
-        this.removeTimelapseLayers();
-        this.removeRouteLayers();
-        this.removeTodoLayer();
-        this.removeAllRidesLayer();
+        console.log("show last ride: " + this._showLast);
+
+        this.removeAllLayers();
+
+        this._showLast = shouldShow;
 
         if (this._showLast) {
             this._map.addLayer(this._lastRidePlacesLayer);
             this._map.addLayer(this._lastRideLineLayer);
-        } else {
-            this._map.removeLayer(this._lastRideLineLayer);
-            this._map.removeLayer(this._lastRidePlacesLayer);
         }
-        
-        if (this._showLast && this._showYear) {
-            this._map.removeLayer(this._yearLayer);
-        }
-
-        this._showYear = false;
     }
 
     public showHideTrackForSelectedPlace() {
         const isTrackShowed = this._showTrack;
 
-        this.removeTrackLayers();
-        this.removeTimelapseLayers();
-        this.removeRouteLayers();
-        this.removeTodoLayer();
-        this.removeAllRidesLayer();
-
-        if (this._showYear) {
-            this._map.removeLayer(this._yearLayer);
-            this._showYear = false;
-        }
-
-        if (this._showLast) {
-            this._map.removeLayer(this._lastRideLineLayer);
-            this._map.removeLayer(this._lastRidePlacesLayer);
-            this._showLast = false;
-        }
+        this.removeAllLayers();
 
         if (!isTrackShowed) {
             if (this._currentPlace && this._currentTrack) {
@@ -518,22 +485,7 @@ export class MapHelper {
     public showHideRoute() {
         const isRouteShowed = this._showRoute;
 
-        this.removeTrackLayers();
-        this.removeTimelapseLayers();
-        this.removeRouteLayers();
-        this.removeTodoLayer();
-        this.removeAllRidesLayer();
-
-        if (this._showYear) {
-            this._map.removeLayer(this._yearLayer);
-            this._showYear = false;
-        }
-
-        if (this._showLast) {
-            this._map.removeLayer(this._lastRideLineLayer);
-            this._map.removeLayer(this._lastRidePlacesLayer);
-            this._showLast = false;
-        }
+        this.removeAllLayers();
 
         if (!isRouteShowed) {
             if (this._currentRoutes) {
@@ -547,6 +499,9 @@ export class MapHelper {
     }
 
     public getShowLastRide(): boolean {
+
+        console.log("get show last ride: " + this._showLast);
+        
         return this._showLast;
     }
 
@@ -558,10 +513,10 @@ export class MapHelper {
         return this._showRoute;
     }
 
-    public isStravaRoute(): boolean {
+    public isPlannerRoute(): boolean {
         if (this._currentRoutes)
         {
-            return this._currentRoutes.isStravaRoute;
+            return this._currentRoutes.isPlannerRoute;
         }
 
         return false;
@@ -604,6 +559,31 @@ export class MapHelper {
                 this._map.removeLayer(this._provincesLayer);
             }
         }
+    }
+
+    private removeYearLayer() {
+        if (this._showYear) {
+            this._map.removeLayer(this._yearLayer);
+            this._showYear = false;
+        }
+    }
+
+    private removeLastRideLayers() {
+        if (this._showLast) {
+            this._map.removeLayer(this._lastRideLineLayer);
+            this._map.removeLayer(this._lastRidePlacesLayer);
+            this._showLast = false;
+        }
+    }
+
+    private removeAllLayers(skip: { timelapse?: boolean; year?: boolean; lastRide?: boolean; allRides?: boolean } = {}) {
+        this.removeTrackLayers();
+        this.removeRouteLayers();
+        this.removeTodoLayer();
+        if (!skip.timelapse) this.removeTimelapseLayers();
+        if (!skip.year)      this.removeYearLayer();
+        if (!skip.lastRide)  this.removeLastRideLayers();
+        if (!skip.allRides)  this.removeAllRidesLayer();
     }
 
     private removeTrackLayers() {
@@ -692,21 +672,7 @@ export class MapHelper {
         if (this._showAllRides) {
             this.removeAllRidesLayer();
         } else {
-            this.removeTimelapseLayers();
-            this.removeTrackLayers();
-            this.removeRouteLayers();
-            this.removeTodoLayer();
-
-            if (this._showYear) {
-                this._map.removeLayer(this._yearLayer);
-                this._showYear = false;
-            }
-
-            if (this._showLast) {
-                this._map.removeLayer(this._lastRideLineLayer);
-                this._map.removeLayer(this._lastRidePlacesLayer);
-                this._showLast = false;
-            }
+            this.removeAllLayers({ allRides: true });
 
             const mapStyleHelper = this._mapStyleHelper;
             const score = this._score;
@@ -751,22 +717,7 @@ export class MapHelper {
     }
 
     public showTodoPlace(placeId: string, centerPoint: number[] | null) {
-        this.removeTodoLayer();
-        this.removeTrackLayers();
-        this.removeTimelapseLayers();
-        this.removeRouteLayers();
-        this.removeAllRidesLayer();
-
-        if (this._showYear) {
-            this._map.removeLayer(this._yearLayer);
-            this._showYear = false;
-        }
-
-        if (this._showLast) {
-            this._map.removeLayer(this._lastRideLineLayer);
-            this._map.removeLayer(this._lastRidePlacesLayer);
-            this._showLast = false;
-        }
+        this.removeAllLayers();
 
         const mapStyleHelper = this._mapStyleHelper;
         const map = this._map;
@@ -797,22 +748,7 @@ export class MapHelper {
     }
 
     public showTrackForSelectedPlace(placeId: string, track: Track, doZoom = true) {
-        this.removeTrackLayers();
-        this.removeTimelapseLayers();
-        this.removeRouteLayers();
-        this.removeTodoLayer();
-        this.removeAllRidesLayer();
-
-        if (this._showYear) {
-            this._map.removeLayer(this._yearLayer);
-            this._showYear = false;
-        }
-
-        if (this._showLast) {
-            this._map.removeLayer(this._lastRideLineLayer);
-            this._map.removeLayer(this._lastRidePlacesLayer);
-            this._showLast = false;
-        }
+        this.removeAllLayers();
 
         this._currentTrack = track;
         this._currentPlace = placeId;
@@ -902,22 +838,7 @@ export class MapHelper {
         const hasTracksOnRoutes = hasTracks;
 
         if (hasPlacesOnRoutes || hasTracksOnRoutes) {
-            this.removeTrackLayers();
-            this.removeTimelapseLayers();
-            this.removeRouteLayers();
-            this.removeTodoLayer();
-            this.removeAllRidesLayer();
-
-            if (this._showYear) {
-                this._map.removeLayer(this._yearLayer);
-                this._showYear = false;
-            }
-
-            if (this._showLast) {
-                this._map.removeLayer(this._lastRideLineLayer);
-                this._map.removeLayer(this._lastRidePlacesLayer);
-                this._showLast = false;
-            }
+            this.removeAllLayers();
 
             this._currentRoutes = routes;
 
@@ -993,21 +914,7 @@ export class MapHelper {
     }
 
     private removeNonTimelapseLayers() {
-        this.removeTrackLayers();
-        this.removeRouteLayers();
-        this.removeTodoLayer();
-        this.removeAllRidesLayer();
-
-        if (this._showYear) {
-            this._map.removeLayer(this._yearLayer);
-            this._showYear = false;
-        }
-
-        if (this._showLast) {
-            this._map.removeLayer(this._lastRideLineLayer);
-            this._map.removeLayer(this._lastRidePlacesLayer);
-            this._showLast = false;
-        }
+        this.removeAllLayers({ timelapse: true });
     }
 
     public getTimelapseIndex(): number {

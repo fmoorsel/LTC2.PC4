@@ -44,7 +44,7 @@
                     <p v-if="!isRoutesLoaded" style="margin-top: 120px; margin-left: 10px;">{{routesNotYetLoadedText}}</p>
                     <p v-else-if="isLoadingStravaRoutes" style="margin-top: 120px; margin-left: 10px;">{{loadingStravaRoutesText}}</p>
                     <p v-else-if="isNoStravaRoutes" style="margin-top: 120px; margin-left: 10px;">{{noRoutesInStravaText}}</p>
-                    <p v-else-if="isStravaRouteLoading" style="margin-top: 120px; margin-left: 10px;">{{loadingStravaRouteText}}</p>
+                    <p v-else-if="isPlannerRouteLoading" style="margin-top: 120px; margin-left: 10px;">{{loadingStravaRouteText}}</p>
                     <p v-else-if="isNoPlaces" style="margin-top: 120px; margin-left: 10px;">{{noPlacesText}}</p>
                     
                     <table v-else class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -152,7 +152,7 @@
           const isRoutesLoaded = ref(false);
           const isNoStravaRoutes = ref(false);
           const isLoadingStravaRoutes = ref(false);
-          const isStravaRouteLoading = ref(false);
+          const isPlannerRouteLoading = ref(false);
           const isNoPlaces = ref(false);
 
           const stravaRoutes :  PresentationRoute[] = [];
@@ -227,7 +227,7 @@
             }
             
             try {
-                isStravaRouteLoading.value = true;
+                isPlannerRouteLoading.value = true;
 
                 const route = await _routeCheckerService?.checkRoute(id, source);
 
@@ -252,7 +252,7 @@
                 emit('error', error);                     
             }
 
-            isStravaRouteLoading.value = false;
+            isPlannerRouteLoading.value = false;
             isButtonDisabled.value = fileName.value == emptyString;
 
             if (loadRoutesButton?.value) {
@@ -429,7 +429,7 @@
             }
           }
  
-          return { showModal, hideModal, modalElement, header, tableContainer, texthint, onSelectFile, inputElement, fileName, buttonTextSelectFile, selectFileButton, isButtonDisabled, onSelectGpx, buttonTextCheckGpx, feedBackNoRoutes, feedBackWorking, isEmpty, isWorking, feedBackInstuction, buttonTextLoadStravaRoute, isRoutesLoaded, routesNotYetLoadedText, noRoutesInStravaText, isNoStravaRoutes, loadRoutesButton, onLoadRoutes, isLoadingStravaRoutes, loadingStravaRoutesText, sortedRoutes, loadingStravaRouteText, isStravaRouteLoading, isNoPlaces, noPlacesText, onSelectRoute, onSelectFileButtonClick, isRideWithGpsMode }
+          return { showModal, hideModal, modalElement, header, tableContainer, texthint, onSelectFile, inputElement, fileName, buttonTextSelectFile, selectFileButton, isButtonDisabled, onSelectGpx, buttonTextCheckGpx, feedBackNoRoutes, feedBackWorking, isEmpty, isWorking, feedBackInstuction, buttonTextLoadStravaRoute, isRoutesLoaded, routesNotYetLoadedText, noRoutesInStravaText, isNoStravaRoutes, loadRoutesButton, onLoadRoutes, isLoadingStravaRoutes, loadingStravaRoutesText, sortedRoutes, loadingStravaRouteText, isPlannerRouteLoading, isNoPlaces, noPlacesText, onSelectRoute, onSelectFileButtonClick, isRideWithGpsMode }
       }
   })
   

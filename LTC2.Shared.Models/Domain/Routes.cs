@@ -6,9 +6,9 @@ namespace LTC2.Shared.Models.Domain
 {
     public class Routes
     {
-        public bool IsStravaRoute { get; set; }
+        public bool IsPlannerRoute { get; set; }
 
-        public string StravaRouteId { get; set; }
+        public string PlannerRouteId { get; set; }
 
         public LimitInfo LimitInfo { get; set; }
 
