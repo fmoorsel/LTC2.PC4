@@ -33,6 +33,7 @@ namespace LTC2.Webapps.MainApp.Services
             GetSettingsFromConfig<MainClientSettings>("MainClientSettings", result);
 
             GetSettingsFromConfig<SpatiaLiteMapperSettings>("SpatiaLiteMapperSettings", result);
+            GetSettingsFromConfig<PdokHttpProxySettings>("PdokHttpProxySettings", result);
 
             foreach (var key in result.Keys)
             {

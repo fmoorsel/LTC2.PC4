@@ -14,6 +14,8 @@ using LTC2.Shared.RideWithGpsConnector.Bootstrap.Extensions;
 using LTC2.Shared.StravaConnector.Bootstrap.Extensions;
 using LTC2.Shared.Utils.Bootstrap.Extensions;
 using LTC2.Shared.Utils.Bootstrap.Interfaces;
+using LTC2.Shared.Http.Interfaces;
+using LTC2.Shared.Http.Proxies;
 using LTC2.Webapps.MainApp.Models;
 using LTC2.Webapps.MainApp.Services;
 using LTC2.Webapps.MainApp.ServiceTasks;
@@ -86,6 +88,8 @@ namespace LTC2.Webapps.MainApp
             services.AddSingleton<SpatiaLiteRepository>();
 
             services.AddSingleton<TilesRepository>();
+            services.AddSingleton<FundaClient>();
+            services.AddSingleton<IPdokLocatieserverProxy, PdokLocatieserverProxy>();
 
             services.AddSingleton<ISecretsVault, WindowsSecretsVault>();
             services.AddSingleton<IDesktopProfileRepository, DesktopProfileRepository>();

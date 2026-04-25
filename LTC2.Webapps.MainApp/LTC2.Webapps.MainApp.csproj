@@ -40,6 +40,7 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
+    <PackageReference Include="NetTopologySuite" Version="2.5.0" />
   </ItemGroup>
 
     <ItemGroup>
@@ -51,6 +52,7 @@
       <ProjectReference Include="..\LTC2.Shared.SpatiaLiteRepository\LTC2.Shared.SpatiaLiteRepository.csproj" />
       <ProjectReference Include="..\LTC2.Shared.StravaConnector\LTC2.Shared.StravaConnector.csproj" />
       <ProjectReference Include="..\LTC2.Shared.RideWithGpsConnector\LTC2.Shared.RideWithGpsConnector.csproj" />
+      <ProjectReference Include="..\LTC2.Shared.Http\LTC2.Shared.Http.csproj" />
     </ItemGroup>
 
   <ItemGroup>
