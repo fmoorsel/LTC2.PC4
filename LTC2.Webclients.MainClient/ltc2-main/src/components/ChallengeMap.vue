@@ -142,6 +142,9 @@ export default defineComponent({
                 mapHelper.performTimelapse(undefined);
             }
             
+            timelapseCount.value = null;
+            timelapseDate.value = null;
+
             emit('spinnerRequested');
 
             try {
@@ -213,11 +216,17 @@ export default defineComponent({
         const onShowHideYear = () => {
             mapHelper.showHideYear();
 
+            timelapseCount.value = null;
+            timelapseDate.value = null;
+            
             doCheckBoxes(1);
         }
 
         const onShowHideLast = () => {
             mapHelper.showHideLastRide();
+
+            timelapseCount.value = null;
+            timelapseDate.value = null;
 
             doCheckBoxes(2);
         }
@@ -225,12 +234,17 @@ export default defineComponent({
         const onShowHideTrackForPlace = () => {
             mapHelper.showHideTrackForSelectedPlace();
 
+            timelapseCount.value = null;
+            timelapseDate.value = null;
+
             doCheckBoxes(3);
         }
 
         const onShowHideRoute = () => {
             mapHelper.showHideRoute();
 
+            timelapseCount.value = null;
+            timelapseDate.value = null;
             doCheckBoxes(4);
         }
 
@@ -296,6 +310,9 @@ export default defineComponent({
             
             mapHelper.showRoute(routes, doZoom);
 
+            timelapseCount.value = null;
+            timelapseDate.value = null;
+
             hasRoutes.value = mapHelper.getShowRoute();
             isPlannerRoute.value = mapHelper.isPlannerRoute();
         
@@ -311,6 +328,9 @@ export default defineComponent({
 
             mapHelper.showTodoPlace(placeId, centerPoint);
 
+            timelapseCount.value = null;
+            timelapseDate.value = null;
+
             doCheckBoxes(0);
         }
 
@@ -322,6 +342,9 @@ export default defineComponent({
             if (mapHelper.getShowYear()) {
                 onShowHideYear();
             }
+
+            timelapseCount.value = null;
+            timelapseDate.value = null;
 
             mapHelper.showTrackForSelectedPlace(placeId, track);
 
