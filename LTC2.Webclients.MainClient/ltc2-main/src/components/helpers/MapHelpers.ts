@@ -1128,6 +1128,8 @@ export class MapHelper {
 
         map.addLayer(baseLayer);
 
+        (window as any).challengeMap = map;
+
         return map;
     }
 
