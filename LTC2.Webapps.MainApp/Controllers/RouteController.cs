@@ -199,6 +199,12 @@ namespace LTC2.Webapps.MainApp.Controllers
             foreach (var line in request.Lines)
             {
                 var coordinates = line.Select(c => new List<double> { c[0], c[1] }).ToList();
+
+                if (coordinates.Count < 2)
+                {
+                    continue;
+                }
+
                 var places = _mapRepository.CheckTrack(coordinates);
 
                 foreach (var place in places)
