@@ -9,9 +9,9 @@ export class PresentationRoute {
         if (stravaRoute.timestamp) {
             const dt = new Date(stravaRoute.timestamp * 1000);
 
-            const month = dt.getMonth();
+            const month = dt.getMonth() + 1;
             const montAsString = month.toString().padStart(2, '0');
-            const day = dt.getDay();
+            const day = dt.getDay() + 1;
             const dayAsString = day.toString().padStart(2, '0');
 
             this.date = dt.getFullYear().toString() + '-' + montAsString + '-' + dayAsString;
