@@ -1,5 +1,14 @@
 <template>
   <div ref="challengeMap" class="h-full"></div>
+  <AreaDetailModal
+    ref="areaDetailModal"
+    :place-name="clickedAreaName"
+    :is-new-alltime="clickedIsNewAlltime"
+    :is-new-year="clickedIsNewYear"
+    :new-alltime-names="clickedNewAlltimeNames"
+    :new-year-names="clickedNewYearNames"
+    @area-selected="onRouteAreaSelected"
+  />
   <div ref="popup" class="ol-popup">
     <a href="#" @click="closePopup()" ref="popup-closer" class="ol-popup-closer"></a>
     <div>{{ place }}</div>
@@ -53,8 +62,11 @@ import { Routes } from '../models/Routes';
 
 import { MapHelper } from './helpers/MapHelpers';
 import { fromatDateAsYYYYDDMM, leftpad, runsInRideWithGpsMode } from '../utils/Utils';
+import AreaDetailModal from './AreaDetailModal.vue';
 
 export default defineComponent({
+
+    components: { AreaDetailModal },
 
     emits: ['detailsRequested', 'spinnerRequested', 'routeSelectionRequested', 'error' ],
 
@@ -76,6 +88,13 @@ export default defineComponent({
         const checkBoxAllRides = ref<HTMLInputElement>();
         const place = ref<string>("");
         const hasYear = ref<boolean>();
+
+        const areaDetailModal = ref<InstanceType<typeof AreaDetailModal>>();
+        const clickedAreaName = ref('');
+        const clickedIsNewAlltime = ref(false);
+        const clickedIsNewYear = ref(false);
+        const clickedNewAlltimeNames = ref<string[]>([]);
+        const clickedNewYearNames = ref<string[]>([]);
         const timelapseCount = ref<number | null>(null);
         const timelapseDate = ref<string | null>(null);
         const hasTrack = ref<boolean>();
@@ -112,9 +131,32 @@ export default defineComponent({
         hasYear.value = scoreYear && scoreYear.length > 0;
 
         onMounted(() => {
-            const coordinates =  _profileService?.getProfile()?.trackLastRide ?? []; 
+            const coordinates =  _profileService?.getProfile()?.trackLastRide ?? [];
 
-            mapHelper = new MapHelper(challengeMap.value, popup.value, mapcontrol.value, score, scoreYear, scoreLast, coordinates, place, _clientSettings);            
+            mapHelper = new MapHelper(challengeMap.value, popup.value, mapcontrol.value, score, scoreYear, scoreLast, coordinates, place, _clientSettings);
+
+            mapHelper.setRouteAreaClickedCallback((placeId: string, placeName: string) => {
+                const currentRoutes = mapHelper.getCurrentRoutes();
+                if (!currentRoutes) return;
+
+                const uniquePlaceIds = [...new Set(mapHelper.getPlaces(currentRoutes))];
+
+                clickedAreaName.value = placeName;
+                clickedIsNewAlltime.value = !score?.some(v => v.id === placeId);
+                clickedIsNewYear.value = !clickedIsNewAlltime.value && !scoreYear?.some(v => v.id === placeId);
+
+                clickedNewAlltimeNames.value = uniquePlaceIds
+                    .filter(id => !score?.some(v => v.id === id))
+                    .map(id => _mapService?.getPlaceName(id) ?? '')
+                    .filter(name => name !== '');
+
+                clickedNewYearNames.value = uniquePlaceIds
+                    .filter(id => score?.some(v => v.id === id) && !scoreYear?.some(v => v.id === id))
+                    .map(id => _mapService?.getPlaceName(id) ?? '')
+                    .filter(name => name !== '');
+
+                areaDetailModal.value?.showModal();
+            });
         })
     
         const closePopup = () => {
@@ -393,7 +435,20 @@ export default defineComponent({
             }
         }
 
-        return ({ challengeMap, popup, place, closePopup, mapcontrol, checkBoxYear, checkBoxLast, checkBoxTrack, checkBoxRoute, checkBoxProvinces, checkBoxAllRides, onclickDetails, onclickPlanRoute, onclickCheckRoute, buttonText, buttonReloadRouteText, buttonPlanRouteText, buttonCheckRouteText, buttonRouteText, bottumYearText: bottonYearText, buttonTimelapseText, bottumText, bottumLastText: buttonLastText, bottumProvinciesText, buttonAllRidesText, hasYear, onShowHideYear, onShowHideLast, onShowHideTrackForPlace, onShowHideRoute, onShowHideProvinces, onShowHideAllRides, showTrackForPlace, showTodoPlace, onClickTimelapse, hasTrack, currentTrackDate, showRoute, hasRoutes, isPlannerRoute, onclickReloadRoute, enablePlanRoute, timelapseCount, timelapseDate } )
+        const onRouteAreaSelected = async (name: string) => {
+            try {
+                const centerPoint = await _routeCheckerService?.getCenterPointForName(name) ?? null;
+                if (centerPoint) {
+                    mapHelper.zoomToCenter(centerPoint);
+                    mapHelper.showPopupAtCenter(name, centerPoint);
+                }
+            } catch (error) {
+                console.log("error when zooming to area: " + error);
+                emit('error', error);
+            }
+        };
+
+        return ({ challengeMap, popup, place, closePopup, mapcontrol, checkBoxYear, checkBoxLast, checkBoxTrack, checkBoxRoute, checkBoxProvinces, checkBoxAllRides, onclickDetails, onclickPlanRoute, onclickCheckRoute, buttonText, buttonReloadRouteText, buttonPlanRouteText, buttonCheckRouteText, buttonRouteText, bottumYearText: bottonYearText, buttonTimelapseText, bottumText, bottumLastText: buttonLastText, bottumProvinciesText, buttonAllRidesText, hasYear, onShowHideYear, onShowHideLast, onShowHideTrackForPlace, onShowHideRoute, onShowHideProvinces, onShowHideAllRides, showTrackForPlace, showTodoPlace, onClickTimelapse, hasTrack, currentTrackDate, showRoute, hasRoutes, isPlannerRoute, onclickReloadRoute, enablePlanRoute, timelapseCount, timelapseDate, areaDetailModal, clickedAreaName, clickedIsNewAlltime, clickedIsNewYear, clickedNewAlltimeNames, clickedNewYearNames, onRouteAreaSelected } )
     }
 })
 </script>

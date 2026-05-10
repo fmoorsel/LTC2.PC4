@@ -360,6 +360,8 @@ export class MapHelper {
 
     private _timelapseCallback: ((count: number | null, date: string | null) => void) | undefined;
 
+    private _routeAreaClickedCallback: ((placeId: string, placeName: string) => void) | undefined;
+
     constructor (
         placeholder: HTMLElement | undefined, 
         popupPlaceHolder: HTMLElement | undefined,
@@ -399,6 +401,22 @@ export class MapHelper {
         this._yearLayer = this.initYearLayer();
         this._lastRidePlacesLayer = this.initLastRidePlacesLayer();
         this._lastRideLineLayer = this.initLastRideLineLayer();
+    }
+
+    public setRouteAreaClickedCallback(callback: (placeId: string, placeName: string) => void) {
+        this._routeAreaClickedCallback = callback;
+    }
+
+    public zoomToCenter(centerPoint: number[]) {
+        const center = fromLonLat([centerPoint[0], centerPoint[1]]);
+        this._map.getView().setCenter(center);
+        this._map.getView().setZoom(this.getInitialZoom() + 4);
+    }
+
+    public showPopupAtCenter(name: string, centerPoint: number[]) {
+        const center = fromLonLat([centerPoint[0], centerPoint[1]]);
+        this._place.value = name;
+        this._overlay.setPosition(center);
     }
 
     public getStyleHelper(): MapStyleHelper{
@@ -1145,23 +1163,33 @@ export class MapHelper {
 
         const place = this._place;
 
-        map.on('singleclick', function (event) {
+        map.on('singleclick', (event) => {
             if (map.hasFeatureAtPixel(event.pixel) === true) {
                 const coordinate = event.coordinate;
 
                 const features = map.getFeaturesAtPixel(event.pixel);
 
                 if (features && features.length > 0) {
-                    
-                    const feature = features[0];
-                    const placeName = feature.getProperties()["popupContent"] as string
 
-                    if (placeName){
-                        
+                    const feature = features[0];
+                    const featurePointer = feature.getProperties()["featurePointer"] as string;
+                    const id = featurePointer?.split(":")[0];
+                    const placeName = feature.getProperties()["popupContent"] as string;
+
+                    if (placeName) {
+                        if (this._showRoute && this._currentRoutes && id && this._routeAreaClickedCallback) {
+                            const routePlaces = this.getPlaces(this._currentRoutes);
+                            if (routePlaces.some(p => p === id)) {
+                                this._routeAreaClickedCallback(id, placeName);
+                                overlay.setPosition(undefined);
+                                return;
+                            }
+                        }
+
                         place.value = placeName;
 
                         overlay.setPosition(coordinate);
-                        
+
                         return;
                     }
                 }

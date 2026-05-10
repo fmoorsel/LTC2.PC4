@@ -53,5 +53,12 @@
     "selectroutemodal.text.noRoutesInRwGps": "Geen routes in Ride with Gps gevonden!",
     "selectroutemodal.text.loadingStravaRoutesText": "Je routes worden geladen....",
     "selectroutemodal.text.loadingStravaRouteText": "Route wordt geladen en gecheckt....",
-    "selectroutemodal.text.noplaces": "Geen postcode gebieden gevonden in deze route!"
+    "selectroutemodal.text.noplaces": "Geen postcode gebieden gevonden in deze route!",
+    "areadetailmodal.header": "Gecheckte route gebied",
+    "areadetailmodal.header.newalltime": "{0} wordt toegevoegd aan je resultaat",
+    "areadetailmodal.header.newyear": "{0} wordt toegevoegd aan je jaar-resultaat",
+    "areadetailmodal.header.existing": "{0} al onderdeel van je (jaar-)resultaat",
+    "areadetailmodal.panel.alltime.label": "Worden toegevoegd aan je resultaat:",
+    "areadetailmodal.panel.year.label": "Worden toegevoegd aan je jaar-resultaat:",
+    "areadetailmodal.button.close": "Sluiten"
 }
