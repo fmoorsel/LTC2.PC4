@@ -2,6 +2,7 @@
 {
     public static class ScriptProvider
     {
+
         public static string GetStravaRouteBuilderScript()
         {
             var script = @"
@@ -11,30 +12,33 @@ function Init() {
     window.checkedPlaces = ['noplaces'];
     window.checkedNewPlaces = ['nonewplaces'];
 
-    var elements = document.getElementsByClassName('mapboxgl-map');
-    if (elements[0] == null) {
+    var stravaMap = window.strava.maps.getMap();
+    if (stravaMap == null) {
         console.log('mapbox element not found');
     } else {
-        var element = elements[0];
-        Object.entries(element).find(([k, _]) => k.startsWith('__react'))[1].return.memoizedProps.mapboxRef((x) => (window.routeMap = x, x));
+        window.routeMap = stravaMap;
 
-        if (window.routeMap != null) {
+        if (window.routeMap != null) {            
             console.log('route map found');
-
             console.log('try adding vector layer');
 
-            window.routeMap.on('style.load', () => {
-                console.log('changed layer style re-add layer to: ' + window.routeMap.getStyle().sprite);
+            const style = new URLSearchParams(window.location.search).get('style');
+            console.log('current map style: ' + style);
 
-                AddTileLayer();
+            window.currentStyle = style;
 
-                setVisibility();
-            });
+            const origReplace = history.replaceState.bind(history);
+            history.replaceState = function(...args) {
+                const result = origReplace(...args);
 
+                AdaptToStyle();
+
+                return result;
+            };
+            
             window.routeMap.on('idle', () => {
-                EnsureLayerOrder();        
+                AdaptToStyle();        
             });
-
 
             AddTileLayer();
 
@@ -58,21 +62,73 @@ function Init() {
                 }
             });
 
-            return '1';
-        }
+            AddCanvasListener();
 
-        console.log('route map is null try again');
+            return '1';
+
+        } else {
+            console.log('route map is null try again');              
+        }
     }
 
     return '0';
 }
 
-function EnsureLayerOrder() {
-    const layers = window.routeMap.getStyle().layers;
+function AdaptToStyle() {
+    const style = new URLSearchParams(window.location.search).get('style');
+    console.log('current map style: ' + style);
 
-    if (layers && layers.map(l => l.id).includes('fltc2tiles') && layers.map(l => l.id).includes('z-index-1'))
-    {    
-        window.routeMap.moveLayer('fltc2tiles', 'z-index-1');
+    if (window.currentStyle !== style) {
+        console.log('changed layer style detected, re-adding layer to: ' + style);
+        
+        window.routeMap.removeLayer('ltc2tiles');
+        window.routeMap.removeLayer('fltc2tiles');
+        window.routeMap.removeSource('ltc2tiles');
+
+        AddTileLayer();
+
+        setVisibility();
+
+        window.currentStyle = style;
+
+    }
+}
+
+function AddCanvasListener() {
+    const stravaCanvas = document.getElementById('canvas');    
+
+    if (stravaCanvas) {
+        stravaCanvas.addEventListener('mousemove', (e) => {
+            const map = window.routeMap;
+
+            if (map) {
+                const rect = stravaCanvas.getBoundingClientRect();
+                const point = [e.clientX - rect.left, e.clientY - rect.top];
+                
+                const features = map.queryRenderedFeatures(point, { layers: ['fltc2tiles'] });
+
+                if (features.length > 0) {
+                    console.log(features[0].properties.popupContent);
+                    console.log(features[0].properties.featurePointer);
+
+                    if (window.chrome && window.chrome.webview) {
+                        console.log(""posting message to webview"");
+                        
+                        const id = features[0].properties.featurePointer.split(':')[0];                  
+
+                        const isChecked = GetVisitedAlltime().includes(id);
+                        const isCheckedYear = GetVisitedYear().includes(id);
+
+                        console.log('isChecked: ' + isChecked);
+                        console.log('isCheckedYear: ' + isCheckedYear);
+
+                        chrome.webview.postMessage(features[0].properties.popupContent + ',' + features[0].properties.featurePointer);
+                    }
+                } else {
+                    chrome.webview.postMessage(""----,----"");
+                }
+            }
+      });
     }
 }
 
@@ -113,7 +169,9 @@ function setVisibility() {
     }
 }
 
+
 function AddTileLayer() {
+    console.log('in adding vector layer');
     if (window.routeMap != null) {
         console.log('adding vector layer');
         window.routeMap.addSource('ltc2tiles', {
@@ -150,31 +208,7 @@ function AddTileLayer() {
                 'line-width': 2
             },
             slot: 'middle'
-        });
-
-
-        window.routeMap.on('mousemove', 'fltc2tiles', (event) => {
-            console.log('mouse move on tile layer');
-
-            if (event.features.length > 0) {
-                console.log(event.features[0].properties.popupContent);
-                console.log(event.features[0].properties.featurePointer);
-
-                if (window.chrome && window.chrome.webview) {
-                    console.log(""posting message to webview"");
-                    
-                    const id = event.features[0].properties.featurePointer.split(':')[0];                  
-
-                    const isChecked = GetVisitedAlltime().includes(id);
-                    const isCheckedYear = GetVisitedYear().includes(id);
-
-                    console.log('isChecked: ' + isChecked);
-                    console.log('isCheckedYear: ' + isCheckedYear);
-
-                    chrome.webview.postMessage(event.features[0].properties.popupContent + ',' + event.features[0].properties.featurePointer);
-                }
-            }
-        });
+        });    
 
         const checkExprOpacity = window.createCheckExprOpacity();        
         const checkExprColor = window.createCheckExprColor();
@@ -182,91 +216,88 @@ function AddTileLayer() {
         window.routeMap.setPaintProperty('fltc2tiles', 'fill-opacity', checkExprOpacity);
         window.routeMap.setPaintProperty('fltc2tiles', 'fill-color', checkExprColor);
 
-        window.routeMap.on('mousemove', (e) => {
-            const features = window.routeMap.queryRenderedFeatures(e.point, {
-                layers: ['fltc2tiles']
-            });
-
-            if (features.length <= 0) {
-                if (window.chrome && window.chrome.webview) {
-                    chrome.webview.postMessage(""----,----"");
-                }
-            }
-        });
     } else {
         console.log('route map is null cannot add tile layer');
     }
 }
 
 function GetColor() {
-    const stryle = window.routeMap.getStyle().sprite;
+    const style = new URLSearchParams(window.location.search).get('style');
 
-    if (stryle.includes('satellite')) {
+    if (style.includes('satellite')) {
         return 'rgb(255,165,0)';
-    } else if (stryle.includes('hybrid')) {
+    } else if (style.includes('hybrid')) {
         return 'rgb(255,165,0)';
-    } else if (stryle.includes('dark-standard')) {
+    } else if (style.includes('dark')) {
         return 'rgb(255,165,0)';
-    } else if (stryle.includes('winter')) {
+    } else if (style.includes('dark-standard')) {
+        return 'rgb(255,165,0)';
+    } else if (style.includes('winter')) {
         return 'rgb(0,0,0)';
-    } else if (stryle.includes('light')) {
+    } else if (style.includes('light')) {
         return 'rgb(0,0,0)';
-    } else if (stryle.includes('standard')) {
+    } else if (style.includes('standard')) {
+        return 'rgb(0,0,0)';
+    } else {
         return 'rgb(0,0,0)';
     }
 }
 
 function GetFillColor() {
-    const stryle = window.routeMap.getStyle().sprite;
+    const style = new URLSearchParams(window.location.search).get('style');
 
-    if (stryle.includes('satellite')) {
+    if (style.includes('satellite')) {
         return 'rgb(255,165,0)';
-    } else if (stryle.includes('hybrid')) {
+    } else if (style.includes('hybrid')) {
         return 'rgb(255,165,0)';
-    } else if (stryle.includes('dark-standard')) {
+    } else if (style.includes('dark-standard')) {
         return 'rgb(255,165,0)';
-    } else if (stryle.includes('winter')) {
+    } else if (style.includes('dark')) {
         return 'rgb(255,165,0)';
-    } else if (stryle.includes('light')) {
+    } else if (style.includes('winter')) {
         return 'rgb(255,165,0)';
-    } else if (stryle.includes('standard')) {
+    } else if (style.includes('light')) {
+        return 'rgb(255,165,0)';
+    } else if (style.includes('standard')) {
+        return 'rgb(255,165,0)';
+    } else {
         return 'rgb(255,165,0)';
     }
 }
 
 function GetFillColorOnTrack() {
-    const stryle = window.routeMap.getStyle().sprite;
+    const style = new URLSearchParams(window.location.search).get('style');
 
-    if (stryle.includes('satellite')) {
+    if (style.includes('satellite')) {
         return 'rgb(0, 0, 255)';
-    } else if (stryle.includes('hybrid')) {
+    } else if (style.includes('hybrid')) {
         return 'rgb(0, 0, 255)';
-    } else if (stryle.includes('dark-standard')) {
+    } else if (style.includes('dark-standard')) {
         return 'rgb(0, 0, 255)';
-    } else if (stryle.includes('winter')) {
+    } else if (style.includes('winter')) {
         return 'rgb(0, 100, 0)';
-    } else if (stryle.includes('light')) {
+    } else if (style.includes('light')) {
         return 'rgb(0, 100, 0)';
-    } else if (stryle.includes('standard')) {
+    } else if (style.includes('standard')) {
         return 'rgb(0, 100, 0)';
     }
 }
 
 
 function GetFillColorOnTrackNew() {
-    const stryle = window.routeMap.getStyle().sprite;
+    const style = new URLSearchParams(window.location.search).get('style');
 
-    if (stryle.includes('satellite')) {
+    if (style.includes('satellite')) {
         return 'rgb(0, 255, 255)';
-    } else if (stryle.includes('hybrid')) {
+    } else if (style.includes('hybrid')) {
         return 'rgb(0, 255, 255)';
-    } else if (stryle.includes('dark-standard')) {
+    } else if (style.includes('dark-standard')) {
         return 'rgb(0, 255, 255)';
-    } else if (stryle.includes('winter')) {
+    } else if (style.includes('winter')) {
         return 'rgb(0, 255, 0)';
-    } else if (stryle.includes('light')) {
+    } else if (style.includes('light')) {
         return 'rgb(0, 255, 0)';
-    } else if (stryle.includes('standard')) {
+    } else if (style.includes('standard')) {
         return 'rgb(0, 255, 0)';
     }
 }
@@ -307,7 +338,12 @@ function GetVisitedYear() {
     return filteredYear;
 }
 
-Init();
+try {
+    Init();
+} catch (error) {
+    console.error(error);
+}
+
             ";
 
             return script;
@@ -785,31 +821,13 @@ function GetLines() {
 
     let lineCoordinates = [];
 
-    const layers = window.routeMap.getStyle().layers.filter(function (layer) {
-        return layer.id.match(/^route-.*-polyline/);
-    });
+    const route = window.strava.maps.getCurrentRoute();
 
-    let coordinateSources = new Set();
-
-    layers.forEach(layer => {
-        if (!coordinateSources.has(layer.source)) {
-            coordinateSources.add(layer.source);
-        }
-    });
-
-
-    coordinateSources.forEach(source => {
-        const sourceData = window.routeMap.getSource(source)._data;
-
-        if (sourceData.features) {
-            sourceData.features.forEach(feature => {
-                if (feature.geometry.type == 'LineString') {
-                    lineCoordinates.push(feature.geometry.coordinates);
-                }
-            });
-        }
-    });
-
+    if (route.features) {
+        route.features.forEach(feature => {
+            lineCoordinates.push(feature.geometry.coordinates);
+        });
+    }
 
     console.log('Retrieved line coordinates:', JSON.stringify(lineCoordinates));
 
@@ -819,7 +837,11 @@ function GetLines() {
 
 console.log('>>> Retrieving line coordinates');
 
-GetLines();
+try {
+    GetLines();
+} catch (error) {
+    console.error(error);
+}
             ";
 
             return script;
