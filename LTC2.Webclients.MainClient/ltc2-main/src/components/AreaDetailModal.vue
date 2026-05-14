@@ -22,7 +22,7 @@
 
             <p class="pl-2" style="margin-top: 16px;">{{ alltimePanelLabel }}</p>
 
-            <div class="p-2 overflow-y-scroll overflow-x-clip" style="height: 113px;">
+            <div class="p-2 overflow-y-scroll overflow-x-clip" style="height: 110px;">
               <p v-for="(names, lineIndex) in alltimeLines" :key="lineIndex" style="padding: 0px; margin: 0px;">
                 <template v-for="(name, nameIndex) in names" :key="name">
                   <a href="#" @click.prevent="onAreaClick(name)" class="text-blue-600 hover:underline">{{ name }}</a><span v-if="nameIndex < names.length - 1">, </span>
@@ -34,7 +34,7 @@
 
             <p class="pl-2" style="margin-top: 16px;">{{ yearPanelLabel }}</p>
 
-            <div class="p-2 overflow-y-scroll overflow-x-clip" style="height: 113px;">
+            <div class="p-2 overflow-y-scroll overflow-x-clip" style="height: 110px;">
               <p v-for="(names, lineIndex) in yearLines" :key="lineIndex" style="padding: 0px; margin: 0px;">
                 <template v-for="(name, nameIndex) in names" :key="name">
                   <a href="#" @click.prevent="onAreaClick(name)" class="text-blue-600 hover:underline">{{ name }}</a><span v-if="nameIndex < names.length - 1">, </span>
