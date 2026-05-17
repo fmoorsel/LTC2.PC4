@@ -42,12 +42,32 @@ function Init() {
 
             AddTileLayer();
 
+            let _pendingResizeSync = false;
+
             const stravaCanvas = document.getElementById('canvas');
-            if (stravaCanvas && stravaCanvas.parentElement) {
+            if (stravaCanvas) {
                 new ResizeObserver(() => {
-                    console.log('canvas resized, resizing map');
-                    window.routeMap.resize();
-                }).observe(stravaCanvas.parentElement);
+                    if (window.routeMap) window.routeMap.resize();
+                    _pendingResizeSync = true;
+                }).observe(stravaCanvas);
+            }
+
+            const wasmRef = findWasmRef();
+            if (wasmRef && typeof wasmRef.addViewUpdateListener === 'function') {
+                wasmRef.addViewUpdateListener({
+                    onViewUpdated: () => {
+                        if (!_pendingResizeSync || !window.routeMap) return;
+                        _pendingResizeSync = false;
+                        try {
+                            const scale = wasmRef.getCamera().getScaleMetersPerPixel();
+                            const lat = window.routeMap.getCenter().lat;
+                            const zoom = Math.log2(2 * Math.PI * 6378137 * Math.cos(lat * Math.PI / 180) / (512 * scale));
+                            if (Math.abs(zoom - window.routeMap.getZoom()) > 0.005) {
+                                window.routeMap.setZoom(zoom);
+                            }
+                        } catch(e) {}
+                    }
+                });
             }
 
             window.layervisible = true;
@@ -87,6 +107,24 @@ function Init() {
     }
 
     return '0';
+}
+
+function findWasmRef() {
+    try {
+        const coreMap = document.querySelector('[class*=""CoreMap_mapContainer""]');
+        if (!coreMap) return null;
+        const rk = Object.keys(coreMap).find(k => k.startsWith('__reactFiber$'));
+        if (!rk) return null;
+        let fiber = coreMap[rk];
+        for (let i = 0; i < 3; i++) fiber = fiber?.child;
+        let state = fiber?.memoizedState;
+        while (state) {
+            const ref = state.queue?.lastRenderedState;
+            if (ref?._djinni_native_ref) return ref;
+            state = state.next;
+        }
+    } catch(e) {}
+    return null;
 }
 
 function AdaptToStyle() {
