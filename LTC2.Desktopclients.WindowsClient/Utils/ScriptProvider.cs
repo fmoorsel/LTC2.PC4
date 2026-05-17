@@ -147,11 +147,10 @@ function AdaptToStyle() {
             window.ltc2DrawRoute();
         }
 
-        setVisibility();
-
         window.currentStyle = style;
-
     }
+
+    setVisibility();
 }
 
 function AddCanvasListener() {
@@ -287,13 +286,15 @@ window.createCheckExprColor = function() {
 
 function setVisibility() {
     if (window.routeMap != null) {
-        const visibilty = window.layervisible ? 'visible' : 'none';
+        const is3d = new URLSearchParams(window.location.search).get('3d') === 'true';
+        const effectiveVisible = window.layervisible && !is3d;
+        const visibilty = effectiveVisible ? 'visible' : 'none';
 
         window.routeMap.setLayoutProperty('ltc2tiles', 'visibility', visibilty);
         window.routeMap.setLayoutProperty('fltc2tiles', 'visibility', visibilty);
 
         if (window.routeMap.getLayer('ltc2-route-line')) {
-            const routeVisibility = (window.layervisible && window.ltc2RouteVisible) ? 'visible' : 'none';
+            const routeVisibility = (effectiveVisible && window.ltc2RouteVisible) ? 'visible' : 'none';
             window.routeMap.setLayoutProperty('ltc2-route-line', 'visibility', routeVisibility);
         }
     }
