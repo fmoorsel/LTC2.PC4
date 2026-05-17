@@ -42,8 +42,17 @@ function Init() {
 
             AddTileLayer();
 
-            window.layervisible = true;           
-            
+            const stravaCanvas = document.getElementById('canvas');
+            if (stravaCanvas && stravaCanvas.parentElement) {
+                new ResizeObserver(() => {
+                    console.log('canvas resized, resizing map');
+                    window.routeMap.resize();
+                }).observe(stravaCanvas.parentElement);
+            }
+
+            window.layervisible = true;
+            window.ltc2RouteVisible = false;
+
             window.addEventListener('message', (event) => {
                 console.log('message!');
 
@@ -64,6 +73,12 @@ function Init() {
 
             AddCanvasListener();
 
+            window.addEventListener('strava:route:change', () => {
+                if (window.ltc2RouteVisible) {
+                    window.ltc2DrawRoute();
+                }
+            });
+
             return '1';
 
         } else {
@@ -80,12 +95,19 @@ function AdaptToStyle() {
 
     if (window.currentStyle !== style) {
         console.log('changed layer style detected, re-adding layer to: ' + style);
-        
+
+        const hadRoute = window.ltc2RouteVisible;
+        window.ltc2ClearRoute();
+
         window.routeMap.removeLayer('ltc2tiles');
         window.routeMap.removeLayer('fltc2tiles');
         window.routeMap.removeSource('ltc2tiles');
 
         AddTileLayer();
+
+        if (hadRoute) {
+            window.ltc2DrawRoute();
+        }
 
         setVisibility();
 
@@ -132,12 +154,77 @@ function AddCanvasListener() {
     }
 }
 
+window.ltc2DrawRoute = function() {
+    try {
+        const route = window.strava.maps.getCurrentRoute();
+        if (!route || !route.features || route.features.length === 0) {
+            return '0';
+        }
+
+        const features = route.features.map(f => ({
+            type: 'Feature',
+            geometry: f.geometry,
+            properties: {}
+        }));
+
+        if (window.routeMap.getLayer('ltc2-route-line')) {
+            window.routeMap.removeLayer('ltc2-route-line');
+        }
+        if (window.routeMap.getSource('ltc2-route')) {
+            window.routeMap.removeSource('ltc2-route');
+        }
+
+        window.routeMap.addSource('ltc2-route', {
+            type: 'geojson',
+            data: { type: 'FeatureCollection', features: features }
+        });
+
+        window.routeMap.addLayer({
+            id: 'ltc2-route-line',
+            type: 'line',
+            source: 'ltc2-route',
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+                'visibility': window.layervisible ? 'visible' : 'none'
+            },
+            paint: {
+                'line-color': 'rgb(250, 80, 0)',
+                'line-width': 2,
+                'line-opacity': 1.0
+            }
+        });
+
+        window.ltc2RouteVisible = true;
+        return '1';
+    } catch(e) {
+        console.error('ltc2DrawRoute error:', e);
+        return '0';
+    }
+};
+
+window.ltc2ClearRoute = function() {
+    try {
+        if (window.routeMap) {
+            if (window.routeMap.getLayer('ltc2-route-line')) {
+                window.routeMap.removeLayer('ltc2-route-line');
+            }
+            if (window.routeMap.getSource('ltc2-route')) {
+                window.routeMap.removeSource('ltc2-route');
+            }
+        }
+        window.ltc2RouteVisible = false;
+    } catch(e) {
+        console.error('ltc2ClearRoute error:', e);
+    }
+};
+
 window.createCheckExprOpacity = function() {
     var expr = [
         'match',
             ['slice', ['get', 'featurePointer'], 0, ['index-of', ':', ['get', 'featurePointer']]],
-            GetVisitedAlltime(), 0.25, 
-            GetVisitedYear(), 0.45, 
+            GetVisitedAlltime(), 0.25,
+            GetVisitedYear(), 0.45,
             GetCheckedPlaces(), 0.45,
             GetCheckedNewPlaces(), 0.45,
             0.0
@@ -150,22 +237,27 @@ window.createCheckExprColor = function() {
     var expr = [
         'match',
             ['slice', ['get', 'featurePointer'], 0, ['index-of', ':', ['get', 'featurePointer']]],
-            GetVisitedAlltime(), GetFillColor(), 
+            GetVisitedAlltime(), GetFillColor(),
             GetVisitedYear(), GetFillColor(),
             GetCheckedPlaces(), GetFillColorOnTrack(),
             GetCheckedNewPlaces(), GetFillColorOnTrackNew(),
-            GetFillColor()              
+            GetFillColor()
     ];
-        
+
     return expr;
 }
 
 function setVisibility() {
     if (window.routeMap != null) {
         const visibilty = window.layervisible ? 'visible' : 'none';
-        
+
         window.routeMap.setLayoutProperty('ltc2tiles', 'visibility', visibilty);
         window.routeMap.setLayoutProperty('fltc2tiles', 'visibility', visibilty);
+
+        if (window.routeMap.getLayer('ltc2-route-line')) {
+            const routeVisibility = (window.layervisible && window.ltc2RouteVisible) ? 'visible' : 'none';
+            window.routeMap.setLayoutProperty('ltc2-route-line', 'visibility', routeVisibility);
+        }
     }
 }
 
@@ -930,6 +1022,16 @@ GetLines();
             ";
 
             return script;
+        }
+
+        public static string GetStravaDrawRouteScript()
+        {
+            return "window.ltc2DrawRoute()";
+        }
+
+        public static string GetStravaClearRouteScript()
+        {
+            return "window.ltc2ClearRoute()";
         }
 
         public static string GetRwGpsTrackUpdateScript(List<string> places)

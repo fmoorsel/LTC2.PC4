@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using LTC2.Desktopclients.WindowsClient.Models;
 using LTC2.Desktopclients.WindowsClient.Services;
 using LTC2.Desktopclients.WindowsClient.Utils;
@@ -8,6 +7,7 @@ using LTC2.Shared.Models.Requests;
 using LTC2.Shared.Models.Responses;
 using Microsoft.Web.WebView2.Core;
 using Newtonsoft.Json;
+using System.Text.RegularExpressions;
 
 namespace LTC2.Desktopclients.WindowsClient.Forms
 {
@@ -204,7 +204,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             e.Cancel = true;
         }
 
-        private void RoutePlanner_Resize(object sender, EventArgs e)
+        private async void RoutePlanner_Resize(object sender, EventArgs e)
         {
             if (WindowState != FormWindowState.Minimized)
             {
@@ -518,6 +518,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                     }
 
                     await webView.ExecuteScriptAsync(updateScript);
+                    await webView.ExecuteScriptAsync(ScriptProvider.GetStravaDrawRouteScript());
                 }
                 catch
                 {
@@ -533,6 +534,7 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
                     var updateScript = ScriptProvider.GetStravaTrackUpdateScript([]);
 
                     await webView.ExecuteScriptAsync(updateScript);
+                    await webView.ExecuteScriptAsync(ScriptProvider.GetStravaClearRouteScript());
                 }
                 catch
                 {
@@ -550,6 +552,11 @@ namespace LTC2.Desktopclients.WindowsClient.Forms
             try
             {
                 await webView.ExecuteScriptAsync(updateScript);
+
+                if (_multiSportsManager.RunWithSource != "ridewithgps")
+                {
+                    await webView.ExecuteScriptAsync(ScriptProvider.GetStravaClearRouteScript());
+                }
             }
             catch
             {
