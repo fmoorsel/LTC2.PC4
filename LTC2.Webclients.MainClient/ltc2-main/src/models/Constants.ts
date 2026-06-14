@@ -1,2 +1,2 @@
 export const emptyString = "";
-export const defaultRequestTimeout = 5000;
+export const defaultRequestTimeout = 30000;
