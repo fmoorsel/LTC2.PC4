@@ -385,7 +385,14 @@ namespace LTC2.Shared.SpatiaLiteRepository.Repositories
                 return result;
             }
 
-            return GetStreamFromCache(athleteId, activityId, true);
+            result = GetStreamFromCache(athleteId, activityId, true);
+
+            if (result.Count > 1)
+            {
+                return result;
+            }
+
+            return GetTripFromCache(activityId);
         }
 
         private List<List<double>> GetStreamFromCache(long athleteId, string activityId, bool archiveCache)
@@ -424,6 +431,39 @@ namespace LTC2.Shared.SpatiaLiteRepository.Repositories
             }
 
             return new List<List<double>>();
+        }
+
+        private List<List<double>> GetTripFromCache(string activityId)
+        {
+            var cacheFolder = Path.Combine(_genericSettings.CacheFolder, "Trips");
+            var fileName = Path.Combine(cacheFolder, $"r{activityId}");
+
+            if (File.Exists(fileName))
+            {
+                try
+                {
+                    var json = File.ReadAllText(fileName);
+                    var cachedResult = JsonConvert.DeserializeObject<RwGpsTripCache>(json);
+
+                    if (cachedResult?.Coordinates != null)
+                    {
+                        var result = cachedResult.Coordinates.Select(coord => new List<double> { coord[1], coord[0] }).ToList();
+
+                        return result;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, $"Unable to read trip {activityId} in {fileName} from RwGPS cache due to {ex.Message}");
+                }
+            }
+
+            return new List<List<double>>();
+        }
+
+        private class RwGpsTripCache
+        {
+            public List<List<double>> Coordinates { get; set; }
         }
 
         public async Task<List<Track>> GetAlltimeTracksForAllPlaces(long athleteId, bool multi)
