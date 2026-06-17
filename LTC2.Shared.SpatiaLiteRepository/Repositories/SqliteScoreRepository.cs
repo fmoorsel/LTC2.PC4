@@ -548,6 +548,7 @@ namespace LTC2.Shared.SpatiaLiteRepository.Repositories
                         }
 
                         var queryResultLastRide = await GetRecordsAsync<DtoLastRideScore>(connection, _querySelectCurrentLastRideScores, new RowMappers.DtoLastRideScoreRowMapper(), parameters);
+                        var firstDone = false;
 
                         foreach (var visitDto in queryResultLastRide)
                         {
@@ -567,7 +568,8 @@ namespace LTC2.Shared.SpatiaLiteRepository.Repositories
 
                                 if (visitDto.lastExternalId != null)
                                 {
-                                    var detailedTrack = TryGetDetailedTrack(athleteId, visitDto.lastExternalId);
+
+                                    var detailedTrack = !firstDone ? TryGetDetailedTrack(athleteId, visitDto.lastExternalId) : result.VisitedPlacesLastRide.Values.First().Track;
 
                                     if (detailedTrack.Count > 1)
                                     {
@@ -584,6 +586,7 @@ namespace LTC2.Shared.SpatiaLiteRepository.Repositories
                                 }
 
                                 result.VisitedPlacesLastRide.Add(visit.PlaceId, visit);
+                                firstDone = true;
                             }
 
                         }
