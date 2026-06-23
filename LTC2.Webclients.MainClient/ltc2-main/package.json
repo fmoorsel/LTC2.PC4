@@ -10,30 +10,30 @@
   "dependencies": {
     "@types/geojson": "^7946.0.16",
     "@types/ol": "^6.5.3",
-    "autoprefixer": "^10.4.24",
-    "axios": "^1.8.4",
+    "autoprefixer": "^10.5.0",
+    "axios": "^1.18.1",
     "flowbite": "^1.8.1",
     "inversify": "^6.2.2",
     "jwt-decode": "^4.0.0",
-    "ol": "^10.7.0",
-    "postcss": "^8.5.6",
+    "ol": "^10.9.0",
+    "postcss": "^8.5.15",
     "reflect-metadata": "^0.2.2",
     "tailwindcss": "^3.4.19",
-    "vue": "^3.5.27",
+    "vue": "^3.5.38",
     "vue-plugin-load-script": "^2.1.1",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "@swc/core": "^1.10.0",
-    "@typescript-eslint/eslint-plugin": "^8.0.0",
-    "@typescript-eslint/parser": "^8.0.0",
+    "@swc/core": "^1.15.43",
+    "@typescript-eslint/eslint-plugin": "^8.62.0",
+    "@typescript-eslint/parser": "^8.62.0",
     "@vitejs/plugin-vue": "^5.0.0",
-    "@vue/eslint-config-typescript": "^14.0.0",
-    "eslint": "^9.27.0",
-    "eslint-plugin-vue": "^9.31.0",
-    "sass": "^1.97.3",
+    "@vue/eslint-config-typescript": "^14.9.0",
+    "eslint": "^9.39.4",
+    "eslint-plugin-vue": "^9.33.0",
+    "sass": "^1.101.0",
     "typescript": "~4.9.5",
     "unplugin-swc": "^1.5.0",
-    "vite": "^6.0.0"
+    "vite": "^6.4.3"
   }
 }
