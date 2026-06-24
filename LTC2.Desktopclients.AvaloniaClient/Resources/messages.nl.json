@@ -59,5 +59,11 @@
 
   "checkbox.start.multisport": "Start in MultiSport modus",
   "button.select.multisport": "Kies MultiSport sporten",
-  "title.select.multisport.window": "Selecteer je MultiSport sporten"
+  "title.select.multisport.window": "Selecteer je MultiSport sporten",
+
+  "title.selectprofile.window": "Kies een profiel",
+  "button.selectprofile.select": "Selecteer Profiel...",
+  "button.selectprofile.profilemanager": "Profiel Manager..."
+
+
 }
