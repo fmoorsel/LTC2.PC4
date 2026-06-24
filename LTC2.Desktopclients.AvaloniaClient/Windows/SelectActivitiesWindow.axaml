@@ -1,0 +1,34 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="LTC2.Desktopclients.AvaloniaClient.Windows.SelectActivitiesWindow"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Width="500"
+        Height="600"
+        Background="LightGray">
+
+    <StackPanel Orientation="Vertical" Margin="20">
+
+        <Border HorizontalAlignment="Center" Width="460" Margin="0,0,0,15" Theme="{StaticResource CardBorder}">
+            <StackPanel Margin="15">
+                <TextBlock x:Name="LblSelectActivities" FontWeight="Bold" Margin="0,0,0,10">Select sport types</TextBlock>
+                <ListBox x:Name="LstActivities" Height="450" SelectionMode="Multiple,Toggle">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding IsSelected}" Content="{Binding Description}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+        </Border>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="15">
+            <Button x:Name="BtnApply" Width="150" Height="40" Classes="Tertiary" Theme="{StaticResource SolidButton}" Click="ClickHandlerApply" />
+            <Button x:Name="BtnCancel" Width="150" Height="40" Classes="Tertiary" Theme="{StaticResource SolidButton}" Click="ClickHandlerCancel" />
+        </StackPanel>
+
+    </StackPanel>
+
+</Window>

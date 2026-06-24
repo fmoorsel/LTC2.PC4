@@ -25,5 +25,6 @@
     <Project Path="LTC2.DesktopCLients.ArchiveImporter/LTC2.DesktopClients.ArchiveImporter.csproj" />
     <Project Path="LTC2.Desktopclients.ProfileManager/LTC2.Desktopclients.ProfileManager.csproj" />
     <Project Path="LTC2.Desktopclients.WindowsClient/LTC2.Desktopclients.WindowsClient.csproj" />
+    <Project Path="LTC2.Desktopclients.AvaloniaClient/LTC2.Desktopclients.AvaloniaClient.csproj" />
   </Folder>
 </Solution>

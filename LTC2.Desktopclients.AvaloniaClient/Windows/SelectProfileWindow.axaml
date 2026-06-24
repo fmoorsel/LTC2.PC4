@@ -1,0 +1,70 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="LTC2.Desktopclients.AvaloniaClient.Windows.SelectProfileWindow"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen"
+        Width="760"
+        Height="470"
+        Background="LightGray">
+
+    <StackPanel>
+        <Border Background="LightGray" Margin="25" Width="700" Height="120" Padding="0" Theme="{StaticResource CardBorder}">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="500"></ColumnDefinition>
+                    <ColumnDefinition Width="175"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="200"></RowDefinition>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Column="0" Grid.Row="0" >
+                    <StackPanel Margin="30, 30, 0 , 0">
+                        <TextBlock Name="LblLine1"></TextBlock>
+                        <TextBlock Name="LblLine2" Margin="0, 20, 0, 0"></TextBlock>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Grid.Row="0">
+                    <Button Name="BtnProfileManager" Click="ClickHandlerProfileManager" Width="160" Height="35" Margin="0,40,0,5" Theme="{StaticResource SolidButton}" Classes="Tertiary"></Button>
+                </StackPanel>
+
+            </Grid>
+
+        </Border>
+
+        <Border  Margin="20,10" Width="700" Height="260" Background="LightGray" Padding="0" Theme="{StaticResource CardBorder}">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="500"></ColumnDefinition>
+                    <ColumnDefinition Width="175"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="220"></RowDefinition>
+                </Grid.RowDefinitions>
+
+                <StackPanel HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0">
+                    <ListBox Name="LstProfiles" Background="WhiteSmoke" Margin="30,30,0,0" Height="200" Width="440" >
+                        <ListBox.Styles>
+                            <Style Selector="ListBoxItem:selected">
+                                <Setter Property="Background" Value="SteelBlue"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Style>
+                        </ListBox.Styles>
+                    </ListBox>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Top">
+                    <Button Name="BtnSelectProfile" Click="ClickHandlerSelectProfile" Width="160" Height="40" IsEnabled="False"  Margin="0,30,0,5" Theme="{StaticResource SolidButton}" Classes="Tertiary"></Button>
+                </StackPanel>
+            </Grid>
+
+        </Border>
+
+    </StackPanel>
+
+</Window>
