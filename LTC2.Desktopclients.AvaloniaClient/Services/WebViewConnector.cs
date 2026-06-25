@@ -1,9 +1,9 @@
+using Avalonia.Controls;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Avalonia.Controls;
 
 namespace LTC2.Desktopclients.AvaloniaClient.Services
 {
@@ -55,17 +55,6 @@ namespace LTC2.Desktopclients.AvaloniaClient.Services
             var jwtSecurityToken = handler.ReadJwtToken(token);
 
             return jwtSecurityToken.Claims.FirstOrDefault(c => c.Type == "StravaAthleteId")?.Value;
-        }
-
-        public void DeleteCookies(string domain)
-        {
-            WebView?.InvokeScript(
-                "document.cookie.split(';').forEach(c => { document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/'); });");
-        }
-
-        public void DeleteStravaCookies()
-        {
-            DeleteCookies("strava.com");
         }
 
         public void FireOnFileEvent(string fileName)

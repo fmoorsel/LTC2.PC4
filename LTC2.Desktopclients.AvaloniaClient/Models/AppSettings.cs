@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace LTC2.Desktopclients.AvaloniaClient.Models
 {
@@ -69,6 +70,8 @@ namespace LTC2.Desktopclients.AvaloniaClient.Models
             get => _multiSportFolder == null ? null : Environment.ExpandEnvironmentVariables(_multiSportFolder);
             set => _multiSportFolder = value;
         }
+
+        public List<string> SkipCookiesWhileDeleting { get; set; }
 
         public string StravaRouteBuilderEntryPoint { get; set; }
         public string StravaRouteBuilderRegex { get; set; }

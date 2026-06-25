@@ -1,19 +1,21 @@
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using AvaloniaProgressRing;
-using LTC2.Desktopclients.AvaloniaClient.Services;
 using LTC2.Desktopclients.AvaloniaClient.Models;
+using LTC2.Desktopclients.AvaloniaClient.Services;
 using LTC2.Shared.BaseMessages.Interfaces;
 using LTC2.Shared.Models.Interprocess;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LTC2.Desktopclients.AvaloniaClient.Windows
 {
@@ -90,6 +92,7 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
 
             if (_webView != null)
             {
+                _webView.EnvironmentRequested += OnEnvironmentRequested;
                 _webView.NavigationStarted += OnBeforeNavigate;
                 _webView.NavigationCompleted += OnNavigated;
                 _webView.WebMessageReceived += OnWebMessage;
@@ -109,15 +112,30 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             _timer.Tick += OnTimer;
         }
 
+
+        private void OnEnvironmentRequested(object sender, WebViewEnvironmentRequestedEventArgs args)
+        {
+            if (args is WindowsWebView2EnvironmentRequestedEventArgs webView2)
+            {
+                if (!Directory.Exists(_appSettings.WebviewRoot))
+                {
+                    Directory.CreateDirectory(_appSettings.WebviewRoot);
+                }
+
+                webView2.EnableDevTools = true;
+                webView2.UserDataFolder = _appSettings.WebviewRoot;
+            }
+        }
+
         protected override void OnOpened(EventArgs e)
         {
             base.OnOpened(e);
             _statusNotifier.OnStatusNotification += OnStatusNotification;
         }
 
-        private void OnAdapterCreated(object sender, EventArgs e)
+        private async void OnAdapterCreated(object sender, EventArgs e)
         {
-            Dispatcher.UIThread.Post(() =>
+            try
             {
                 if (!_isLoaded)
                 {
@@ -127,14 +145,66 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
 
                     if (_profileManager.HasMultipleProfiles)
                     {
-                        _webViewConnector.DeleteStravaCookies();
+                        await DeleteCookies();
                     }
 
                     var prefix = _multiSportManager.RunInMultiSportMode ? "MultiSport - " : string.Empty;
                     Title = prefix + Title;
                 }
-            });
+            }
+            catch (Exception)
+            {
+                // ignore, we don't want to crash the app if something goes wrong here
+            }
         }
+
+
+        private async Task DeleteCookies()
+        {
+            var cookieManager = _webView.TryGetCookieManager();
+
+            if (cookieManager == null)
+            {
+                return;
+            }
+
+            try
+            {
+                var cookies = await cookieManager.GetCookiesAsync();
+                var stravaCookies = cookies.Where(c => c.Domain.Contains("www.strava.com"));
+
+                foreach (var cookie in stravaCookies)
+                {
+                    var cookieName = cookie.Name;
+
+                    if (_appSettings.SkipCookiesWhileDeleting != null && _appSettings.SkipCookiesWhileDeleting.Contains(cookieName))
+                    {
+                        continue;
+                    }
+
+                    cookieManager.DeleteCookie(cookie.Name, cookie.Domain, cookie.Path);
+                }
+
+                var rwgpsCookies = cookies.Where(c => c.Domain.Contains("ridewithgps.com"));
+
+                foreach (var cookie in rwgpsCookies)
+                {
+                    var cookieName = cookie.Name;
+
+                    if (_appSettings.SkipCookiesWhileDeleting != null && _appSettings.SkipCookiesWhileDeleting.Contains(cookieName))
+                    {
+                        continue;
+                    }
+
+                    cookieManager.DeleteCookie(cookie.Name, cookie.Domain, cookie.Path);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting cookies: {ex.Message}");
+            }
+        }
+
 
         private async void OnWebMessage(object sender, WebMessageReceivedEventArgs args)
         {
