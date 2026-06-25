@@ -1,7 +1,3 @@
-using System;
-using System.IO.Pipes;
-using System.Threading;
-using System.Threading.Tasks;
 using LTC2.Desktopclients.AvaloniaClient.Models;
 using LTC2.Desktopclients.AvaloniaClient.Services;
 using LTC2.Shared.Models.Interprocess;
@@ -9,6 +5,10 @@ using LTC2.Shared.Utils.Bootstrap.Interfaces;
 using LTC2.Shared.Utils.Utils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System;
+using System.IO.Pipes;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace LTC2.Desktopclients.AvaloniaClient.ServiceTasks
 {
@@ -76,7 +76,10 @@ namespace LTC2.Desktopclients.AvaloniaClient.ServiceTasks
                             var messageContent = stream.ReadString();
                             var statusMessage = JsonConvert.DeserializeObject<StatusMessage>(messageContent);
 
-                            _statusNotifier.Notify(statusMessage);
+                            if (statusMessage != null)
+                            {
+                                _statusNotifier.Notify(statusMessage);
+                            }
 
                             proceed = !cancellationToken.IsCancellationRequested;
                         }
@@ -84,8 +87,10 @@ namespace LTC2.Desktopclients.AvaloniaClient.ServiceTasks
                         {
                             proceed = false;
                         }
-                        catch (Exception)
+                        catch (Exception e)
                         {
+                            _logger.LogError(e, "Pipe error ({Type})", GetType().Name);
+
                             var statusMessage = new StatusMessage()
                             {
                                 Status = StatusMessage.STATUS_FATAL,

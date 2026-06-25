@@ -1,12 +1,12 @@
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
 using LTC2.Desktopclients.AvaloniaClient.Models;
 using LTC2.Desktopclients.AvaloniaClient.Services;
 using LTC2.Shared.BaseMessages.Interfaces;
 using LTC2.Shared.Models.Interprocess;
 using LTC2.Shared.Utils.Bootstrap.Interfaces;
+using LTC2.Shared.Utils.Utils;
+using System.Diagnostics;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace LTC2.Desktopclients.AvaloniaClient.ServiceTasks
 {
@@ -38,14 +38,24 @@ namespace LTC2.Desktopclients.AvaloniaClient.ServiceTasks
                 var workingDirectory = Path.GetDirectoryName(_appSettings.WebApp);
 
                 var startInfo = new ProcessStartInfo();
+
                 startInfo.WorkingDirectory = workingDirectory;
                 startInfo.FileName = _appSettings.WebApp;
                 startInfo.CreateNoWindow = _appSettings.WebAppNoWindow;
 
-                var prof = _profileManager.Profile;
-                startInfo.Arguments = $"{_appSettings.WebAppParameters} ppid:{Process.GetCurrentProcess().Id} prof:{prof.ID}";
+                if (!_appSettings.WebAppNoWindow)
+                {
+                    startInfo.WindowStyle = _appSettings.WebAppWindowMinimized ? ProcessWindowStyle.Minimized : ProcessWindowStyle.Normal;
+                }
 
-                Process.Start(startInfo);
+                if (_appSettings.WebAppParameters != null)
+                {
+                    startInfo.Arguments = $"{_appSettings.WebAppParameters} prof:{_profileManager.Profile.ID}";
+                }
+
+                var process = Process.Start(startInfo);
+
+                ChildProcessTracker.AddProcess(process);
             }
 
             return Task.CompletedTask;

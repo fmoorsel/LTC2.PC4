@@ -100,14 +100,18 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             TryTranslate(_txtBtnUpdate, "button.browser.update");
             TryTranslate(this, "title.browser.window");
 
-            _statusNotifier.OnStatusNotification += OnStatusNotification;
-
             _timer = new DispatcherTimer()
             {
                 Interval = TimeSpan.FromSeconds(1)
             };
 
             _timer.Tick += OnTimer;
+        }
+
+        protected override void OnOpened(EventArgs e)
+        {
+            base.OnOpened(e);
+            _statusNotifier.OnStatusNotification += OnStatusNotification;
         }
 
         private async void OnWebMessage(object sender, WebMessageReceivedEventArgs args)
@@ -274,11 +278,6 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             if (_isClosing)
             {
                 return;
-            }
-
-            if (!_timer.IsEnabled)
-            {
-                _timer.Start();
             }
 
             var component = GetComponentNiceName(status.Origin);
