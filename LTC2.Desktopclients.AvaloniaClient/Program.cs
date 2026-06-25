@@ -31,7 +31,7 @@ public static class Program
     public static IHost ApplicationHost { get; private set; }
 
     [STAThread]
-    public static async Task Main(string[] args)
+    public static void Main(string[] args)
     {
         try
         {
@@ -41,8 +41,8 @@ public static class Program
 
             var worker = ApplicationHost.Services.GetRequiredService<Worker>();
 
-            await worker.Execute();
-            await worker.Stop();
+            worker.Execute().GetAwaiter().GetResult();
+            worker.Stop().GetAwaiter().GetResult();
         }
         catch (Exception e)
         {

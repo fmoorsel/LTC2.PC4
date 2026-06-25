@@ -93,6 +93,7 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
                 _webView.NavigationStarted += OnBeforeNavigate;
                 _webView.NavigationCompleted += OnNavigated;
                 _webView.WebMessageReceived += OnWebMessage;
+                _webView.AdapterCreated += OnAdapterCreated;
 
                 _webViewConnector.WebView = _webView;
             }
@@ -112,6 +113,27 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
         {
             base.OnOpened(e);
             _statusNotifier.OnStatusNotification += OnStatusNotification;
+        }
+
+        private void OnAdapterCreated(object sender, EventArgs e)
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (!_isLoaded)
+                {
+                    _isLoaded = true;
+
+                    _webView.Source = new Uri(GetUrl());
+
+                    if (_profileManager.HasMultipleProfiles)
+                    {
+                        _webViewConnector.DeleteStravaCookies();
+                    }
+
+                    var prefix = _multiSportManager.RunInMultiSportMode ? "MultiSport - " : string.Empty;
+                    Title = prefix + Title;
+                }
+            });
         }
 
         private async void OnWebMessage(object sender, WebMessageReceivedEventArgs args)
@@ -140,21 +162,6 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             if (!_timer.IsEnabled)
             {
                 _timer.Start();
-            }
-
-            if (!_isLoaded)
-            {
-                _webView.Source = new Uri(GetUrl());
-
-                if (_profileManager.HasMultipleProfiles)
-                {
-                    _webViewConnector.DeleteStravaCookies();
-                }
-
-                var prefix = _multiSportManager.RunInMultiSportMode ? "MultiSport - " : string.Empty;
-                Title = prefix + Title;
-
-                _isLoaded = true;
             }
         }
 

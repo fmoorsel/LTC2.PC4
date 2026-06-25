@@ -1,11 +1,10 @@
-using System;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using LTC2.Desktopclients.AvaloniaClient.Services;
 using LTC2.Shared.BaseMessages.Interfaces;
 using LTC2.Shared.Models.Interprocess;
-using MsBox.Avalonia.Enums;
+using System;
 
 namespace LTC2.Desktopclients.AvaloniaClient.Windows
 {
