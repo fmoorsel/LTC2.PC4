@@ -1,7 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform;
-using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using AvaloniaProgressRing;
 using LTC2.Desktopclients.AvaloniaClient.Models;
@@ -95,7 +94,6 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
                 _webView.EnvironmentRequested += OnEnvironmentRequested;
                 _webView.NavigationStarted += OnBeforeNavigate;
                 _webView.NavigationCompleted += OnNavigated;
-                _webView.WebMessageReceived += OnWebMessage;
                 _webView.AdapterCreated += OnAdapterCreated;
 
                 _webViewConnector.WebView = _webView;
@@ -205,27 +203,6 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             }
         }
 
-
-        private async void OnWebMessage(object sender, WebMessageReceivedEventArgs args)
-        {
-            var message = args.Body;
-
-            if (message == "selectFile")
-            {
-                var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
-                {
-                    AllowMultiple = false
-                });
-
-                if (files != null && files.Count > 0)
-                {
-                    var file = files[0];
-                    var fileName = file.Path.LocalPath;
-
-                    _webViewConnector.FireOnFileEvent(fileName);
-                }
-            }
-        }
 
         private void OnActivated(object sender, EventArgs e)
         {

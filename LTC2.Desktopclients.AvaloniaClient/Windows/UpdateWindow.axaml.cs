@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -7,22 +5,42 @@ using LTC2.Desktopclients.AvaloniaClient.Interfaces;
 using LTC2.Desktopclients.AvaloniaClient.Services;
 using LTC2.Shared.BaseMessages.Interfaces;
 using LTC2.Shared.Http.Interfaces;
+using LTC2.Shared.Models.Interprocess;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LTC2.Desktopclients.AvaloniaClient.Windows
 {
     public partial class UpdateWindow : Window
     {
-        private RadioButton _rdNormal;
-        private RadioButton _rdFull;
+        private bool _isClosing;
+        private bool _isCalculating;
+        private bool _isLoaded;
+        private bool _intermediatesChecked;
+        private DateTime _startUpdate;
+
+        private TextBlock _lblLabelStatusUpdate;
+        private TextBlock _lblStatusUpdate;
+        private TextBlock _lblLabelProgressUpdate;
+        private TextBlock _lblProgressUpdate;
+
+        private RadioButton _rdoNormal;
+        private RadioButton _rdoFull;
         private CheckBox _chkReload;
         private Button _btnStartUpdate;
         private Button _btnSelectMultiSports;
+        private Border _bdrBottum;
 
         private readonly ILTC2HttpProxy _ltc2HttpProxy;
         private readonly WebViewConnector _webViewConnector;
         private readonly MultiSportManager _multiSportManager;
         private readonly IBaseTranslationService _translationService;
         private readonly ISelectActivitiesWindowFactory _selectActivitiesWindowFactory;
+        private readonly StatusNotifier _statusNotifier;
 
         public UpdateWindow()
         {
@@ -33,35 +51,54 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             WebViewConnector webViewConnector,
             MultiSportManager multiSportManager,
             IBaseTranslationService translationService,
-            ISelectActivitiesWindowFactory selectActivitiesWindowFactory) : this()
+            ISelectActivitiesWindowFactory selectActivitiesWindowFactory,
+            StatusNotifier statusNotifier) : this()
         {
             _ltc2HttpProxy = ltc2HttpProxy;
             _webViewConnector = webViewConnector;
             _multiSportManager = multiSportManager;
             _translationService = translationService;
             _selectActivitiesWindowFactory = selectActivitiesWindowFactory;
+            _statusNotifier = statusNotifier;
 
             InitializeComponent();
+
+            this.Closing += OnClose;
+            this.Activated += OnActivated;
+
             InitControls();
+
+            _statusNotifier.OnStatusNotification += OnStatusNotification;
         }
 
         private void InitControls()
         {
-            _rdNormal = this.FindControl<RadioButton>("RdNormal");
-            _rdFull = this.FindControl<RadioButton>("RdFull");
+            _lblLabelStatusUpdate = this.FindControl<TextBlock>("LblLabelStatusUpdate");
+            _lblStatusUpdate = this.FindControl<TextBlock>("LblStatusUpdate");
+            _lblLabelProgressUpdate = this.FindControl<TextBlock>("LblLabelProgressUpdate");
+            _lblProgressUpdate = this.FindControl<TextBlock>("LblProgressUpdate");
+            _rdoNormal = this.FindControl<RadioButton>("RdoNormal");
+            _rdoFull = this.FindControl<RadioButton>("RdoFull");
             _chkReload = this.FindControl<CheckBox>("ChkReload");
             _btnStartUpdate = this.FindControl<Button>("BtnStartUpdate");
             _btnSelectMultiSports = this.FindControl<Button>("BtnSelectMultiSports");
+            _bdrBottum = this.FindControl<Border>("BdrBottum");
 
+            DoTranslate();
+        }
+
+        private void DoTranslate()
+        {
             TryTranslate(this, "title.update.window");
-            TryTranslate(_rdNormal, "radiobutton.update.normal");
-            TryTranslate(_rdFull, "radiobutton.update.full");
-            TryTranslate(_chkReload, "checkbox.update.reload");
-            TryTranslate(_btnStartUpdate, "button.update.start");
-            TryTranslate(_btnSelectMultiSports, "button.update.selectmultisports");
-
-            var lblUpdateType = this.FindControl<TextBlock>("LblUpdateType");
-            TryTranslate(lblUpdateType, "label.update.type");
+            TryTranslate(_lblLabelStatusUpdate, "label.running.update");
+            TryTranslate(_lblLabelProgressUpdate, "label.progress.update");
+            TryTranslate(_lblStatusUpdate, "label.no.update");
+            TryTranslate(_lblProgressUpdate, "---");
+            TryTranslate(_btnStartUpdate, "button.start.update");
+            TryTranslate(_rdoFull, "radio.calc.all.update");
+            TryTranslate(_rdoNormal, "radio.normal.update");
+            TryTranslate(_chkReload, "checkbox.renew.details");
+            TryTranslate(_btnSelectMultiSports, "button.select.multisport");
         }
 
         private void TryTranslate(Control control, string key)
@@ -75,45 +112,185 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             else if (control is Window window) window.Title = message;
         }
 
-        public new void Show(Window owner)
+        private async void OnActivated(object sender, EventArgs e)
         {
-            AdaptFormToMultiSport();
-            ShowDialog(owner);
+            _isClosing = false;
+
+            if (!_isLoaded)
+            {
+                if (_multiSportManager.RunInMultiSportMode)
+                {
+                    DoTranslate();
+
+                    _multiSportManager.AthleteId = _webViewConnector.GetAthleteIdFromToken();
+
+                    _bdrBottum.Height += 35;
+                    Height += 35;
+
+                    _btnSelectMultiSports.IsVisible = true;
+                }
+
+                _isLoaded = true;
+            }
+
+            ShowUpdating();
+
+            await IntermediateCheck();
         }
 
-        private void AdaptFormToMultiSport()
+        private void OnClose(object sender, WindowClosingEventArgs args)
         {
-            if (_multiSportManager.RunInMultiSportMode)
+            if (!_isClosing)
             {
-                _btnSelectMultiSports.IsVisible = true;
+                args.Cancel = true;
+                _isClosing = true;
+
+                Dispatcher.UIThread.Post(SignalStopping);
             }
         }
 
-        private async Task<bool> IntermediateCheck(string token)
+        private void SignalStopping()
         {
-            var hasIntermediate = await _ltc2HttpProxy.HasIntermediateResult(token, _multiSportManager.RunInMultiSportMode);
+            _isClosing = false;
+            Hide();
+        }
 
-            if (hasIntermediate)
+        private void ShowUpdating(bool limitReached = false, string statusMessage = null)
+        {
+            _rdoFull.IsEnabled = !_isCalculating;
+            _rdoNormal.IsEnabled = !_isCalculating;
+            _chkReload.IsEnabled = !_isCalculating && (_rdoFull?.IsChecked ?? false);
+            _btnStartUpdate.IsEnabled = !_isCalculating;
+            _btnSelectMultiSports.IsEnabled = !_isCalculating;
+
+            if (_isCalculating)
             {
-                _rdNormal.IsChecked = true;
-                _rdFull.IsEnabled = false;
+                var startUpdate = $"{_startUpdate}";
+                _lblStatusUpdate.Text = _translationService.GetMessage("label.running.update.status", startUpdate);
+            }
+            else if (limitReached)
+            {
+                _lblStatusUpdate.Text = _translationService.GetMessage("label.running.update.limit");
+                _lblProgressUpdate.Text = _translationService.GetMessage("label.limit.update");
+            }
+            else
+            {
+                _lblStatusUpdate.Text = _translationService.GetMessage("label.no.update");
+                _lblProgressUpdate.Text = "---";
+            }
+        }
+
+        private void OnStatusNotification(object sender, OnStatusMessageEventArguments e)
+        {
+            Dispatcher.UIThread.Post(() => UpdateStatus(e.Status));
+        }
+
+        private void UpdateStatus(StatusMessage status)
+        {
+            if (status.Status == StatusMessage.STATUS_CHECK)
+            {
+                var msgParts = status.Message.Split(' ');
+                var msg = _translationService.GetMessage("label.progress.check.1", msgParts[0]);
+
+                if (msgParts.Length >= 2)
+                {
+                    msg = _translationService.GetMessage("label.progress.check.2", msgParts.ToList());
+                }
+
+                _lblProgressUpdate.Text = msg;
+            }
+            else if (status.Status == StatusMessage.STATUS_RESULT)
+            {
+                _isCalculating = false;
+                ShowUpdating();
+            }
+            else if (status.Status == StatusMessage.STATUS_LIMIT)
+            {
+                _isCalculating = false;
+                ShowUpdating(true, status.Message);
+            }
+            else if (status.Status == StatusMessage.STATUS_WAIT)
+            {
+                _lblProgressUpdate.Text = _translationService.GetMessage("label.limit.update.quarter", status.Message);
+            }
+        }
+
+        private async Task IntermediateCheck()
+        {
+            if (_isCalculating || _intermediatesChecked)
+            {
+                return;
             }
 
-            return hasIntermediate;
+            _intermediatesChecked = true;
+
+            var token = await _webViewConnector.Login();
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return;
+            }
+
+            var hasIntermediateResult = await _ltc2HttpProxy.HasIntermediateResult(token, _multiSportManager.RunInMultiSportMode);
+
+            if (hasIntermediateResult)
+            {
+                var text = _translationService.GetMessage("messagebox.intermediate.found");
+                var caption = _translationService.GetMessage("messagebox.intermediate.found.header");
+                var box = MessageBoxManager.GetMessageBoxStandard(caption, text, ButtonEnum.YesNo);
+
+                var answer = await box.ShowWindowDialogAsync(this);
+
+                if (answer == ButtonResult.Yes)
+                {
+                    _rdoFull.IsEnabled = false;
+                    _rdoNormal.IsEnabled = false;
+                    _chkReload.IsEnabled = false;
+                    _btnStartUpdate.IsEnabled = false;
+                    _btnSelectMultiSports.IsEnabled = false;
+
+                    var textPr = _translationService.GetMessage("messagebox.intermediate.process");
+                    var captionPr = _translationService.GetMessage("messagebox.intermediate.process.header");
+                    var boxPr = MessageBoxManager.GetMessageBoxStandard(captionPr, textPr, ButtonEnum.Ok);
+
+                    if (_multiSportManager.RunInMultiSportMode)
+                    {
+                        await _ltc2HttpProxy.UpdateMulti(token, new List<int>(), new List<string>(), false, false, true, false, _multiSportManager.RunWithSource);
+                    }
+                    else
+                    {
+                        await _ltc2HttpProxy.Update(token, false, false, true, false, _multiSportManager.RunWithSource);
+                    }
+
+                    await boxPr.ShowWindowDialogAsync(this);
+                }
+                else
+                {
+                    if (_multiSportManager.RunInMultiSportMode)
+                    {
+                        await _ltc2HttpProxy.UpdateMulti(token, new List<int>(), new List<string>(), false, false, false, true, _multiSportManager.RunWithSource);
+                    }
+                    else
+                    {
+                        await _ltc2HttpProxy.Update(token, false, false, false, true, _multiSportManager.RunWithSource);
+                    }
+                }
+            }
         }
 
         public async void ClickHandlerStartUpdate(object sender, RoutedEventArgs e)
         {
-            _btnStartUpdate.IsEnabled = false;
-
             var token = await _webViewConnector.Login();
 
             if (token != null)
             {
-                await IntermediateCheck(token);
+                var refresh = _rdoFull?.IsChecked ?? false;
+                var bypassCache = false;
 
-                var refresh = _rdNormal.IsChecked == true;
-                var reload = _chkReload.IsChecked == true;
+                if (refresh)
+                {
+                    bypassCache = _chkReload?.IsChecked ?? false;
+                }
 
                 if (_multiSportManager.RunInMultiSportMode)
                 {
@@ -124,48 +301,53 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
                             new List<int>(),
                             _multiSportManager.CurrentRwGpsActivityTypes,
                             refresh,
+                            bypassCache,
                             false,
                             false,
-                            reload,
                             _multiSportManager.RunWithSource);
                     }
                     else
                     {
-                        var types = new List<int>();
-
-                        foreach (var type in _multiSportManager.CurrentActivityTypes)
-                        {
-                            types.Add((int)type);
-                        }
+                        var types = _multiSportManager.CurrentActivityTypes.Select(x => (int)x).ToList();
 
                         await _ltc2HttpProxy.UpdateMulti(
                             token,
                             types,
                             new List<string>(),
                             refresh,
+                            bypassCache,
                             false,
                             false,
-                            reload,
                             _multiSportManager.RunWithSource);
                     }
                 }
                 else
                 {
-                    await _ltc2HttpProxy.Update(token, refresh, false, false, reload, _multiSportManager.RunWithSource);
+                    await _ltc2HttpProxy.Update(token, refresh, bypassCache, false, false, _multiSportManager.RunWithSource);
                 }
-            }
 
-            Dispatcher.UIThread.Post(() =>
-            {
-                _btnStartUpdate.IsEnabled = true;
-                Close();
-            });
+                _isCalculating = true;
+                _startUpdate = DateTime.Now;
+
+                ShowUpdating();
+            }
         }
 
         public async void ClickHandlerSelectMultiSports(object sender, RoutedEventArgs e)
         {
             var selectActivitiesWindow = _selectActivitiesWindowFactory.Create();
             await selectActivitiesWindow.ShowDialog(this);
+        }
+
+        public void ClickHandlerRdoNormal(object sender, RoutedEventArgs e)
+        {
+            _chkReload.IsEnabled = false;
+            _chkReload.IsChecked = false;
+        }
+
+        public void ClickHandlerRdoFull(object sender, RoutedEventArgs e)
+        {
+            _chkReload.IsEnabled = true;
         }
     }
 }

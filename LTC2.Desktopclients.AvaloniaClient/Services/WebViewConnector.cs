@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace LTC2.Desktopclients.AvaloniaClient.Services
@@ -23,12 +22,17 @@ namespace LTC2.Desktopclients.AvaloniaClient.Services
         {
             if (_token == null && WebView != null)
             {
-                var result = await WebView.InvokeScript("getToken();");
+                var cookieManager = WebView.TryGetCookieManager();
 
-                if (result != null && result.Length > 2 && result.StartsWith('"') && result.EndsWith('"'))
+                if (cookieManager != null)
                 {
-                    var unescaped = Regex.Unescape(result);
-                    _token = unescaped.Substring(1, unescaped.Length - 2);
+                    var cookies = await cookieManager.GetCookiesAsync();
+                    var tokenCookie = cookies.FirstOrDefault(c => c.Name == "token");
+
+                    if (tokenCookie != null)
+                    {
+                        _token = tokenCookie.Value;
+                    }
                 }
             }
 

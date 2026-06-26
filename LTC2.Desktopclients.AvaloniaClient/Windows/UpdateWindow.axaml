@@ -7,24 +7,33 @@
         Height="440"
         Background="LightGray">
 
-    <StackPanel Orientation="Vertical" Margin="20">
-
-        <Border HorizontalAlignment="Center" Width="800" Margin="0,0,0,15" Theme="{StaticResource CardBorder}">
-            <StackPanel Orientation="Vertical" Margin="15">
-                <TextBlock x:Name="LblUpdateType" FontWeight="Bold" Margin="0,0,0,10">Update type</TextBlock>
-                <RadioButton x:Name="RdNormal" GroupName="UpdateType" IsChecked="True" Margin="0,0,0,5" />
-                <RadioButton x:Name="RdFull" GroupName="UpdateType" Margin="0,0,0,5" />
-                <CheckBox x:Name="ChkReload" Margin="0,10,0,0" />
-            </StackPanel>
+    <StackPanel>
+        <Border HorizontalAlignment="Center" Background="LightGray" Margin="20" Width="810" Height="100" Theme="{StaticResource CardBorder}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="500"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="35"/>
+                </Grid.RowDefinitions>
+                <TextBlock x:Name="LblLabelStatusUpdate" Grid.Row="0" Grid.Column="0"/>
+                <TextBlock x:Name="LblStatusUpdate" Grid.Row="0" Grid.Column="1"/>
+                <TextBlock x:Name="LblLabelProgressUpdate" Grid.Row="1" Grid.Column="0"/>
+                <TextBlock x:Name="LblProgressUpdate" Grid.Row="1" Grid.Column="1"/>
+            </Grid>
         </Border>
 
-        <Border HorizontalAlignment="Center" Width="800" Margin="0,0,0,15" Theme="{StaticResource CardBorder}">
-            <StackPanel Orientation="Horizontal" Margin="15">
-                <Button x:Name="BtnSelectMultiSports" Width="200" Height="40" IsVisible="False" Classes="Tertiary" Theme="{StaticResource SolidButton}" Click="ClickHandlerSelectMultiSports" Margin="0,0,15,0" />
-                <Button x:Name="BtnStartUpdate" Width="200" Height="40" Classes="Tertiary" Theme="{StaticResource SolidButton}" Click="ClickHandlerStartUpdate" />
+        <Border HorizontalAlignment="Center" x:Name="BdrBottum" Margin="20,10" Width="810" Height="260" Background="LightGray" Theme="{StaticResource CardBorder}">
+            <StackPanel Orientation="Vertical">
+                <RadioButton x:Name="RdoNormal" GroupName="UpdateGroup" Margin="10,5,0,0" IsChecked="True" Click="ClickHandlerRdoNormal"/>
+                <RadioButton x:Name="RdoFull" GroupName="UpdateGroup" Margin="10,5,0,0" Click="ClickHandlerRdoFull"/>
+                <CheckBox x:Name="ChkReload" IsEnabled="False" Margin="50,5,0,0"/>
+                <Button x:Name="BtnStartUpdate" Margin="0,30,0,0" Width="700" Height="80" IsEnabled="True" Theme="{StaticResource SolidButton}" Classes="Tertiary" Click="ClickHandlerStartUpdate"/>
+                <Button x:Name="BtnSelectMultiSports" IsVisible="False" Margin="0,20,0,0" Width="280" Height="40" IsEnabled="True" Theme="{StaticResource SolidButton}" Classes="Tertiary" Click="ClickHandlerSelectMultiSports"/>
             </StackPanel>
         </Border>
-
     </StackPanel>
 
 </Window>
