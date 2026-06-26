@@ -151,5 +151,19 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             }
         }
 
+#if WINDOWS
+        [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern int GetWindowLong(IntPtr hwnd, int nIndex);
+        [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern int SetWindowLong(IntPtr hwnd, int nIndex, int value);
+        private const int GWL_STYLE = -16;
+        private const int WS_MINIMIZEBOX = 0x00020000;
+
+        protected override void OnOpened(EventArgs e)
+        {
+            base.OnOpened(e);
+            var hwnd = TryGetPlatformHandle()?.Handle;
+            if (hwnd.HasValue)
+                SetWindowLong(hwnd.Value, GWL_STYLE, GetWindowLong(hwnd.Value, GWL_STYLE) & ~WS_MINIMIZEBOX);
+        }
+#endif
     }
 }

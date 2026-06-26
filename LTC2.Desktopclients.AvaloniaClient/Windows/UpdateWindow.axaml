@@ -25,7 +25,7 @@
             </Grid>
         </Border>
 
-        <Border HorizontalAlignment="Center" x:Name="BdrBottum" Margin="20,10" Width="810" Height="260" Background="LightGray" Theme="{StaticResource CardBorder}">
+        <Border HorizontalAlignment="Center" x:Name="BdrBottom" Margin="20,10" Width="810" Height="260" Background="LightGray" Theme="{StaticResource CardBorder}">
             <StackPanel Orientation="Vertical">
                 <RadioButton x:Name="RdoNormal" GroupName="UpdateGroup" Margin="10,5,0,0" IsChecked="True" Click="ClickHandlerRdoNormal"/>
                 <RadioButton x:Name="RdoFull" GroupName="UpdateGroup" Margin="10,5,0,0" Click="ClickHandlerRdoFull"/>

@@ -3,32 +3,35 @@
         x:Class="LTC2.Desktopclients.AvaloniaClient.Windows.SelectActivitiesWindow"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
-        Width="500"
-        Height="600"
+        Width="560"
+        Height="400"
         Background="LightGray">
 
-    <StackPanel Orientation="Vertical" Margin="20">
+    <StackPanel>
+        <Border Background="LightGray" Margin="25" Width="500" Height="245" Padding="0" Theme="{StaticResource CardBorder}">
+            <ListBox x:Name="LstActivities" Background="WhiteSmoke" Height="195" Width="440" SelectionMode="Multiple,Toggle">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Panel HorizontalAlignment="Stretch">
+                            <CheckBox IsChecked="{Binding IsSelected}" Content="{Binding Description}" />
+                        </Panel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
 
-        <Border HorizontalAlignment="Center" Width="460" Margin="0,0,0,15" Theme="{StaticResource CardBorder}">
-            <StackPanel Margin="15">
-                <TextBlock x:Name="LblSelectActivities" FontWeight="Bold" Margin="0,0,0,10">Select sport types</TextBlock>
-                <ListBox x:Name="LstActivities" Height="450" SelectionMode="Multiple,Toggle">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding IsSelected}" Content="{Binding Description}" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </StackPanel>
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem:selected">
+                        <Setter Property="Background" Value="WhiteSmoke"/>
+                    </Style>
+                </ListBox.Styles>
+            </ListBox>
         </Border>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="15">
-            <Button x:Name="BtnApply" Width="150" Height="40" Classes="Tertiary" Theme="{StaticResource SolidButton}" Click="ClickHandlerApply" />
-            <Button x:Name="BtnCancel" Width="150" Height="40" Classes="Tertiary" Theme="{StaticResource SolidButton}" Click="ClickHandlerCancel" />
-        </StackPanel>
-
+        <Border Background="LightGray" Margin="3" Width="500" Height="75" Padding="0" Theme="{StaticResource CardBorder}">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Button x:Name="BtnApply" Click="ClickHandlerApply" Width="160" Height="40" Margin="0,0,20,0" Theme="{StaticResource SolidButton}" Classes="Tertiary" />
+                <Button x:Name="BtnCancel" Click="ClickHandlerCancel" Width="160" Height="40" Margin="20,0,0,0" Theme="{StaticResource SolidButton}" Classes="Tertiary" />
+            </StackPanel>
+        </Border>
     </StackPanel>
 
 </Window>

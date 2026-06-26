@@ -33,7 +33,7 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
         private CheckBox _chkReload;
         private Button _btnStartUpdate;
         private Button _btnSelectMultiSports;
-        private Border _bdrBottum;
+        private Border _bdrBottom;
 
         private readonly ILTC2HttpProxy _ltc2HttpProxy;
         private readonly WebViewConnector _webViewConnector;
@@ -82,7 +82,7 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             _chkReload = this.FindControl<CheckBox>("ChkReload");
             _btnStartUpdate = this.FindControl<Button>("BtnStartUpdate");
             _btnSelectMultiSports = this.FindControl<Button>("BtnSelectMultiSports");
-            _bdrBottum = this.FindControl<Border>("BdrBottum");
+            _bdrBottom = this.FindControl<Border>("BdrBottom");
 
             DoTranslate();
         }
@@ -105,37 +105,57 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
         {
             var message = _translationService.GetMessage(key);
 
-            if (control is TextBlock textBlock) textBlock.Text = message;
-            else if (control is Button button) button.Content = message;
-            else if (control is RadioButton rb) rb.Content = message;
-            else if (control is CheckBox cb) cb.Content = message;
-            else if (control is Window window) window.Title = message;
+            switch (control)
+            {
+                case TextBlock textBlock:
+                    textBlock.Text = message;
+                    break;
+                case RadioButton rb:
+                    rb.Content = message;
+                    break;
+                case CheckBox cb:
+                    cb.Content = message;
+                    break;
+                case Button button:
+                    button.Content = message;
+                    break;
+                case Window window:
+                    window.Title = message;
+                    break;
+            }
         }
 
         private async void OnActivated(object sender, EventArgs e)
         {
-            _isClosing = false;
-
-            if (!_isLoaded)
+            try
             {
-                if (_multiSportManager.RunInMultiSportMode)
+                _isClosing = false;
+
+                if (!_isLoaded)
                 {
-                    DoTranslate();
+                    if (_multiSportManager.RunInMultiSportMode)
+                    {
+                        DoTranslate();
 
-                    _multiSportManager.AthleteId = _webViewConnector.GetAthleteIdFromToken();
+                        _multiSportManager.AthleteId = await _webViewConnector.GetAthleteIdFromTokenAsync();
 
-                    _bdrBottum.Height += 35;
-                    Height += 35;
+                        _bdrBottom.Height += 35;
+                        Height += 35;
 
-                    _btnSelectMultiSports.IsVisible = true;
+                        _btnSelectMultiSports.IsVisible = true;
+                    }
+
+                    _isLoaded = true;
                 }
 
-                _isLoaded = true;
+                ShowUpdating();
+
+                await IntermediateCheck();
             }
-
-            ShowUpdating();
-
-            await IntermediateCheck();
+            catch (Exception)
+            {
+                // ignore, catch exception to avoid crash
+            }
         }
 
         private void OnClose(object sender, WindowClosingEventArgs args)
@@ -280,63 +300,77 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
 
         public async void ClickHandlerStartUpdate(object sender, RoutedEventArgs e)
         {
-            var token = await _webViewConnector.Login();
-
-            if (token != null)
+            try
             {
-                var refresh = _rdoFull?.IsChecked ?? false;
-                var bypassCache = false;
+                var token = await _webViewConnector.Login();
 
-                if (refresh)
+                if (token != null)
                 {
-                    bypassCache = _chkReload?.IsChecked ?? false;
-                }
+                    var refresh = _rdoFull?.IsChecked ?? false;
+                    var bypassCache = false;
 
-                if (_multiSportManager.RunInMultiSportMode)
-                {
-                    if (_multiSportManager.RunWithSource == "ridewithgps")
+                    if (refresh)
                     {
-                        await _ltc2HttpProxy.UpdateMulti(
-                            token,
-                            new List<int>(),
-                            _multiSportManager.CurrentRwGpsActivityTypes,
-                            refresh,
-                            bypassCache,
-                            false,
-                            false,
-                            _multiSportManager.RunWithSource);
+                        bypassCache = _chkReload?.IsChecked ?? false;
+                    }
+
+                    if (_multiSportManager.RunInMultiSportMode)
+                    {
+                        if (_multiSportManager.RunWithSource == "ridewithgps")
+                        {
+                            await _ltc2HttpProxy.UpdateMulti(
+                                token,
+                                new List<int>(),
+                                _multiSportManager.CurrentRwGpsActivityTypes,
+                                refresh,
+                                bypassCache,
+                                false,
+                                false,
+                                _multiSportManager.RunWithSource);
+                        }
+                        else
+                        {
+                            var types = _multiSportManager.CurrentActivityTypes.Select(x => (int)x).ToList();
+
+                            await _ltc2HttpProxy.UpdateMulti(
+                                token,
+                                types,
+                                new List<string>(),
+                                refresh,
+                                bypassCache,
+                                false,
+                                false,
+                                _multiSportManager.RunWithSource);
+                        }
                     }
                     else
                     {
-                        var types = _multiSportManager.CurrentActivityTypes.Select(x => (int)x).ToList();
-
-                        await _ltc2HttpProxy.UpdateMulti(
-                            token,
-                            types,
-                            new List<string>(),
-                            refresh,
-                            bypassCache,
-                            false,
-                            false,
-                            _multiSportManager.RunWithSource);
+                        await _ltc2HttpProxy.Update(token, refresh, bypassCache, false, false, _multiSportManager.RunWithSource);
                     }
-                }
-                else
-                {
-                    await _ltc2HttpProxy.Update(token, refresh, bypassCache, false, false, _multiSportManager.RunWithSource);
-                }
 
-                _isCalculating = true;
-                _startUpdate = DateTime.Now;
+                    _isCalculating = true;
+                    _startUpdate = DateTime.Now;
 
-                ShowUpdating();
+                    ShowUpdating();
+                }
+            }
+            catch (Exception)
+            {
+                // ignore, catch exception to avoid crash
             }
         }
 
         public async void ClickHandlerSelectMultiSports(object sender, RoutedEventArgs e)
         {
-            var selectActivitiesWindow = _selectActivitiesWindowFactory.Create();
-            await selectActivitiesWindow.ShowDialog(this);
+            try
+            {
+                var selectActivitiesWindow = _selectActivitiesWindowFactory.Create();
+                await selectActivitiesWindow.ShowDialog(this);
+            }
+            catch (Exception)
+            {
+                // ignore, catch exception to avoid crash
+            }
         }
 
         public void ClickHandlerRdoNormal(object sender, RoutedEventArgs e)
@@ -349,5 +383,20 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
         {
             _chkReload.IsEnabled = true;
         }
+
+#if WINDOWS
+        [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern int GetWindowLong(IntPtr hwnd, int nIndex);
+        [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern int SetWindowLong(IntPtr hwnd, int nIndex, int value);
+        private const int GWL_STYLE = -16;
+        private const int WS_MINIMIZEBOX = 0x00020000;
+
+        protected override void OnOpened(EventArgs e)
+        {
+            base.OnOpened(e);
+            var hwnd = TryGetPlatformHandle()?.Handle;
+            if (hwnd.HasValue)
+                SetWindowLong(hwnd.Value, GWL_STYLE, GetWindowLong(hwnd.Value, GWL_STYLE) & ~WS_MINIMIZEBOX);
+        }
+#endif
     }
 }

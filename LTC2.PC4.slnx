@@ -4,6 +4,9 @@
     <Project Path="LTC2.Webapps.MainApp/LTC2.Webapps.MainApp.csproj" />
     <Project Path="LTC2.Webclients.MainClient/LTC2.Webclients.MainClient.shproj" />
   </Folder>
+  <Folder Name="/LTC2.Generic/">
+    <Project Path="LTC2.Desktopclients.AvaloniaClient/LTC2.Desktopclients.AvaloniaClient.csproj" />
+  </Folder>
   <Folder Name="/LTC2.Shared/">
     <Project Path="LTC2.Shared.AcivityFormats/LTC2.Shared.ActivityFormats.csproj" />
     <Project Path="LTC2.Shared.BaseMessages/LTC2.Shared.BaseMessages.csproj" />
@@ -25,6 +28,5 @@
     <Project Path="LTC2.DesktopCLients.ArchiveImporter/LTC2.DesktopClients.ArchiveImporter.csproj" />
     <Project Path="LTC2.Desktopclients.ProfileManager/LTC2.Desktopclients.ProfileManager.csproj" />
     <Project Path="LTC2.Desktopclients.WindowsClient/LTC2.Desktopclients.WindowsClient.csproj" />
-    <Project Path="LTC2.Desktopclients.AvaloniaClient/LTC2.Desktopclients.AvaloniaClient.csproj" />
   </Folder>
 </Solution>

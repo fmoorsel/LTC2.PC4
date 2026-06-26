@@ -1,14 +1,14 @@
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using LTC2.Desktopclients.AvaloniaClient.Models;
 using LTC2.Desktopclients.AvaloniaClient.Services;
 using LTC2.Shared.BaseMessages.Interfaces;
 using LTC2.Shared.Models.Domain;
+using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace LTC2.Desktopclients.AvaloniaClient.Windows
 {
@@ -72,12 +72,9 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             _btnApply = this.FindControl<Button>("BtnApply");
             _btnCancel = this.FindControl<Button>("BtnCancel");
 
-            TryTranslate(this, "title.selectactivities.window");
-            TryTranslate(_btnApply, "button.selectactivities.apply");
-            TryTranslate(_btnCancel, "button.selectactivities.cancel");
-
-            var lblSelectActivities = this.FindControl<TextBlock>("LblSelectActivities");
-            TryTranslate(lblSelectActivities, "label.selectactivities.header");
+            TryTranslate(this, "title.select.multisport.window");
+            TryTranslate(_btnApply, "button.select.activities.apply");
+            TryTranslate(_btnCancel, "button.select.activities.cancel");
 
             PopulateList();
         }
@@ -159,5 +156,20 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
         {
             Close();
         }
+
+#if WINDOWS
+        [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern int GetWindowLong(IntPtr hwnd, int nIndex);
+        [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern int SetWindowLong(IntPtr hwnd, int nIndex, int value);
+        private const int GWL_STYLE = -16;
+        private const int WS_MINIMIZEBOX = 0x00020000;
+
+        protected override void OnOpened(EventArgs e)
+        {
+            base.OnOpened(e);
+            var hwnd = TryGetPlatformHandle()?.Handle;
+            if (hwnd.HasValue)
+                SetWindowLong(hwnd.Value, GWL_STYLE, GetWindowLong(hwnd.Value, GWL_STYLE) & ~WS_MINIMIZEBOX);
+        }
+#endif
     }
 }
