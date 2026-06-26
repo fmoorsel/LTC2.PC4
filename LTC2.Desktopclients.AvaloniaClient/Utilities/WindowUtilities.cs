@@ -19,7 +19,7 @@ namespace LTC2.Desktopclients.AvaloniaClient.Utilities
             if (hwnd.HasValue)
                 SetWindowLong(hwnd.Value, GWL_STYLE, GetWindowLong(hwnd.Value, GWL_STYLE) & ~WS_MINIMIZEBOX);
 #else
-            // intentionally empty due to cross platform concerns
+            // intentionally empty due to cross-platform concerns
 #endif
         }
     }
