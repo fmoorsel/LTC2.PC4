@@ -1,0 +1,154 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="LTC2.Desktopclients.AvaloniaProfileManager.Windows.ProfileManagerWindow"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen"
+        Width="800"
+        Height="460"
+        Background="LightGray">
+
+    <TabControl Margin="10">
+
+        <!-- ===== STRAVA TAB ===== -->
+        <TabItem Header="Strava">
+            <StackPanel Margin="10">
+
+                <!-- Profile list -->
+                <Border Margin="0,10,0,10" Padding="10" Background="LightGray" Theme="{StaticResource CardBorder}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="180" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="160" />
+                        </Grid.RowDefinitions>
+
+                        <ListBox Name="LstProfiles" Grid.Column="0" Grid.Row="0" Margin="0,0,10,0" Background="WhiteSmoke">
+                            <ListBox.Styles>
+                                <Style Selector="ListBoxItem:selected">
+                                    <Setter Property="Background" Value="SteelBlue"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                </Style>
+                            </ListBox.Styles>
+                        </ListBox>
+
+                        <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center">
+                            <Button Name="BtnEditProfile" Width="165" Height="40" IsEnabled="False" Margin="0,0,0,5"
+                                    Theme="{StaticResource SolidButton}" Classes="Tertiary" />
+                            <Button Name="BtnNewProfile" Width="165" Height="40" Margin="0,0,0,5"
+                                    Theme="{StaticResource SolidButton}" Classes="Tertiary" />
+                            <Button Name="BtnDeleteProfile" Width="165" Height="40" IsEnabled="False"
+                                    Theme="{StaticResource SolidButton}" Classes="Tertiary" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Profile details -->
+                <Border Name="GrpDetails" Margin="0,0,0,10" Padding="15" IsEnabled="False" Background="LightGray" Theme="{StaticResource CardBorder}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="175" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="180" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="50" />
+                            <RowDefinition Height="50" />
+                            <RowDefinition Height="50" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Name="LblProfileName" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
+                        <TextBox Name="TxtProfileName" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Margin="0,0,10,0" Background="WhiteSmoke" />
+                        <Button Name="BtnTestProfile" Grid.Column="2" Grid.Row="0" Width="165" Height="40"
+                                IsEnabled="False" Click="ClickTestHandler"
+                                Theme="{StaticResource SolidButton}" Classes="Tertiary" />
+
+                        <TextBlock Name="LblClientId" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" />
+                        <TextBox Name="TxtClientId" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Margin="0,0,10,0" Background="WhiteSmoke" />
+                        <TextBlock Name="LblError" Grid.Column="2" Grid.Row="1" VerticalAlignment="Center"
+                                   Foreground="Crimson" IsVisible="False" Margin="5,0" />
+
+                        <TextBlock Name="LblClientSecret" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" />
+                        <TextBox Name="TxtClientSecret" PasswordChar="*" Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" Margin="0,0,10,0" Background="WhiteSmoke" />
+                        <Button Name="BtnShowSecret" Grid.Column="2" Grid.Row="2" Width="165" Height="40"
+                                Click="ClickShowSecretHandler"
+                                Theme="{StaticResource SolidButton}" Classes="Tertiary" />
+                    </Grid>
+                </Border>
+
+            </StackPanel>
+        </TabItem>
+
+        <!-- ===== RIDEWITHGPS TAB ===== -->
+        <TabItem Header="RideWithGPS">
+            <StackPanel Margin="10">
+
+                <!-- RwGPS profile list -->
+                <Border Margin="0,10,0,10" Padding="10" Background="LightGray" Theme="{StaticResource CardBorder}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="180" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="160" />
+                        </Grid.RowDefinitions>
+
+                        <ListBox Name="LstProfilesRwg" Grid.Column="0" Grid.Row="0" Margin="0,0,10,0" Background="WhiteSmoke">
+                            <ListBox.Styles>
+                                <Style Selector="ListBoxItem:selected">
+                                    <Setter Property="Background" Value="SteelBlue"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                </Style>
+                            </ListBox.Styles>
+                        </ListBox>
+
+                        <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center">
+                            <Button Name="BtnEditProfileRwg" Width="165" Height="40" IsEnabled="False" Margin="0,0,0,5"
+                                    Theme="{StaticResource SolidButton}" Classes="Tertiary" />
+                            <Button Name="BtnNewProfileRwg" Width="165" Height="40" Margin="0,0,0,5"
+                                    Theme="{StaticResource SolidButton}" Classes="Tertiary" />
+                            <Button Name="BtnDeleteProfileRwg" Width="165" Height="40" IsEnabled="False"
+                                    Theme="{StaticResource SolidButton}" Classes="Tertiary" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- RwGPS profile details -->
+                <Border Name="GrpDetailsRwg" Margin="0,0,0,10" Padding="15" IsEnabled="False" Background="LightGray" Theme="{StaticResource CardBorder}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="175" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="180" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="50" />
+                            <RowDefinition Height="50" />
+                            <RowDefinition Height="50" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Name="LblProfileNameRwg" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
+                        <TextBox Name="TxtProfileNameRwg" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Margin="0,0,10,0" Background="WhiteSmoke" />
+                        <Button Name="BtnTestProfileRwg" Grid.Column="2" Grid.Row="0" Width="165" Height="40"
+                                IsEnabled="False" Click="ClickTestHandlerRwg"
+                                Theme="{StaticResource SolidButton}" Classes="Tertiary" />
+
+                        <TextBlock Name="LblRwGpsId" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" />
+                        <TextBox Name="TxtRwGpsId" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Margin="0,0,10,0" Background="WhiteSmoke" />
+
+                        <TextBlock Name="LblRwGpsSecret" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" />
+                        <TextBox Name="TxtRwGpsSecret" PasswordChar="*" Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" Margin="0,0,10,0" Background="WhiteSmoke" />
+                        <Button Name="BtnShowSecretRwg" Grid.Column="2" Grid.Row="2" Width="165" Height="40"
+                                Click="ClickShowSecretHandlerRwg"
+                                Theme="{StaticResource SolidButton}" Classes="Tertiary" />
+                    </Grid>
+                </Border>
+
+            </StackPanel>
+        </TabItem>
+
+    </TabControl>
+
+</Window>

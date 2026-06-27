@@ -1,0 +1,13 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:semi="https://irihi.tech/semi"
+             x:Class="LTC2.Desktopclients.AvaloniaProfileManager.App"
+             RequestedThemeVariant="Light"
+             Name="LTC2 Profile Manager">
+
+    <Application.Styles>
+        <semi:SemiTheme Locale="nl-NL" />
+        <StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml"/>
+    </Application.Styles>
+
+</Application>

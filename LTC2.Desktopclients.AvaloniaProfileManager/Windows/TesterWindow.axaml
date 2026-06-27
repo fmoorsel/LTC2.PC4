@@ -1,0 +1,40 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+        xmlns:webview="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.WebView"
+        x:Class="LTC2.Desktopclients.AvaloniaProfileManager.Windows.TesterWindow"
+        WindowStartupLocation="CenterScreen"
+        Width="1900"
+        Height="950"
+        MinWidth="1200"
+        MinHeight="750">
+
+    <DockPanel Background="LightGray">
+
+        <DockPanel DockPanel.Dock="Top">
+            <Panel DockPanel.Dock="Left" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <progRing:ProgressRing Width="40"
+                                       Height="40"
+                                       Margin="10"
+                                       IsVisible="False"
+                                       IsActive="False"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Top"
+                                       Foreground="Gray"
+                                       Name="CtrProgressRing"/>
+            </Panel>
+
+            <Panel DockPanel.Dock="Right" Width="50" />
+
+            <Border DockPanel.Dock="Bottom" Height="70" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Button Name="BtnLink" Height="50" Width="175" IsEnabled="False"
+                        Theme="{StaticResource SolidButton}" Classes="Tertiary"
+                        CornerRadius="5" Click="ClickHandlerLink" />
+            </Border>
+        </DockPanel>
+
+        <webview:NativeWebView DockPanel.Dock="Left" x:Name="WebView" Focusable="True" />
+
+    </DockPanel>
+
+</Window>

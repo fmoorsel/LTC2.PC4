@@ -17,12 +17,22 @@ namespace LTC2.Shared.Utils.Utils
 
         public string ReadString()
         {
-            int len = 0;
+            int b1 = ioStream.ReadByte();
+            if (b1 == -1) throw new EndOfStreamException("Pipe closed.");
 
-            len = ioStream.ReadByte() * 256;
-            len += ioStream.ReadByte();
+            int b2 = ioStream.ReadByte();
+            if (b2 == -1) throw new EndOfStreamException("Pipe closed.");
+
+            int len = b1 * 256 + b2;
             byte[] inBuffer = new byte[len];
-            _ = ioStream.Read(inBuffer, 0, len);
+
+            int totalRead = 0;
+            while (totalRead < len)
+            {
+                int read = ioStream.Read(inBuffer, totalRead, len - totalRead);
+                if (read == 0) throw new EndOfStreamException("Pipe closed during read.");
+                totalRead += read;
+            }
 
             return streamEncoding.GetString(inBuffer);
         }

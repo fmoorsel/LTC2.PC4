@@ -1,0 +1,37 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="LTC2.Desktopclients.AvaloniaClient.Windows.SelectActivitiesWindow"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Width="560"
+        Height="400"
+        Background="LightGray">
+
+    <StackPanel>
+        <Border Background="LightGray" Margin="25" Width="500" Height="245" Padding="0" Theme="{StaticResource CardBorder}">
+            <ListBox x:Name="LstActivities" Background="WhiteSmoke" Height="195" Width="440" SelectionMode="Multiple,Toggle">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Panel HorizontalAlignment="Stretch">
+                            <CheckBox IsChecked="{Binding IsSelected}" Content="{Binding Description}" />
+                        </Panel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem:selected">
+                        <Setter Property="Background" Value="WhiteSmoke"/>
+                    </Style>
+                </ListBox.Styles>
+            </ListBox>
+        </Border>
+
+        <Border Background="LightGray" Margin="3" Width="500" Height="75" Padding="0" Theme="{StaticResource CardBorder}">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Button x:Name="BtnApply" Click="ClickHandlerApply" Width="160" Height="40" Margin="0,0,20,0" Theme="{StaticResource SolidButton}" Classes="Tertiary" />
+                <Button x:Name="BtnCancel" Click="ClickHandlerCancel" Width="160" Height="40" Margin="20,0,0,0" Theme="{StaticResource SolidButton}" Classes="Tertiary" />
+            </StackPanel>
+        </Border>
+    </StackPanel>
+
+</Window>

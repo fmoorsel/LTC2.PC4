@@ -1,0 +1,48 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+        xmlns:webview="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.WebView"
+        x:Class="LTC2.Desktopclients.AvaloniaClient.Windows.BrowserWindow"
+        Width="1900"
+        Height="950"
+        MinWidth="1200"
+        MinHeight="750"
+        WindowStartupLocation="CenterScreen">
+
+    <DockPanel Background="LightGray">
+
+        <DockPanel DockPanel.Dock="Top">
+            <Panel DockPanel.Dock="Left" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <progRing:ProgressRing Width="40"
+                                       Height="40"
+                                       Margin="10"
+                                       IsVisible="False"
+                                       IsActive="False"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Top"
+                                       Foreground="Gray"
+                                       Name="CtrProgressRing" />
+            </Panel>
+
+            <Panel DockPanel.Dock="Right" Width="50" />
+
+            <Border DockPanel.Dock="Bottom" Height="70" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Button Name="BtnUpdate" Height="50" Width="150" IsEnabled="False" Classes="Tertiary" Theme="{StaticResource SolidButton}" CornerRadius="5" Click="ClickHandlerUpdate">
+                    <TextBlock Name="TxtBtnUpdate" VerticalAlignment="Center" HorizontalAlignment="Center">Update</TextBlock>
+                </Button>
+            </Border>
+        </DockPanel>
+
+        <Border DockPanel.Dock="Bottom" Height="30">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="LblPingCalculator" Width="300" Margin="7,5,0,0" />
+                <TextBlock x:Name="LblPingMainApp" Width="300" Margin="7,5,0,0" />
+                <TextBlock x:Name="LblStatusUpdate" Width="550" Margin="7,5,0,0" />
+            </StackPanel>
+        </Border>
+
+        <webview:NativeWebView DockPanel.Dock="Left" x:Name="WebView" Focusable="True" />
+
+    </DockPanel>
+
+</Window>
