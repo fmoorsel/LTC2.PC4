@@ -16,6 +16,8 @@ namespace LTC2.Desktopclients.AvaloniaProfileManager.Models
         public bool DisablePasswordSave { get; set; }
         public int PingDeltaInSeconds { get; set; }
 
+        public string LibraryPath { get; set; }
+
         public string WebviewRoot
         {
             get => _webviewRoot == null ? null : Environment.ExpandEnvironmentVariables(_webviewRoot);
