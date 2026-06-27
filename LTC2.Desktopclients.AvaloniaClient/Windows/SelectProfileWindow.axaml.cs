@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace LTC2.Desktopclients.AvaloniaClient.Windows
 {
@@ -110,6 +111,11 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
         public void ClickHandlerProfileManager(object sender, RoutedEventArgs e)
         {
             _profileManagerStarter.Start();
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Close();
+            }
         }
 
         private void OnClose(object sender, EventArgs e)
