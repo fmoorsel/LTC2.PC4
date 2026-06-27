@@ -1,7 +1,7 @@
-﻿using LTC2.DesktopClients.ArchiveImporter.Services;
+﻿using LTC2.Desktopclients.ArchiveImporter.Services;
 using LTC2.Shared.Messages.Interfaces;
 
-namespace LTC2.DesktopClients.ArchiveImporter.Forms
+namespace LTC2.Desktopclients.ArchiveImporter.Forms
 {
     public partial class ImportForm : Form
     {

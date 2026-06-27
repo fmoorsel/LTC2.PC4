@@ -1,7 +1,7 @@
-﻿using LTC2.DesktopClients.ArchiveImporter.Forms;
-using LTC2.DesktopClients.ArchiveImporter.Interfaces;
+﻿using LTC2.Desktopclients.ArchiveImporter.Forms;
+using LTC2.Desktopclients.ArchiveImporter.Interfaces;
 
-namespace LTC2.DesktopClients.ArchiveImporter.ServiceTasks
+namespace LTC2.Desktopclients.ArchiveImporter.ServiceTasks
 {
     public class StartWinforms : IMainServiceTask
     {

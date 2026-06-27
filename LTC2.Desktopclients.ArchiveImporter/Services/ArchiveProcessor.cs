@@ -1,4 +1,4 @@
-﻿using LTC2.DesktopClients.ArchiveImporter.Models;
+﻿using LTC2.Desktopclients.ArchiveImporter.Models;
 using LTC2.Shared.ActivityFormats.Fit.Utils;
 using LTC2.Shared.ActivityFormats.Gpx.Utils;
 using LTC2.Shared.ActivityFormats.Json.Utils;
@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 using System.IO.Compression;
 using System.Text;
 
-namespace LTC2.DesktopClients.ArchiveImporter.Services
+namespace LTC2.Desktopclients.ArchiveImporter.Services
 {
     public delegate void ArchiveImportUpdateStatusDelegate(string status);
 

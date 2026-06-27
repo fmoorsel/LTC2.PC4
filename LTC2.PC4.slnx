@@ -4,9 +4,15 @@
     <Project Path="LTC2.Webapps.MainApp/LTC2.Webapps.MainApp.csproj" />
     <Project Path="LTC2.Webclients.MainClient/LTC2.Webclients.MainClient.shproj" />
   </Folder>
-  <Folder Name="/LTC2.Generic/">
+  <Folder Name="/LTC2.Desktop/" />
+  <Folder Name="/LTC2.Desktop/Generic/">
     <Project Path="LTC2.Desktopclients.AvaloniaClient/LTC2.Desktopclients.AvaloniaClient.csproj" />
     <Project Path="LTC2.Desktopclients.AvaloniaProfileManager/LTC2.Desktopclients.AvaloniaProfileManager.csproj" />
+  </Folder>
+  <Folder Name="/LTC2.Desktop/Windows/">
+    <Project Path="LTC2.Desktopclients.ArchiveImporter/LTC2.Desktopclients.ArchiveImporter.csproj" />
+    <Project Path="LTC2.Desktopclients.ProfileManager/LTC2.Desktopclients.ProfileManager.csproj" />
+    <Project Path="LTC2.Desktopclients.WindowsClient/LTC2.Desktopclients.WindowsClient.csproj" />
   </Folder>
   <Folder Name="/LTC2.Shared/">
     <Project Path="LTC2.Shared.AcivityFormats/LTC2.Shared.ActivityFormats.csproj" />
@@ -24,10 +30,5 @@
     <Project Path="LTC2.Shared.StravaConnector/LTC2.Shared.StravaConnector.csproj" />
     <Project Path="LTC2.Shared.RideWithGpsConnector/LTC2.Shared.RideWithGpsConnector.csproj" />
     <Project Path="LTC2.Shared.Utils/LTC2.Shared.Utils.csproj" />
-  </Folder>
-  <Folder Name="/LTC2.Windows/">
-    <Project Path="LTC2.DesktopCLients.ArchiveImporter/LTC2.DesktopClients.ArchiveImporter.csproj" />
-    <Project Path="LTC2.Desktopclients.ProfileManager/LTC2.Desktopclients.ProfileManager.csproj" />
-    <Project Path="LTC2.Desktopclients.WindowsClient/LTC2.Desktopclients.WindowsClient.csproj" />
   </Folder>
 </Solution>

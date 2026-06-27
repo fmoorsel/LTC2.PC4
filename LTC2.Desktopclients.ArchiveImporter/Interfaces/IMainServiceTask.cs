@@ -1,6 +1,6 @@
 ﻿using LTC2.Shared.Utils.Bootstrap.Interfaces;
 
-namespace LTC2.DesktopClients.ArchiveImporter.Interfaces
+namespace LTC2.Desktopclients.ArchiveImporter.Interfaces
 {
     public interface IMainServiceTask : IServiceTask
     {

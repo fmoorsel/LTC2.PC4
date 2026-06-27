@@ -1,4 +1,4 @@
-﻿namespace LTC2.DesktopClients.ArchiveImporter.Models
+﻿namespace LTC2.Desktopclients.ArchiveImporter.Models
 {
     public class AppSettings
     {

@@ -1,8 +1,8 @@
-﻿using LTC2.DesktopClients.ArchiveImporter.Interfaces;
+﻿using LTC2.Desktopclients.ArchiveImporter.Interfaces;
 using LTC2.Shared.Utils.Bootstrap.Interfaces;
 using Microsoft.Extensions.Logging;
 
-namespace LTC2.DesktopClients.ArchiveImporter.Services
+namespace LTC2.Desktopclients.ArchiveImporter.Services
 {
     public class Worker
     {

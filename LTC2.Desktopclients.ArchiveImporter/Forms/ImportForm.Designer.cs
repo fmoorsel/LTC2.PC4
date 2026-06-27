@@ -1,4 +1,4 @@
-﻿namespace LTC2.DesktopClients.ArchiveImporter.Forms
+﻿namespace LTC2.Desktopclients.ArchiveImporter.Forms
 {
     partial class ImportForm
     {

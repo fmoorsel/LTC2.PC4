@@ -1,7 +1,7 @@
-using LTC2.DesktopClients.ArchiveImporter.Forms;
-using LTC2.DesktopClients.ArchiveImporter.Models;
-using LTC2.DesktopClients.ArchiveImporter.Services;
-using LTC2.DesktopClients.ArchiveImporter.ServiceTasks;
+﻿using LTC2.Desktopclients.ArchiveImporter.Forms;
+using LTC2.Desktopclients.ArchiveImporter.Models;
+using LTC2.Desktopclients.ArchiveImporter.Services;
+using LTC2.Desktopclients.ArchiveImporter.ServiceTasks;
 using LTC2.Shared.Messages.Interfaces;
 using LTC2.Shared.Messages.Services;
 using LTC2.Shared.Models.Settings;
@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
 
-namespace LTC2.DesktopClients.ArchiveImporter
+namespace LTC2.Desktopclients.ArchiveImporter
 {
     internal static class Program
     {
