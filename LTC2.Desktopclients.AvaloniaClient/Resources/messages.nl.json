@@ -76,7 +76,7 @@
   "routeplanner.postcode": "Postcode: %0%",
   "routeplanner.postcode.visited": "Postcode %0% (afgevinkt)",
   "routeplanner.postcode.year": "Postcode %0% (ook dit jaar afgevinkt)",
-  "plugin.install.failed": "De plugin kon niet worden geinstalleerd. Probeer het opnieuw.",
-  "plugin.install.failed.header": "Probleempje..."
+  "plugin.install.failed": "Kan de Route Builder extensie niet activeren.",
+  "plugin.install.failed.header": "Helaas..."
 
 }

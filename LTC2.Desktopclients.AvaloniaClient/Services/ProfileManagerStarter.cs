@@ -1,7 +1,8 @@
+using LTC2.Desktopclients.AvaloniaClient.Models;
 using System;
 using System.Diagnostics;
 using System.IO;
-using LTC2.Desktopclients.AvaloniaClient.Models;
+using System.Runtime.InteropServices;
 
 namespace LTC2.Desktopclients.AvaloniaClient.Services
 {
@@ -27,7 +28,10 @@ namespace LTC2.Desktopclients.AvaloniaClient.Services
 
                 var process = Process.Start(startInfo);
 
-                process?.WaitForExit();
+                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    process?.WaitForExit();
+                }
 
                 Environment.Exit(0);
             }
