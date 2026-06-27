@@ -2,7 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using LTC2.Desktopclients.AvaloniaClient.Models;
 using LTC2.Desktopclients.AvaloniaClient.Services;
-using LTC2.Desktopclients.AvaloniaClient.Utilities;
+using LTC2.Desktopclients.AvaloniaClient.Utils;
 using LTC2.Shared.BaseMessages.Interfaces;
 using LTC2.Shared.Models.Domain;
 using System;

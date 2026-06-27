@@ -3,7 +3,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using LTC2.Desktopclients.AvaloniaClient.Interfaces;
 using LTC2.Desktopclients.AvaloniaClient.Services;
-using LTC2.Desktopclients.AvaloniaClient.Utilities;
+using LTC2.Desktopclients.AvaloniaClient.Utils;
 using LTC2.Shared.BaseMessages.Interfaces;
 using LTC2.Shared.Http.Interfaces;
 using LTC2.Shared.Models.Interprocess;

@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using System;
 
-namespace LTC2.Desktopclients.AvaloniaClient.Utilities
+namespace LTC2.Desktopclients.AvaloniaClient.Utils
 {
     public static class WindowUtilities
     {

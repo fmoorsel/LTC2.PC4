@@ -1,63 +1,70 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-	<OutputType>WinExe</OutputType>
-	<TargetFramework>net10.0</TargetFramework>
-	<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-	<Nullable>disable</Nullable>
-	<ImplicitUsings>disable</ImplicitUsings>
-	<AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
-	<ApplicationIcon>Resources\Long Term Challenge Logo3.ico</ApplicationIcon>
-	<ApplicationManifest>app.manifest</ApplicationManifest>
-	<Version>1.0.0</Version>
-	<DefineConstants>WINDOWS</DefineConstants>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+    <ApplicationIcon>Resources\Long Term Challenge Logo3.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>1.0.0</Version>
+    <DefineConstants>WINDOWS</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-	<PackageReference Include="Avalonia" Version="12.0.5" />
-	<PackageReference Include="Avalonia.Desktop" Version="12.0.5" />
-	<PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.5" />
-	<PackageReference Include="Avalonia.Controls.WebView" Version="12.0.1" />
-	<PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.11.0" />
-	<PackageReference Include="MessageBox.Avalonia" Version="12.0.0" />
-	<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
-	<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-	<PackageReference Include="Semi.Avalonia" Version="12.0.3" />
-	<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.16.0" />
+    <PackageReference Include="Avalonia" Version="12.0.5" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.0.5" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.5" />
+    <PackageReference Include="Avalonia.Controls.WebView" Version="12.0.1" />
+    <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.11.0" />
+    <PackageReference Include="MessageBox.Avalonia" Version="12.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Semi.Avalonia" Version="12.0.3" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.16.0" />
   </ItemGroup>
 
   <ItemGroup>
-	<ProjectReference Include="..\LTC2.Shared.BaseMessages\LTC2.Shared.BaseMessages.csproj" />
-	<ProjectReference Include="..\LTC2.Shared.Http\LTC2.Shared.Http.csproj" />
-	<ProjectReference Include="..\LTC2.Shared.Models\LTC2.Shared.Models.csproj" />
-	<ProjectReference Include="..\LTC2.Shared.Repositories\LTC2.Shared.Repositories.csproj" />
-	<ProjectReference Include="..\LTC2.Shared.Secrets\LTC2.Shared.Secrets.csproj" />
-	<ProjectReference Include="..\LTC2.Shared.StravaConnector\LTC2.Shared.StravaConnector.csproj" />
-	<ProjectReference Include="..\LTC2.Shared.Utils\LTC2.Shared.Utils.csproj" />
+    <ProjectReference Include="..\LTC2.Shared.BaseMessages\LTC2.Shared.BaseMessages.csproj" />
+    <ProjectReference Include="..\LTC2.Shared.Http\LTC2.Shared.Http.csproj" />
+    <ProjectReference Include="..\LTC2.Shared.Models\LTC2.Shared.Models.csproj" />
+    <ProjectReference Include="..\LTC2.Shared.Repositories\LTC2.Shared.Repositories.csproj" />
+    <ProjectReference Include="..\LTC2.Shared.Secrets\LTC2.Shared.Secrets.csproj" />
+    <ProjectReference Include="..\LTC2.Shared.StravaConnector\LTC2.Shared.StravaConnector.csproj" />
+    <ProjectReference Include="..\LTC2.Shared.Utils\LTC2.Shared.Utils.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-	<Content Include="Resources\Long Term Challenge Logo3.ico" />
-	<None Update="appsettings.json">
-	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</None>
-	<None Update="appsettings.Development.json">
-	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</None>
-	<None Update="Resources\activities.json">
-	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</None>
-	<None Update="Resources\activities.rwgps.json">
-	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</None>
-	<None Update="Resources\messages.nl.json">
-	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</None>
-	<None Update="Resources\messages.nl.multi.json">
-	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</None>
+    <Content Include="Resources\Long Term Challenge Logo3.ico" />
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.Development.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\activities.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\activities.rwgps.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\messages.nl.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\messages.nl.multi.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
-	<AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaXaml Remove="Utilities\**" />
+    <Compile Remove="Utilities\**" />
+    <EmbeddedResource Remove="Utilities\**" />
+    <None Remove="Utilities\**" />
   </ItemGroup>
 </Project>
