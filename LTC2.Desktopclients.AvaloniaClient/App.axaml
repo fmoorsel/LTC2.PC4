@@ -5,14 +5,9 @@
              RequestedThemeVariant="Light"
              Name="Long Term NL Postcode Challenge">
 
-    <NativeMenu.Menu>
-        <NativeMenu>
-            <NativeMenuItem Header="About Long Term NL Postcode Challenge" Click="ShowAboutHandler" />
-        </NativeMenu>
-    </NativeMenu.Menu>
-
     <Application.Styles>
         <semi:SemiTheme Locale="en-US" />
         <StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml"/>
     </Application.Styles>
+
 </Application>

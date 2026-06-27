@@ -1,7 +1,3 @@
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
 using Avalonia;
 using LTC2.Desktopclients.AvaloniaClient.Factories;
 using LTC2.Desktopclients.AvaloniaClient.Interfaces;
@@ -23,6 +19,9 @@ using LTC2.Shared.Utils.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
+using System.Diagnostics;
+using System.IO;
 
 namespace LTC2.Desktopclients.AvaloniaClient;
 
@@ -68,7 +67,6 @@ public static class Program
             services.AddTransient<UpdateWindow>();
             services.AddTransient<SelectActivitiesWindow>();
             services.AddTransient<SelectProfileWindow>();
-            services.AddTransient<AboutBoxWindow>();
 
             services.AddSingleton<ISecretsVault, WindowsSecretsVault>();
             services.AddSingleton<WebViewConnector>();

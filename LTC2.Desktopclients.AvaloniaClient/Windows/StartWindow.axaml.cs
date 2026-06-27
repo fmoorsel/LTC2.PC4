@@ -16,6 +16,7 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
         private readonly IBaseTranslationService _translationService;
         private readonly ProfileManagerStarter _profileManagerStarter;
         private readonly MultiSportManager _multiSportManager;
+        private readonly ProfileManager _profileManager;
 
         private TextBlock _lblLabelStatusCalculator;
         private TextBlock _lblLabelStatusMainApp;
@@ -40,6 +41,7 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             BrowserWindow browserWindow,
             StatusNotifier statusNotifier,
             ProfileManagerStarter profileManagerStarter,
+            ProfileManager profileManager,
             MultiSportManager multiSportManager,
             IBaseTranslationService translationService) : this()
         {
@@ -48,6 +50,7 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             _translationService = translationService;
             _profileManagerStarter = profileManagerStarter;
             _multiSportManager = multiSportManager;
+            _profileManager = profileManager;
 
             statusNotifier.OnStatusNotification += OnStatusNotification;
 
@@ -74,10 +77,14 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             TryTranslate(_btnOpenProfileManager, _translationService.GetMessage("button.start.openprofilemanager"));
             TryTranslate(_chkMultiSport, _translationService.GetMessage("checkbox.start.multisport"));
 
-            if (_chkMultiSport != null)
-            {
-                _chkMultiSport.IsChecked = _multiSportManager.IsMultiSportDefault;
-            }
+        }
+
+        private void SetProfileDependencies()
+        {
+            if (_chkMultiSport == null) return;
+            var hasProfile = !string.IsNullOrEmpty(_profileManager.Profile?.StravaID) || !string.IsNullOrEmpty(_profileManager.Profile?.RwGpsId);
+            _chkMultiSport.IsEnabled = hasProfile;
+            _chkMultiSport.IsChecked = hasProfile && _multiSportManager.IsMultiSportDefault;
         }
 
         private void TryTranslate(Control control, string message)
@@ -110,6 +117,12 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
 
         private void UpdateStatus(StatusMessage status)
         {
+            if (status.Status == StatusMessage.STATUS_PROFILESELECTED)
+            {
+                SetProfileDependencies();
+                return;
+            }
+
             var message = status.Message != null ? _translationService.GetMessage(status.Message) : string.Empty;
             var labelText = $"{status.Status ?? string.Empty} {status.Origin ?? string.Empty} {message}";
 
@@ -153,6 +166,7 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
 
             _multiSportManager.WriteDefaults(_chkMultiSport?.IsChecked ?? false);
             _multiSportManager.RunInMultiSportMode = _chkMultiSport?.IsChecked ?? false;
+            _multiSportManager.RunWithSource = !string.IsNullOrEmpty(_profileManager.Profile.RwGpsId) ? "ridewithgps" : "strava";
 
             if (_multiSportManager.RunInMultiSportMode)
             {
@@ -171,7 +185,7 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             _profileManagerStarter.Start();
         }
 
-        private void SingalStopping()
+        private void SignalStopping()
         {
             var stopMessage = _translationService.GetMessage("progress.status.stop");
 
@@ -188,7 +202,7 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
                 args.Cancel = true;
                 _closing = true;
 
-                Dispatcher.UIThread.Post(() => SingalStopping());
+                Dispatcher.UIThread.Post(SignalStopping);
             }
         }
 

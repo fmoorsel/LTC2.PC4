@@ -63,7 +63,9 @@
 
   "title.selectprofile.window": "Kies een profiel",
   "button.selectprofile.select": "Selecteer Profiel...",
-  "button.selectprofile.profilemanager": "Profiel Manager..."
+  "button.selectprofile.profilemanager": "Profiel Manager...",
 
+  "button.select.activities.apply": "Toepassen",
+  "button.select.activities.cancel": "Annuleren"
 
 }

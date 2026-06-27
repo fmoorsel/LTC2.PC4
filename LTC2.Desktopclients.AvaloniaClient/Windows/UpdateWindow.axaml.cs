@@ -276,7 +276,10 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
 
                     if (_multiSportManager.RunInMultiSportMode)
                     {
-                        await _ltc2HttpProxy.UpdateMulti(token, new List<int>(), new List<string>(), false, false, true, false, _multiSportManager.RunWithSource);
+                        if (_multiSportManager.RunWithSource == "ridewithgps")
+                            await _ltc2HttpProxy.UpdateMulti(token, null, new List<string>(), false, false, true, false, _multiSportManager.RunWithSource);
+                        else
+                            await _ltc2HttpProxy.UpdateMulti(token, new List<int>(), null, false, false, true, false, _multiSportManager.RunWithSource);
                     }
                     else
                     {
@@ -289,7 +292,10 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
                 {
                     if (_multiSportManager.RunInMultiSportMode)
                     {
-                        await _ltc2HttpProxy.UpdateMulti(token, new List<int>(), new List<string>(), false, false, false, true, _multiSportManager.RunWithSource);
+                        if (_multiSportManager.RunWithSource == "ridewithgps")
+                            await _ltc2HttpProxy.UpdateMulti(token, null, new List<string>(), false, false, false, true, _multiSportManager.RunWithSource);
+                        else
+                            await _ltc2HttpProxy.UpdateMulti(token, new List<int>(), null, false, false, false, true, _multiSportManager.RunWithSource);
                     }
                     else
                     {

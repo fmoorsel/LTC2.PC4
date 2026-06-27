@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -9,6 +6,8 @@ using LTC2.Desktopclients.AvaloniaClient.Models;
 using LTC2.Desktopclients.AvaloniaClient.Services;
 using LTC2.Desktopclients.AvaloniaClient.Windows;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.IO;
 
 namespace LTC2.Desktopclients.AvaloniaClient;
 
@@ -43,28 +42,5 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
 
         Dispatcher.UIThread.Post(() => OnReady?.Invoke(this, EventArgs.Empty));
-    }
-
-    public async void ShowAboutHandler(object sender, EventArgs e)
-    {
-        var aboutBox = Program.ApplicationHost.Services.GetRequiredService<AboutBoxWindow>();
-        var mainWindow = (ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
-        var windows = (ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.Windows.ToList();
-
-        if (windows?.Find(w => w is AboutBoxWindow) != null)
-        {
-            return;
-        }
-
-        var selectedWindow = windows?.Find(w => w is SelectProfileWindow);
-
-        if (selectedWindow != null)
-        {
-            await aboutBox.ShowDialog(selectedWindow);
-        }
-        else if (mainWindow != null)
-        {
-            await aboutBox.ShowDialog(mainWindow);
-        }
     }
 }
