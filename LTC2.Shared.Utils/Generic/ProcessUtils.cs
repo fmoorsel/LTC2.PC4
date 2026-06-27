@@ -65,6 +65,8 @@ namespace LTC2.Shared.Utils.Generic
 
                 Environment.Exit(0);
             }
+#else
+    // intentionally empty due to cross-platform concerns
 #endif
         }
     }

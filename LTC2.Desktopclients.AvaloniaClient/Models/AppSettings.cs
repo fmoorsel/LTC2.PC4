@@ -79,5 +79,7 @@ namespace LTC2.Desktopclients.AvaloniaClient.Models
         public string RideWithGpsRouteBuilderEntryPoint { get; set; }
         public string RideWithGpsRouteBuilderRegex { get; set; }
         public string RideWithGpsSitePrefix { get; set; }
+
+        public string LibraryPath { get; set; }
     }
 }

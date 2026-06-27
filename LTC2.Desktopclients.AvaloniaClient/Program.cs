@@ -22,6 +22,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace LTC2.Desktopclients.AvaloniaClient;
 
@@ -34,6 +35,9 @@ public static class Program
     {
         try
         {
+            SetLTC2Path();
+            SetLibraryPath();
+
             ProcessUtils.EnsureOnlyOneProcess();
 
             ApplicationHost = CreateHostBuilder().Build();
@@ -134,4 +138,48 @@ public static class Program
 
         return new ApplicationManager(appBuilder);
     }
+
+    private static void SetLTC2Path()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return;
+        }
+
+        var processModule = Process.GetCurrentProcess().MainModule;
+        var ltc2Folder = Path.GetDirectoryName(processModule?.FileName) ?? string.Empty;
+
+        if (!string.IsNullOrEmpty(ltc2Folder))
+        {
+            var ltc2Path = Directory.GetParent(ltc2Folder)?.FullName;
+
+            if (ltc2Folder.EndsWith("MacOS"))
+            {
+                ltc2Path = ltc2Folder;
+            }
+
+            if (!string.IsNullOrEmpty(ltc2Path))
+            {
+                Environment.SetEnvironmentVariable("LTC2PATH", ltc2Path);
+            }
+        }
+    }
+
+    private static void SetLibraryPath()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return;
+        }
+
+        var configuration = GetConfig();
+
+        var appSettings = configuration.GetSection("AppSettings").Get<AppSettings>();
+
+        if (!string.IsNullOrEmpty(appSettings?.LibraryPath))
+        {
+            Environment.SetEnvironmentVariable("DYLD_LIBRARY_PATH", appSettings.LibraryPath);
+        }
+    }
+
 }
