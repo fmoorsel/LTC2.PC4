@@ -90,6 +90,11 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             }
         }
 
+        public void ClickHandlerProfileDoubleTapped(object sender, Avalonia.Input.TappedEventArgs e)
+        {
+            ClickHandlerSelectProfile(sender, new RoutedEventArgs());
+        }
+
         public void ClickHandlerSelectProfile(object sender, RoutedEventArgs e)
         {
             if (_lstProfiles.SelectedIndex >= 0)

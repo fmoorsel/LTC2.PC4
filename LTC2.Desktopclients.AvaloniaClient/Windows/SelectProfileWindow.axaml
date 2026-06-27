@@ -48,7 +48,7 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0">
-                    <ListBox Name="LstProfiles" Background="WhiteSmoke" Margin="30,30,0,0" Height="200" Width="440" >
+                    <ListBox Name="LstProfiles" Background="WhiteSmoke" Margin="30,30,0,0" Height="200" Width="440" DoubleTapped="ClickHandlerProfileDoubleTapped">
                         <ListBox.Styles>
                             <Style Selector="ListBoxItem:selected">
                                 <Setter Property="Background" Value="SteelBlue"/>
