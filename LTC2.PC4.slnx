@@ -6,6 +6,7 @@
   </Folder>
   <Folder Name="/LTC2.Generic/">
     <Project Path="LTC2.Desktopclients.AvaloniaClient/LTC2.Desktopclients.AvaloniaClient.csproj" />
+    <Project Path="LTC2.Desktopclients.AvaloniaProfileManager/LTC2.Desktopclients.AvaloniaProfileManager.csproj" />
   </Folder>
   <Folder Name="/LTC2.Shared/">
     <Project Path="LTC2.Shared.AcivityFormats/LTC2.Shared.ActivityFormats.csproj" />
