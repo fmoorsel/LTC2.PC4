@@ -67,6 +67,7 @@ public static class Program
             services.AddTransient<UpdateWindow>();
             services.AddTransient<SelectActivitiesWindow>();
             services.AddTransient<SelectProfileWindow>();
+            services.AddSingleton<RoutePlannerWindow>();
 
             services.AddSingleton<ISecretsVault, WindowsSecretsVault>();
             services.AddSingleton<WebViewConnector>();

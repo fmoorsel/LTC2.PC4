@@ -1,0 +1,67 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+        xmlns:webview="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.WebView"
+        x:Class="LTC2.Desktopclients.AvaloniaClient.Windows.RoutePlannerWindow"
+        Width="1900"
+        Height="950"
+        MinWidth="1200"
+        MinHeight="380"
+        WindowStartupLocation="CenterScreen">
+
+    <DockPanel Background="LightGray">
+
+        <Grid DockPanel.Dock="Top" Height="70">
+
+            <Panel HorizontalAlignment="Left" Width="50" VerticalAlignment="Center">
+                <progRing:ProgressRing Name="CtrProgressRing"
+                                       Width="40"
+                                       Height="40"
+                                       Margin="10"
+                                       IsVisible="False"
+                                       IsActive="False"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Top"
+                                       Foreground="Gray" />
+            </Panel>
+
+            <TextBlock Name="LblCurrentPlace"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="28" />
+
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Margin="0,0,10,0"
+                        Spacing="5">
+                <CheckBox Name="ChkToggleVisibility"
+                          IsChecked="True"
+                          IsVisible="False"
+                          VerticalAlignment="Center">Toggle layer</CheckBox>
+                <Button Name="BtnCheckRoute"
+                        IsVisible="False"
+                        Width="150"
+                        Height="50"
+                        Classes="Tertiary"
+                        Theme="{StaticResource SolidButton}"
+                        CornerRadius="5"
+                        Click="ClickHandlerCheckRoute">Check route</Button>
+                <Button Name="BtnUnCheckRoute"
+                        IsVisible="False"
+                        IsEnabled="False"
+                        Width="150"
+                        Height="50"
+                        Classes="Tertiary"
+                        Theme="{StaticResource SolidButton}"
+                        CornerRadius="5"
+                        Click="ClickHandlerUnCheckRoute">Uncheck route</Button>
+            </StackPanel>
+
+        </Grid>
+
+        <webview:NativeWebView DockPanel.Dock="Left" x:Name="WebView" Focusable="True" />
+
+    </DockPanel>
+
+</Window>

@@ -9,6 +9,7 @@ using LTC2.Shared.BaseMessages.Interfaces;
 using LTC2.Shared.Models.Interprocess;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -42,6 +43,7 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
         private readonly ProfileManager _profileManager;
         private readonly MultiSportManager _multiSportManager;
         private readonly AppSettings _appSettings;
+        private readonly RoutePlannerWindow _routePlannerWindow;
         private readonly List<string> _refreshEnabledFor;
 
         private bool _isLoaded;
@@ -58,6 +60,7 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             WebViewConnector webViewConnector,
             ProfileManager profileManager,
             MultiSportManager multiSportManager,
+            RoutePlannerWindow routePlannerWindow,
             IBaseTranslationService translationService) : this()
         {
             _translationService = translationService;
@@ -68,6 +71,7 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             _profileManager = profileManager;
             _multiSportManager = multiSportManager;
             _appSettings = appSettings;
+            _routePlannerWindow = routePlannerWindow;
 
             _refreshEnabledFor = appSettings?.EnableRefreshFor?.Split(',').ToList() ?? new List<string>();
 
@@ -95,6 +99,7 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
                 _webView.NavigationStarted += OnBeforeNavigate;
                 _webView.NavigationCompleted += OnNavigated;
                 _webView.AdapterCreated += OnAdapterCreated;
+                _webView.WebMessageReceived += OnWebMessageReceived;
 
                 _webViewConnector.WebView = _webView;
             }
@@ -265,6 +270,28 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             }
         }
 
+        private void OnWebMessageReceived(object sender, WebMessageReceivedEventArgs e)
+        {
+            try
+            {
+                var message = e.Body;
+
+                if (!string.IsNullOrEmpty(message))
+                {
+                    var webMessage = JsonConvert.DeserializeObject<GenericWebMessage>(message);
+
+                    if (webMessage?.Message == "routeplanner")
+                    {
+                        Dispatcher.UIThread.Post(() => _routePlannerWindow.ShowPlanner());
+                    }
+                }
+            }
+            catch
+            {
+                // ignore malformed messages
+            }
+        }
+
         private void OnNavigated(object sender, WebViewNavigationCompletedEventArgs arg)
         {
             Dispatcher.UIThread.Post(() => EnableDisableSpinner(false));
@@ -375,6 +402,7 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
                 _lblUpdateProgress.Text = string.Empty;
 
                 _multiSportManager.RefreshCurrentActivityTypes();
+                _routePlannerWindow.UpdateProfile();
 
                 _webView.Source = new Uri(GetUrl());
             }

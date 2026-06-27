@@ -66,6 +66,17 @@
   "button.selectprofile.profilemanager": "Profiel Manager...",
 
   "button.select.activities.apply": "Toepassen",
-  "button.select.activities.cancel": "Annuleren"
+  "button.select.activities.cancel": "Annuleren",
+
+  "title.routeplanner.window": "Route Planner",
+  "button.checkroute": "Check route",
+  "button.uncheckroute": "Verberg check",
+  "check.toggle.visibility": "Toon/verberg postcode-gebieden",
+  "routeplanner.no_map_support": "Kaart wordt niet ondersteund",
+  "routeplanner.postcode": "Postcode: %0%",
+  "routeplanner.postcode.visited": "Postcode %0% (afgevinkt)",
+  "routeplanner.postcode.year": "Postcode %0% (ook dit jaar afgevinkt)",
+  "plugin.install.failed": "De plugin kon niet worden geinstalleerd. Probeer het opnieuw.",
+  "plugin.install.failed.header": "Probleempje..."
 
 }
