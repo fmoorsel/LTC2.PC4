@@ -22,3 +22,16 @@ Doorloop de volgende stappen voor het bouwen en starten van de challenge applica
 Optioneel:
 
 - Stap 9: het Archive Importer Tool is te starten met: "runArchiveImporter.cmd"
+
+'Werk in uitvoering':
+
+- Dit project is opgezet als een tool dat oorspronkelijk alleen op Windows kon worden gebruikt
+- Er heeft ooit een Mac/OSX versie bestaan maar die is nooit 'ge-open-sourced' vanwege licentieredenen
+- Inmiddels is er een 'back-port' van die versie naar deze repository gedaan
+- De oorspronkelijke issues met licentie zitten niet meer in deze back-port
+- Het is echter nog steeds werk in uitvoering en nog niet volledig geschikt voor niet-Windows platform
+- Desalniettemin, het begin is er en enthousiastelingen zouden het kunnen oppakken
+- Het 'buildAllDebug.cmd' script bouwt ook deze 'generieke' applicatie
+- Deze applicatie is na het bouwen te starten met 'runGenericApplication.cmd'
+- Het is nog stees iets wat in ontwikkeling is dus mogelijk niet 100% stabiel
+- Als je eerder de zip file met script downloade, dan moet je deze opnieuw downloaden en uitpakken
