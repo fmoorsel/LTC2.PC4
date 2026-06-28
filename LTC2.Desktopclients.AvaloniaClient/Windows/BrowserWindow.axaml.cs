@@ -29,6 +29,8 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
         private ProgressRing _progressRing;
         private Button _btnUpdate;
         private TextBlock _txtBtnUpdate;
+        private Image _imgBtnUpdate;
+        private Image _imgBtnUpdateEnabled;
         private DispatcherTimer _timer;
 
         private TextBlock _lblStatusCalculator;
@@ -89,6 +91,8 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             _progressRing = this.FindControl<ProgressRing>("CtrProgressRing");
             _btnUpdate = this.FindControl<Button>("BtnUpdate");
             _txtBtnUpdate = this.FindControl<TextBlock>("TxtBtnUpdate");
+            _imgBtnUpdate = this.FindControl<Image>("ImgBtnUpdate");
+            _imgBtnUpdateEnabled = this.FindControl<Image>("ImgBtnUpdateEnabled");
             _lblStatusCalculator = this.FindControl<TextBlock>("LblPingCalculator");
             _lblStatusMainApp = this.FindControl<TextBlock>("LblPingMainApp");
             _lblUpdateProgress = this.FindControl<TextBlock>("LblStatusUpdate");
@@ -307,6 +311,12 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
                         _btnUpdate.IsEnabled = true;
                         break;
                     }
+                }
+
+                if (_btnUpdate.IsEnabled)
+                {
+                    _imgBtnUpdateEnabled.IsVisible = true;
+                    _imgBtnUpdate.IsVisible = false;
                 }
 
                 _ = _webViewConnector.Login();
