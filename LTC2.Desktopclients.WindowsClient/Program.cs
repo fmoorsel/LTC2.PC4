@@ -28,7 +28,7 @@ namespace LTC2.Desktopclients.WindowsClient
         [STAThread]
         public static void Main()
         {
-            ProcessUtils.EnsureOnlyOneProcess();
+            ProcessUtils.EnsureOnlyOneProcess("LTC2.Desktopclients.AvaloniaClient");
 
             ApplicationConfiguration.Initialize();
 

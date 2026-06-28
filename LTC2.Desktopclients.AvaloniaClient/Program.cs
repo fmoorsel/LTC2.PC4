@@ -38,7 +38,7 @@ public static class Program
             SetLTC2Path();
             SetLibraryPath();
 
-            ProcessUtils.EnsureOnlyOneProcess();
+            ProcessUtils.EnsureOnlyOneProcess("LTC2.Desktopclients.WindowsClient");
 
             ApplicationHost = CreateHostBuilder().Build();
 

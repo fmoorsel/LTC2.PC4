@@ -27,7 +27,7 @@ namespace LTC2.Shared.Utils.Generic
         private const int SW_SHOWDEFAULT = 10;
 #endif
 
-        public static void EnsureOnlyOneProcess()
+        public static void EnsureOnlyOneProcess(params string[] competingProcessNames)
         {
 #if WINDOWS
             var proc = Process.GetCurrentProcess().ProcessName;
@@ -64,6 +64,24 @@ namespace LTC2.Shared.Utils.Generic
                 SetForegroundWindow(hWndOther);
 
                 Environment.Exit(0);
+            }
+
+            foreach (var competingName in competingProcessNames)
+            {
+                var competing = Process.GetProcessesByName(competingName);
+                if (competing.Length > 0)
+                {
+                    var hWnd = competing[0].MainWindowHandle;
+
+                    if (IsIconic(hWnd))
+                    {
+                        ShowWindowAsync(hWnd, SW_RESTORE);
+                    }
+
+                    SetForegroundWindow(hWnd);
+
+                    Environment.Exit(0);
+                }
             }
 #else
     // intentionally empty due to cross-platform concerns
