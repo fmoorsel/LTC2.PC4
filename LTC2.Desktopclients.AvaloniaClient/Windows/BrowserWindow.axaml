@@ -45,7 +45,7 @@
             </StackPanel>
         </Border>
 
-        <webview:NativeWebView DockPanel.Dock="Left" x:Name="WebView" Focusable="True" />
+        <webview:NativeWebView DockPanel.Dock="Left" x:Name="WebView" Focusable="True" Background ="White" />
 
     </DockPanel>
 
