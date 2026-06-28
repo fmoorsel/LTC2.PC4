@@ -33,5 +33,5 @@ Optioneel:
 - Desalniettemin, het begin is er en enthousiastelingen zouden het kunnen oppakken
 - Het 'buildAllDebug.cmd' script bouwt ook deze 'generieke' applicatie
 - Deze applicatie is na het bouwen te starten met 'runGenericApplication.cmd'
-- Het is nog stees iets wat in ontwikkeling is dus mogelijk niet 100% stabiel
-- Als je eerder de zip file met script downloade, dan moet je deze opnieuw downloaden en uitpakken
+- Het is nog steeds iets wat in ontwikkeling is dus mogelijk niet 100% stabiel
+- Als je eerder de zip file met script downloadde, dan moet je deze opnieuw downloaden en uitpakken
