@@ -9,7 +9,7 @@
         MinWidth="1200"
         MinHeight="750">
 
-    <DockPanel Background="LightGray">
+    <DockPanel Background="#E6E8EA">
 
         <DockPanel DockPanel.Dock="Top">
             <Panel DockPanel.Dock="Left" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -28,7 +28,7 @@
 
             <Border DockPanel.Dock="Bottom" Height="70" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Button Name="BtnLink" Height="50" Width="175" IsEnabled="False"
-                        Theme="{StaticResource SolidButton}" Classes="Tertiary"
+                        Theme="{StaticResource LightButton}" Classes="Tertiary" Background="#C6CACD"
                         CornerRadius="5" Click="ClickHandlerLink" />
             </Border>
         </DockPanel>

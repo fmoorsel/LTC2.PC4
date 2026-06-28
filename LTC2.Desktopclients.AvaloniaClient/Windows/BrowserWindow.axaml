@@ -9,7 +9,7 @@
         MinHeight="750"
         WindowStartupLocation="CenterScreen">
 
-    <DockPanel Background="LightGray">
+    <DockPanel Background="#E6E8EA">
 
         <DockPanel DockPanel.Dock="Top">
             <Panel DockPanel.Dock="Left" Width="50" VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -27,7 +27,7 @@
             <Panel DockPanel.Dock="Right" Width="50" />
 
             <Border DockPanel.Dock="Bottom" Height="70" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Button Name="BtnUpdate" Height="50" Width="150" IsEnabled="False" Classes="Tertiary" Theme="{StaticResource SolidButton}" CornerRadius="5" Click="ClickHandlerUpdate">
+                <Button Name="BtnUpdate" Height="50" Width="150" IsEnabled="False" Classes="Tertiary" Theme="{StaticResource LightButton}" Background="#C6CACD" CornerRadius="5" Click="ClickHandlerUpdate">
                     <TextBlock Name="TxtBtnUpdate" VerticalAlignment="Center" HorizontalAlignment="Center">Update</TextBlock>
                 </Button>
             </Border>

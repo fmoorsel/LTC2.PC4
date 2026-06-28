@@ -5,10 +5,10 @@
         WindowStartupLocation="CenterScreen"
         Width="760"
         Height="470"
-        Background="LightGray">
+        Background="#E6E8EA">
 
     <StackPanel>
-        <Border Background="LightGray" Margin="25" Width="700" Height="120" Padding="0" Theme="{StaticResource CardBorder}">
+        <Border Background="#E6E8EA" Margin="25" Width="700" Height="120" Padding="0" Theme="{StaticResource CardBorder}">
 
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -28,14 +28,14 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Grid.Row="0">
-                    <Button Name="BtnProfileManager" Click="ClickHandlerProfileManager" Width="160" Height="35" Margin="0,40,0,5" Theme="{StaticResource SolidButton}" Classes="Tertiary"></Button>
+                    <Button Name="BtnProfileManager" Click="ClickHandlerProfileManager" Width="160" Height="35" Margin="0,40,0,5" Theme="{StaticResource LightButton}" Classes="Tertiary" Background="#C6CACD"></Button>
                 </StackPanel>
 
             </Grid>
 
         </Border>
 
-        <Border  Margin="20,10" Width="700" Height="260" Background="LightGray" Padding="0" Theme="{StaticResource CardBorder}">
+        <Border  Margin="20,10" Width="700" Height="260" Background="#E6E8EA" Padding="0" Theme="{StaticResource CardBorder}">
 
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -51,15 +51,14 @@
                     <ListBox Name="LstProfiles" Background="WhiteSmoke" Margin="30,30,0,0" Height="200" Width="440" DoubleTapped="ClickHandlerProfileDoubleTapped">
                         <ListBox.Styles>
                             <Style Selector="ListBoxItem:selected">
-                                <Setter Property="Background" Value="SteelBlue"/>
-                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="Background" Value="#C6CACD"/>
                             </Style>
                         </ListBox.Styles>
                     </ListBox>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Top">
-                    <Button Name="BtnSelectProfile" Click="ClickHandlerSelectProfile" Width="160" Height="40" IsEnabled="False"  Margin="0,30,0,5" Theme="{StaticResource SolidButton}" Classes="Tertiary"></Button>
+                    <Button Name="BtnSelectProfile" Click="ClickHandlerSelectProfile" Width="160" Height="40" IsEnabled="False"  Margin="0,30,0,5" Theme="{StaticResource LightButton}" Classes="Tertiary" Background="#C6CACD"></Button>
                 </StackPanel>
             </Grid>
 

@@ -5,10 +5,10 @@
         WindowStartupLocation="CenterOwner"
         Width="560"
         Height="400"
-        Background="LightGray">
+        Background="#E6E8EA">
 
     <StackPanel>
-        <Border Background="LightGray" Margin="25" Width="500" Height="245" Padding="0" Theme="{StaticResource CardBorder}">
+        <Border Background="#E6E8EA" Margin="25" Width="500" Height="245" Padding="0" Theme="{StaticResource CardBorder}">
             <ListBox x:Name="LstActivities" Background="WhiteSmoke" Height="195" Width="440" SelectionMode="Multiple,Toggle">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
@@ -26,10 +26,10 @@
             </ListBox>
         </Border>
 
-        <Border Background="LightGray" Margin="3" Width="500" Height="75" Padding="0" Theme="{StaticResource CardBorder}">
+        <Border Background="#E6E8EA" Margin="3" Width="500" Height="75" Padding="0" Theme="{StaticResource CardBorder}">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                <Button x:Name="BtnApply" Click="ClickHandlerApply" Width="160" Height="40" Margin="0,0,20,0" Theme="{StaticResource SolidButton}" Classes="Tertiary" />
-                <Button x:Name="BtnCancel" Click="ClickHandlerCancel" Width="160" Height="40" Margin="20,0,0,0" Theme="{StaticResource SolidButton}" Classes="Tertiary" />
+                <Button x:Name="BtnApply" Click="ClickHandlerApply" Width="160" Height="40" Margin="0,0,20,0" Theme="{StaticResource LightButton}" Classes="Tertiary" Background="#C6CACD" />
+                <Button x:Name="BtnCancel" Click="ClickHandlerCancel" Width="160" Height="40" Margin="20,0,0,0" Theme="{StaticResource LightButton}" Classes="Tertiary" Background="#C6CACD" />
             </StackPanel>
         </Border>
     </StackPanel>

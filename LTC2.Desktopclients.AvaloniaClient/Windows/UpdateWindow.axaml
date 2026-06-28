@@ -5,10 +5,10 @@
         WindowStartupLocation="CenterOwner"
         Width="850"
         Height="440"
-        Background="LightGray">
+        Background="#E6E8EA">
 
     <StackPanel>
-        <Border HorizontalAlignment="Center" Background="LightGray" Margin="20" Width="810" Height="100" Theme="{StaticResource CardBorder}">
+        <Border HorizontalAlignment="Center" Background="#E6E8EA" Margin="20" Width="810" Height="100" Theme="{StaticResource CardBorder}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="200"/>
@@ -25,13 +25,13 @@
             </Grid>
         </Border>
 
-        <Border HorizontalAlignment="Center" x:Name="BdrBottom" Margin="20,10" Width="810" Height="260" Background="LightGray" Theme="{StaticResource CardBorder}">
+        <Border HorizontalAlignment="Center" x:Name="BdrBottom" Margin="20,10" Width="810" Height="260" Background="#E6E8EA" Theme="{StaticResource CardBorder}">
             <StackPanel Orientation="Vertical">
                 <RadioButton x:Name="RdoNormal" GroupName="UpdateGroup" Margin="10,10,0,0" IsChecked="True" Click="ClickHandlerRdoNormal"/>
                 <RadioButton x:Name="RdoFull" GroupName="UpdateGroup" Margin="10,10,0,0" Click="ClickHandlerRdoFull"/>
                 <CheckBox x:Name="ChkReload" IsEnabled="False" Margin="50,10,0,0"/>
-                <Button x:Name="BtnStartUpdate" Margin="0,30,0,0" Width="700" Height="80" IsEnabled="True" Theme="{StaticResource SolidButton}" Classes="Tertiary" Click="ClickHandlerStartUpdate"/>
-                <Button x:Name="BtnSelectMultiSports" IsVisible="False" Margin="0,20,0,0" Width="280" Height="40" IsEnabled="True" Theme="{StaticResource SolidButton}" Classes="Tertiary" Click="ClickHandlerSelectMultiSports"/>
+                <Button x:Name="BtnStartUpdate" Margin="0,30,0,0" Width="700" Height="80" IsEnabled="True" Theme="{StaticResource LightButton}" Background="#C6CACD" Classes="Tertiary" Click="ClickHandlerStartUpdate"/>
+                <Button x:Name="BtnSelectMultiSports" IsVisible="False" Margin="0,20,0,0" Width="280" Height="40" IsEnabled="True" Theme="{StaticResource LightButton}" Background="#C6CACD" Classes="Tertiary" Click="ClickHandlerSelectMultiSports"/>
             </StackPanel>
         </Border>
     </StackPanel>

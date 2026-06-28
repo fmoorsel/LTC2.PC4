@@ -9,7 +9,7 @@
         MinHeight="380"
         WindowStartupLocation="CenterScreen">
 
-    <DockPanel Background="LightGray">
+    <DockPanel Background="#E6E8EA">
 
         <Grid DockPanel.Dock="Top" Height="70">
 
@@ -44,7 +44,8 @@
                         Width="150"
                         Height="50"
                         Classes="Tertiary"
-                        Theme="{StaticResource SolidButton}"
+                        Theme="{StaticResource LightButton}"
+                        Background="#C6CACD"
                         CornerRadius="5"
                         Click="ClickHandlerCheckRoute">Check route</Button>
                 <Button Name="BtnUnCheckRoute"
@@ -53,7 +54,8 @@
                         Width="150"
                         Height="50"
                         Classes="Tertiary"
-                        Theme="{StaticResource SolidButton}"
+                        Theme="{StaticResource LightButton}"
+                        Background="#C6CACD"
                         CornerRadius="5"
                         Click="ClickHandlerUnCheckRoute">Uncheck route</Button>
             </StackPanel>
