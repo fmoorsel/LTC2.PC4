@@ -11,6 +11,8 @@ namespace LTC2.Shared.Utils.Utils
     /// <remarks>References:
     ///  https://stackoverflow.com/a/4657392/386091
     ///  https://stackoverflow.com/a/9164742/386091 </remarks>
+
+#if WINDOWS
     public static class ChildProcessTracker
     {
         /// <summary>
@@ -142,3 +144,13 @@ namespace LTC2.Shared.Utils.Utils
     }
 
 }
+#else
+    public static class ChildProcessTracker
+    {
+        public static void AddProcess(Process process)
+        {
+            // No-op on non-Windows platforms.
+        }
+    }
+#endif
+
