@@ -100,9 +100,14 @@ public static class Program
     {
         var configuration = GetConfig();
 
-        var appSettings = configuration.GetSection("AppSettings").Get<AppSettings>();
-        var lTC2HttpProxySettings = configuration.GetSection("LTC2HttpProxySettings").Get<LTC2HttpProxySettings>();
-        var genericSettings = configuration.GetSection("GenericSettings").Get<GenericSettings>();
+        var appSettings = new AppSettings();
+        configuration.GetSection("AppSettings").Bind(appSettings);
+
+        var lTC2HttpProxySettings = new LTC2HttpProxySettings();
+        configuration.GetSection("LTC2HttpProxySettings").Bind(lTC2HttpProxySettings);
+
+        var genericSettings = new GenericSettings();
+        configuration.GetSection("GenericSettings").Bind(genericSettings);
 
         services.AddSingleton(appSettings);
         services.AddSingleton(lTC2HttpProxySettings);
