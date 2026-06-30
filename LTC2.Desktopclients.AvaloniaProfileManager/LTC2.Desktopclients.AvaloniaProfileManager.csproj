@@ -9,6 +9,8 @@
 	<ApplicationManifest>app.manifest</ApplicationManifest>
 	<ApplicationIcon>Resources\Long Term Challenge Logo3.ico</ApplicationIcon>
 	<Version>1.0.0</Version>
+	<DefineConstants Condition="$([MSBuild]::IsOSPlatform('Windows'))">WINDOWS</DefineConstants>
+	<DefineConstants Condition="$([MSBuild]::IsOSPlatform('Linux'))">LINUX</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
