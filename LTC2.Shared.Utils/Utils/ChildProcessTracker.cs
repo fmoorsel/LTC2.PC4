@@ -142,8 +142,6 @@ namespace LTC2.Shared.Utils.Utils
         public UIntPtr PeakProcessMemoryUsed;
         public UIntPtr PeakJobMemoryUsed;
     }
-
-}
 #else
     public static class ChildProcessTracker
     {
@@ -153,4 +151,6 @@ namespace LTC2.Shared.Utils.Utils
         }
     }
 #endif
+
+}
 
