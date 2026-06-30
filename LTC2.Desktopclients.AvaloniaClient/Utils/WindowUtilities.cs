@@ -16,7 +16,6 @@ namespace LTC2.Desktopclients.AvaloniaClient.Utils
         [DllImport("libX11.so.6")] private static extern int XCloseDisplay(IntPtr display);
         [DllImport("libX11.so.6")] private static extern IntPtr XInternAtom(IntPtr display, string atomName, bool onlyIfExists);
         [DllImport("libX11.so.6")] private static extern int XChangeProperty(IntPtr display, IntPtr window, IntPtr property, IntPtr type, int format, int mode, ref MotifWmHints data, int nelements);
-        [DllImport("libX11.so.6")] private static extern int XChangeProperty(IntPtr display, IntPtr window, IntPtr property, IntPtr type, int format, int mode, IntPtr[] data, int nelements);
 
         [StructLayout(LayoutKind.Sequential)]
         private struct MotifWmHints
@@ -39,7 +38,6 @@ namespace LTC2.Desktopclients.AvaloniaClient.Utils
         private const ulong  MwmDecorTitle        = 8UL;
         private const ulong  MwmDecorMenu         = 16UL;
         private const ulong  MwmDecorMaximize     = 64UL;
-        private static readonly IntPtr XA_ATOM    = new IntPtr(4);
 #endif
 
         public static void RemoveMinimizeButton(Window window)
@@ -65,17 +63,6 @@ namespace LTC2.Desktopclients.AvaloniaClient.Utils
                     Decorations = MwmDecorBorder | MwmDecorTitle | MwmDecorMenu | MwmDecorMaximize,
                 };
                 XChangeProperty(display, handle.Handle, motifAtom, motifAtom, 32, PropModeReplace, ref hints, 5);
-
-                // _NET_WM_ALLOWED_ACTIONS: EWMH-compliant WMs (GNOME/Mutter, KWin) use this
-                // to decide which title-bar buttons to render. Omitting _NET_WM_ACTION_MINIMIZE
-                // hides the minimize button entirely instead of just graying it out.
-                var allowedAtom    = XInternAtom(display, "_NET_WM_ALLOWED_ACTIONS", false);
-                var actionMove     = XInternAtom(display, "_NET_WM_ACTION_MOVE", false);
-                var actionMaxHorz  = XInternAtom(display, "_NET_WM_ACTION_MAXIMIZE_HORZ", false);
-                var actionMaxVert  = XInternAtom(display, "_NET_WM_ACTION_MAXIMIZE_VERT", false);
-                var actionClose    = XInternAtom(display, "_NET_WM_ACTION_CLOSE", false);
-                var allowedActions = new[] { actionMove, actionMaxHorz, actionMaxVert, actionClose };
-                XChangeProperty(display, handle.Handle, allowedAtom, XA_ATOM, 32, PropModeReplace, allowedActions, allowedActions.Length);
             }
             finally
             {
