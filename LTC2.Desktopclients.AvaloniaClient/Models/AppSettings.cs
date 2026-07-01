@@ -12,6 +12,8 @@ namespace LTC2.Desktopclients.AvaloniaClient.Models
         private string _calculatorApp;
         private string _profileApp;
         private string _multiSportFolder;
+        private string _libraryPath;
+
 
         public string Name { get; set; }
 
@@ -80,6 +82,10 @@ namespace LTC2.Desktopclients.AvaloniaClient.Models
         public string RideWithGpsRouteBuilderRegex { get; set; }
         public string RideWithGpsSitePrefix { get; set; }
 
-        public string LibraryPath { get; set; }
+        public string LibraryPath
+        {
+            get => _libraryPath == null ? null : Environment.ExpandEnvironmentVariables(_libraryPath);
+            set => _libraryPath = value;
+        }
     }
 }

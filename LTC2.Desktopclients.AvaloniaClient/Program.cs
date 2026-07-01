@@ -183,7 +183,8 @@ public static class Program
 
         if (!string.IsNullOrEmpty(appSettings?.LibraryPath))
         {
-            Environment.SetEnvironmentVariable("DYLD_LIBRARY_PATH", appSettings.LibraryPath);
+            var envVar = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "DYLD_LIBRARY_PATH" : "LD_LIBRARY_PATH";
+            Environment.SetEnvironmentVariable(envVar, appSettings.LibraryPath);
         }
     }
 
