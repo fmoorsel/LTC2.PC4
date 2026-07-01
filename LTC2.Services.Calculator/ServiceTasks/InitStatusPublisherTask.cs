@@ -1,6 +1,7 @@
 ﻿using LTC2.Services.Calculator.Services;
 using LTC2.Shared.Models.Interprocess;
 using LTC2.Shared.Utils.Bootstrap.Interfaces;
+using LTC2.Shared.Utils.Generic;
 using LTC2.Shared.Utils.Utils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -67,10 +68,14 @@ namespace LTC2.Services.Calculator.ServiceTasks
                     {
                         proceed = !cancellationToken.IsCancellationRequested;
 
-
                         if (proceed)
                         {
                             var status = _statusNotifier.GetNotification();
+
+                            if (!ParentChecker.IsParentProcessRunning())
+                            {
+                                Environment.Exit(-1);
+                            }
 
                             proceed = !cancellationToken.IsCancellationRequested;
 
@@ -108,7 +113,7 @@ namespace LTC2.Services.Calculator.ServiceTasks
                     {
                         _logger.LogError(e, e.Message);
 
-                        proceed = false;
+                        Environment.Exit(-1);
                     }
                 }
 

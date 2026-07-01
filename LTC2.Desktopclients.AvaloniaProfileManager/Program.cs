@@ -66,7 +66,17 @@ namespace LTC2.Desktopclients.AvaloniaProfileManager
                 services.AddTransient<ProfileManagerWindow>();
                 services.AddTransient<TesterWindow>();
 
-                services.AddSingleton<ISecretsVault, WindowsSecretsVault>();
+                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+                if (isWindows)
+                {
+                    services.AddSingleton<ISecretsVault, WindowsSecretsVault>();
+                }
+                else
+                {
+                    services.AddSingleton<ISecretsVault, NoSecretsVault>();
+                }
+
                 services.AddSingleton<IDesktopProfileRepository, DesktopProfileRepository>();
                 services.AddSingleton<ITesterWindowFactory, TesterWindowFactory>();
 

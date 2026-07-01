@@ -6,6 +6,7 @@ using LTC2.Shared.Utils.Bootstrap.Interfaces;
 using LTC2.Shared.Utils.Utils;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace LTC2.Desktopclients.AvaloniaClient.ServiceTasks
@@ -51,6 +52,14 @@ namespace LTC2.Desktopclients.AvaloniaClient.ServiceTasks
                 if (_appSettings.WebAppParameters != null)
                 {
                     startInfo.Arguments = $"{_appSettings.WebAppParameters} prof:{_profileManager.Profile.ID}";
+                }
+
+                var isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+                var isMacOS = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+
+                if (isLinux || isMacOS)
+                {
+                    startInfo.Arguments = $"{_appSettings.WebAppParameters} ppid:{Process.GetCurrentProcess().Id}";
                 }
 
                 var process = Process.Start(startInfo);

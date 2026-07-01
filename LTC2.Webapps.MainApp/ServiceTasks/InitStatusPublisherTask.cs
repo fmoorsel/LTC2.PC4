@@ -1,5 +1,6 @@
 ﻿using LTC2.Shared.Models.Interprocess;
 using LTC2.Shared.Utils.Bootstrap.Interfaces;
+using LTC2.Shared.Utils.Generic;
 using LTC2.Shared.Utils.Utils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -78,6 +79,11 @@ namespace LTC2.Webapps.MainApp.ServiceTasks
 
                         proceed = !cancellationToken.IsCancellationRequested;
 
+                        if (!ParentChecker.IsParentProcessRunning())
+                        {
+                            Environment.Exit(-1);
+                        }
+
                         if (proceed)
                         {
                             Task.Delay(2000, cancellationToken).Wait(cancellationToken);
@@ -87,10 +93,11 @@ namespace LTC2.Webapps.MainApp.ServiceTasks
                     {
                         proceed = false;
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        // TODO: notify and close application properly
-                        proceed = false;
+                        _logger.LogError(e, e.Message);
+
+                        Environment.Exit(-1);
                     }
                 }
             }

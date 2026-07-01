@@ -5,17 +5,16 @@ using LTC2.Services.Calculator.Services;
 using LTC2.Services.Calculator.ServiceTasks;
 using LTC2.Shared.Common.Bootstrap.Extensions;
 using LTC2.Shared.Messaging.Implementations.FileBasedBroker.Extensions;
-using LTC2.Shared.RideWithGpsConnector.Bootstrap.Extensions;
 using LTC2.Shared.Repositories.Interfaces;
 using LTC2.Shared.Repositories.Mapdefinitions;
 using LTC2.Shared.Repositories.Repositories;
+using LTC2.Shared.RideWithGpsConnector.Bootstrap.Extensions;
 using LTC2.Shared.Secrets.Interfaces;
 using LTC2.Shared.Secrets.Vaults;
 using LTC2.Shared.SpatiaLiteRepository.Repositories;
 using LTC2.Shared.Stores.Interfaces;
 using LTC2.Shared.Stores.Stores;
 using LTC2.Shared.StravaConnector.Bootstrap.Extensions;
-using LTC2.Shared.StravaConnector.Interfaces;
 using LTC2.Shared.Utils.Bootstrap.Extensions;
 using LTC2.Shared.Utils.Bootstrap.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -25,6 +24,7 @@ using Serilog;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace LTC2.Services.Calculator
 {
@@ -74,7 +74,17 @@ namespace LTC2.Services.Calculator
 
                 services.AddSingleton<IScoresRepository, SqliteScoreRepository>();
 
-                services.AddSingleton<ISecretsVault, WindowsSecretsVault>();
+                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+                if (isWindows)
+                {
+                    services.AddSingleton<ISecretsVault, WindowsSecretsVault>();
+                }
+                else
+                {
+                    services.AddSingleton<ISecretsVault, NoSecretsVault>();
+                }
+
                 services.AddSingleton<IDesktopProfileRepository, DesktopProfileRepository>();
 
                 services.AddSingleton<SpatiaLiteRepository>();
