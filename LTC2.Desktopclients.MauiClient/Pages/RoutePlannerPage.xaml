@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:LTC2.Desktopclients.MauiClient.Controls"
+             x:Class="LTC2.Desktopclients.MauiClient.Pages.RoutePlannerPage"
+             BackgroundColor="#E6E8EA">
+    <ContentPage.Content>
+        <Grid RowDefinitions="Auto,*">
+
+            <!-- Top toolbar -->
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,Auto,*,Auto" HeightRequest="50"
+                  BackgroundColor="#C6CACD" Padding="5,0" ColumnSpacing="8">
+                <ActivityIndicator x:Name="CtrProgressRing" Grid.Column="0" IsRunning="False" IsVisible="False"
+                                   Color="Gray" WidthRequest="35" HeightRequest="35"
+                                   VerticalOptions="Center" HorizontalOptions="Center" />
+                <Button x:Name="BtnCheckRoute" Grid.Column="1" HeightRequest="40" WidthRequest="130"
+                        IsVisible="False" Clicked="OnCheckRoute" BackgroundColor="#9EA5AA" TextColor="Black"
+                        VerticalOptions="Center" />
+                <Button x:Name="BtnUnCheckRoute" Grid.Column="2" HeightRequest="40" WidthRequest="130"
+                        IsVisible="False" IsEnabled="False" Clicked="OnUnCheckRoute" BackgroundColor="#9EA5AA" TextColor="Black"
+                        VerticalOptions="Center" />
+                <Label x:Name="LblCurrentPlace" Grid.Column="3" VerticalOptions="Center"
+                       Margin="10,0" FontSize="13" />
+                <StackLayout Grid.Column="4" Orientation="Horizontal" VerticalOptions="Center" Spacing="8">
+                    <CheckBox x:Name="ChkToggleVisibility" IsVisible="False" IsChecked="True"
+                              CheckedChanged="OnToggleVisibility" Color="Black" />
+                    <Label x:Name="LblToggleVisibility" VerticalOptions="Center" IsVisible="False" />
+                </StackLayout>
+            </Grid>
+
+            <!-- WebView -->
+            <controls:Ltc2WebView x:Name="WebView" Grid.Row="1" />
+
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

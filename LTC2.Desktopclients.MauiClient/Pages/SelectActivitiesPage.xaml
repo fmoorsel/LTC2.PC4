@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="LTC2.Desktopclients.MauiClient.Pages.SelectActivitiesPage"
+             BackgroundColor="#E6E8EA">
+    <ContentPage.Content>
+        <Grid RowDefinitions="*,Auto" Margin="15" RowSpacing="10">
+            <ListView x:Name="LstActivities" Grid.Row="0" BackgroundColor="WhiteSmoke"
+                      HasUnevenRows="True">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout Orientation="Horizontal" Padding="10,5">
+                                <CheckBox IsChecked="{Binding IsSelected}" Color="Black" VerticalOptions="Center" />
+                                <Label Text="{Binding Description}" VerticalOptions="Center" />
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <StackLayout Grid.Row="1" Orientation="Horizontal" Spacing="10" HorizontalOptions="Center">
+                <Button x:Name="BtnApply" WidthRequest="140" HeightRequest="40"
+                        Clicked="OnApply" BackgroundColor="#C6CACD" TextColor="Black" />
+                <Button x:Name="BtnCancel" WidthRequest="140" HeightRequest="40"
+                        Clicked="OnCancel" BackgroundColor="#C6CACD" TextColor="Black" />
+            </StackLayout>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

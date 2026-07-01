@@ -1,0 +1,190 @@
+[
+    {
+        "value": "Ride",
+        "description": "Rit/Ride"
+    },
+    {
+        "value": "Walk",
+        "description": "Wandeling/Walk"
+    },
+    {
+        "value": "Hike",
+        "description": "Hiken/Hike"
+    },
+    {
+        "value": "Run",
+        "description": "Hardloopsessie/Run"
+    },
+    {
+        "value": "Swim",
+        "description": "Zwemsessie/Swim"
+    },
+    {
+        "value": "TrailRun",
+        "description": "Trailrun/Trail Run"
+    },
+    {
+        "value": "MountainBikeRide",
+        "description": "Mountainbike-rit/Mountain Bike Ride"
+    },
+    {
+        "value": "GravelRide",
+        "description": "Gravelrit/Gravel Ride"
+    },
+    {
+        "value": "EBikeRide",
+        "description": "E-bike-rit/E-Bike Ride"
+    },
+    {
+        "value": "EMountainBikeRide",
+        "description": "E-mountainbike-rit/E-Mountain Bike Ride"
+    },
+    {
+        "value": "AlpineSki",
+        "description": "Alpineskiën/Alpine Ski"
+    },
+    {
+        "value": "Badminton",
+        "description": "Badminton/Badminton"
+    },
+    {
+        "value": "BackcountrySki",
+        "description": "Off-piste skiën/Backcountry Ski"
+    },
+    {
+        "value": "Canoeing",
+        "description": "Kanoën/Canoe"
+    },
+    {
+        "value": "Crossfit",
+        "description": "Crossfit/Crossfit"
+    },
+    {
+        "value": "Elliptical",
+        "description": "Crosstrainer/Elliptical"
+    },
+    {
+        "value": "Golf",
+        "description": "Golf/Golf"
+    },
+    {
+        "value": "IceSkate",
+        "description": "Schaatsen/Ice Skate"
+    },
+    {
+        "value": "InlineSkate",
+        "description": "Inline skaten/Inline Skate"
+    },
+    {
+        "value": "Handcycle",
+        "description": "Handfietsen/Handcycle"
+    },
+    {
+        "value": "HighIntensityIntervalTraining",
+        "description": "HIIT/HIIT"
+    },
+    {
+        "value": "Kayaking",
+        "description": "Kajakken/Kayaking"
+    },
+    {
+        "value": "Kitesurf",
+        "description": "Kitesurfen/Kitesurf"
+    },
+    {
+        "value": "NordicSki",
+        "description": "Noords skiën/Nordic Ski"
+    },
+    {
+        "value": "Pickleball",
+        "description": "Pickleball/Pickleball"
+    },
+    {
+        "value": "Pilates",
+        "description": "Pilates/Pilates"
+    },
+    {
+        "value": "Racquetball",
+        "description": "Racquetball/Racquetball"
+    },
+    {
+        "value": "RockClimbing",
+        "description": "Rotsklimmen/Rock Climb"
+    },
+    {
+        "value": "RollerSki",
+        "description": "Rolskiën/Roller Ski"
+    },
+    {
+        "value": "Rowing",
+        "description": "Roeien/Rowing"
+    },
+    {
+        "value": "Sail",
+        "description": "Zeilen/Sail"
+    },
+    {
+        "value": "Skateboard",
+        "description": "Skateboarden/Skateboard"
+    },
+    {
+        "value": "Snowboard",
+        "description": "Snowboarden/Snowboard"
+    },
+    {
+        "value": "Snowshoe",
+        "description": "Sneeuwschoenwandelen/Snowshoe"
+    },
+    {
+        "value": "Soccer",
+        "description": "Voetbal/Football (Soccer)"
+    },
+    {
+        "value": "Squash",
+        "description": "Squash/Squash"
+    },
+    {
+        "value": "StandUpPaddling",
+        "description": "Suppen/Stand Up Paddling"
+    },
+    {
+        "value": "StairStepper",
+        "description": "Stepapparaat/Stair-Stepper"
+    },
+    {
+        "value": "Surfing",
+        "description": "Surfen/Surfing"
+    },
+    {
+        "value": "TableTennis",
+        "description": "Tafel Tennis/Table Tennis"
+    },
+    {
+        "value": "Tennis",
+        "description": "Tennis/Tennis"
+    },
+    {
+        "value": "Velomobile",
+        "description": "Velomobiel/Velomobile"
+    },
+    {
+        "value": "WeightTraining",
+        "description": "Krachttraining/Weight Training"
+    },
+    {
+        "value": "Windsurf",
+        "description": "Windsurfen/Windsurf"
+    },
+    {
+        "value": "Wheelchair",
+        "description": "Rolstoel/Wheelchair"
+    },
+    {
+        "value": "Workout",
+        "description": "Training/Workout"
+    },
+    {
+        "value": "Yoga",
+        "description": "Yoga/Yoga"
+    }
+]

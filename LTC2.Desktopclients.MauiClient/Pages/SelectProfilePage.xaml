@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="LTC2.Desktopclients.MauiClient.Pages.SelectProfilePage"
+             BackgroundColor="#E6E8EA">
+    <ContentPage.Content>
+        <StackLayout Margin="20" Spacing="12">
+            <Label x:Name="LblLine1" FontSize="14" />
+            <Label x:Name="LblLine2" FontSize="12" TextColor="Gray" />
+            <ListView x:Name="LstProfiles" HeightRequest="200" BackgroundColor="WhiteSmoke" />
+            <StackLayout Orientation="Horizontal" Spacing="10" HorizontalOptions="Center">
+                <Button x:Name="BtnSelectProfile" WidthRequest="200" HeightRequest="45"
+                        Clicked="OnSelectProfile" BackgroundColor="#C6CACD" TextColor="Black" />
+                <Button x:Name="BtnProfileManager" WidthRequest="160" HeightRequest="45"
+                        Clicked="OnProfileManager" BackgroundColor="#C6CACD" TextColor="Black" />
+            </StackLayout>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

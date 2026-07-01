@@ -1,0 +1,82 @@
+{
+  "title.start.window": "Opstarten Long Term NL Postcode Challenge...",
+
+  "title.browser.window": "Long Term NL Postcode Challenge",
+  "title.update.window": "Update...",
+
+  "label.running.update": "Lopende update:",
+  "label.running.update.status": "Er loopt een update die is gestart op %0%.",
+  "label.running.update.limit": "De lopende update overschreed de dag-limit van Strava.",
+  "label.progress.update": "Voortgang update:",
+  "label.no.update": "geen lopende updates",
+  "label.progress.check.1": "Rit op %0%",
+  "label.progress.check.2": "Rit op %0% om %1%",
+  "label.limit.update": "Tussenresult opgeslagen, start update opnieuw na %0%",
+  "label.limit.update.quarter": "Kwartier-limiet bereikt, gepauzeerd tot %0%",
+
+  "radio.normal.update": "Normale synchronisatie (je score bijwerken met je laatste activiteiten)",
+  "radio.calc.all.update": "Alle activiteiten opnieuw doorrekenen (je score opnieuw bepalen als je activiteiten verwijderde of aanpaste)",
+  "checkbox.renew.details": "Rit details opnieuw ophalen (alleen gebruiken als je ritten hebt ingekort)",
+
+  "label.status.route.checker": "Status Route Checker:",
+  "label.status.map.manager": "Status Landkaart Manager:",
+
+  "progress.status.start": "wordt gestart...",
+  "progress.status.stop": "wordt gestopt...",
+
+  "button.start.openviewer": "Start Kaarten Viewer...",
+  "button.start.openprofilemanager": "Profiel Manager...",
+
+  "button.browser.update": "Update...",
+
+  "button.start.update": "Start update",
+
+  "component.calculator": "Route Checker",
+  "component.webapp": "Landkaart Manager",
+  "progress.ride": "Rit",
+  "progress.limit": " De lopende update overschreed de dag-limit van Strava.",
+  "progress.quater.limit": "  Strava kwartier-limiet bereikt, update gepauzeerd tot ",
+  "messagebox.fatal.component.exit": "De %0% is uit de lucht.\n\nDe application kan niet verder werken zonder deze component. Herstart de applicatie.",
+  "messagebox.fatal.component.exit.header": "Probleempje...",
+  "messagebox.exit.confirm": "Er loopt nog een update. Wil je deze update stoppen?",
+  "messagebox.exit.confirm.header": "Zeker weten?",
+  "messagebox.intermediate.found": "Wil je het tussenresultaat inlezen zodat je daarna met dit tussenresultaat een nieuwe update kunt starten?",
+  "messagebox.intermediate.found.header": "Tussenresult gevonden",
+  "messagebox.intermediate.process": "Het tussenresultaat wordt ingelezen, je moet daarna een update uitvoeren om het actuele resultaat te krijgen.",
+  "messagebox.intermediate.process.header": "Tussenresultaat inlezen",
+
+  "button.yes": "Ja",
+  "button.no": "Nee",
+
+  "window.select.profile": "Kies een profiel...",
+  "groupbox.profile.info": "Profiel informatie",
+  "groupbox.select.profile": "Selecteer Profiel",
+  "button.select.profile": "Selecteer Profiel...",
+  "label.no.profiles.1": "Je hebt nog geen profiel aangemaakt.",
+  "label.no.profiles.2": "Maak met 'Profiel Manager' een profiel aan en herstart applicatie.",
+  "label.multiple.profiles.1": "Er zijn meerdere profielen gevonden.",
+  "label.multiple.profiles.2": "Kies hieronder het profiel dat je nu wil gebruiken.",
+
+  "checkbox.start.multisport": "Start in MultiSport modus",
+  "button.select.multisport": "Kies MultiSport sporten",
+  "title.select.multisport.window": "Selecteer je MultiSport sporten",
+
+  "title.selectprofile.window": "Kies een profiel",
+  "button.selectprofile.select": "Selecteer Profiel...",
+  "button.selectprofile.profilemanager": "Profiel Manager...",
+
+  "button.select.activities.apply": "Toepassen",
+  "button.select.activities.cancel": "Annuleren",
+
+  "title.routeplanner.window": "Route Planner",
+  "button.checkroute": "Check route",
+  "button.uncheckroute": "Verberg check",
+  "check.toggle.visibility": "Toon/verberg postcode-gebieden",
+  "routeplanner.no_map_support": "Kaart wordt niet ondersteund",
+  "routeplanner.postcode": "Postcode: %0%",
+  "routeplanner.postcode.visited": "Postcode %0% (afgevinkt)",
+  "routeplanner.postcode.year": "Postcode %0% (ook dit jaar afgevinkt)",
+  "plugin.install.failed": "Kan de Route Builder extensie niet activeren.",
+  "plugin.install.failed.header": "Helaas..."
+
+}

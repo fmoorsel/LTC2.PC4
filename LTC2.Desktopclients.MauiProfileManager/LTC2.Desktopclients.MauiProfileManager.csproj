@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net10.0-windows10.0.19041.0</TargetFrameworks>
+    <WindowsPackageType>None</WindowsPackageType>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RootNamespace>LTC2.Desktopclients.MauiProfileManager</RootNamespace>
+    <AssemblyName>LTC2.Desktopclients.MauiProfileManager</AssemblyName>
+    <ApplicationId>nl.ltc2.maui.profilemanager</ApplicationId>
+    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LTC2.Shared.BaseMessages\LTC2.Shared.BaseMessages.csproj" />
+    <ProjectReference Include="..\LTC2.Shared.Models\LTC2.Shared.Models.csproj" />
+    <ProjectReference Include="..\LTC2.Shared.Repositories\LTC2.Shared.Repositories.csproj" />
+    <ProjectReference Include="..\LTC2.Shared.Secrets\LTC2.Shared.Secrets.csproj" />
+    <ProjectReference Include="..\LTC2.Shared.Utils\LTC2.Shared.Utils.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\messages.nl.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

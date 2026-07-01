@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="LTC2.Desktopclients.MauiClient.Pages.StartPage"
+             BackgroundColor="#E6E8EA">
+    <ContentPage.Content>
+        <StackLayout Margin="20" Spacing="12" VerticalOptions="Center">
+
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="8">
+                <Label x:Name="LblLabelStatusCalculator" Grid.Column="0" Grid.Row="0" VerticalOptions="Center" FontAttributes="Bold" />
+                <Label x:Name="LblStatusCalculator" Grid.Column="1" Grid.Row="0" VerticalOptions="Center" />
+                <Label x:Name="LblLabelStatusMainApp" Grid.Column="0" Grid.Row="1" VerticalOptions="Center" FontAttributes="Bold" />
+                <Label x:Name="LblStatusMainApp" Grid.Column="1" Grid.Row="1" VerticalOptions="Center" />
+            </Grid>
+
+            <StackLayout Orientation="Horizontal" Spacing="6" VerticalOptions="Center">
+                <CheckBox x:Name="ChkMultiSport" IsEnabled="False" Color="Black" VerticalOptions="Center" />
+                <Label x:Name="LblMultiSport" VerticalOptions="Center" />
+            </StackLayout>
+
+            <StackLayout Orientation="Horizontal" Spacing="10" HorizontalOptions="Center">
+                <Button x:Name="BtnOpenViewer" WidthRequest="220" HeightRequest="45" IsEnabled="False"
+                        Clicked="OnOpenViewer" BackgroundColor="#C6CACD" TextColor="Black" />
+                <Button x:Name="BtnOpenProfileManager" WidthRequest="180" HeightRequest="45"
+                        Clicked="OnOpenProfileManager" BackgroundColor="#C6CACD" TextColor="Black" />
+            </StackLayout>
+
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

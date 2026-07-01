@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:LTC2.Desktopclients.MauiClient.Controls"
+             x:Class="LTC2.Desktopclients.MauiClient.Pages.BrowserPage"
+             BackgroundColor="#E6E8EA">
+    <ContentPage.Content>
+        <Grid RowDefinitions="Auto,*,Auto">
+
+            <!-- Top toolbar -->
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto" HeightRequest="50" BackgroundColor="#C6CACD" Padding="5,0">
+                <ActivityIndicator x:Name="CtrProgressRing" Grid.Column="0" IsRunning="False" IsVisible="False"
+                                   Color="Gray" WidthRequest="35" HeightRequest="35"
+                                   VerticalOptions="Center" HorizontalOptions="Center" />
+                <Button x:Name="BtnUpdate" Grid.Column="2" HeightRequest="40" WidthRequest="110"
+                        IsEnabled="False" Clicked="OnUpdate" BackgroundColor="#9EA5AA" TextColor="Black"
+                        VerticalOptions="Center" />
+            </Grid>
+
+            <!-- WebView -->
+            <controls:Ltc2WebView x:Name="WebView" Grid.Row="1" />
+
+            <!-- Status bar -->
+            <Grid Grid.Row="2" ColumnDefinitions="*,*,*" HeightRequest="28" BackgroundColor="#C6CACD" Padding="5,2">
+                <Label x:Name="LblPingCalculator" Grid.Column="0" FontSize="11" VerticalOptions="Center" />
+                <Label x:Name="LblStatusUpdate" Grid.Column="1" FontSize="11" VerticalOptions="Center" HorizontalOptions="Center" />
+                <Label x:Name="LblPingMainApp" Grid.Column="2" FontSize="11" VerticalOptions="Center" HorizontalOptions="End" />
+            </Grid>
+
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

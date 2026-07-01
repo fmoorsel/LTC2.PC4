@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:LTC2.Desktopclients.MauiProfileManager.Controls"
+             x:Class="LTC2.Desktopclients.MauiProfileManager.Pages.TesterPage"
+             BackgroundColor="#E6E8EA">
+    <ContentPage.Content>
+        <Grid RowDefinitions="Auto,*">
+            <!-- Top bar -->
+            <Grid Grid.Row="0" ColumnDefinitions="60,*,60" HeightRequest="70">
+                <ActivityIndicator x:Name="CtrProgressRing" Grid.Column="0" IsRunning="False" IsVisible="False" Color="Gray" WidthRequest="40" HeightRequest="40" VerticalOptions="Center" HorizontalOptions="Center" />
+                <Button x:Name="BtnLink" Grid.Column="1" HeightRequest="50" WidthRequest="175" IsEnabled="False" Clicked="OnClickHandlerLink" BackgroundColor="#C6CACD" TextColor="Black" HorizontalOptions="Center" VerticalOptions="Center" />
+            </Grid>
+            <!-- WebView -->
+            <controls:Ltc2WebView x:Name="WebView" Grid.Row="1" />
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

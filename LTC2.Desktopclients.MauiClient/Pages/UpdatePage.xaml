@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="LTC2.Desktopclients.MauiClient.Pages.UpdatePage"
+             BackgroundColor="#E6E8EA">
+    <ContentPage.Content>
+        <StackLayout Margin="20" Spacing="10">
+
+            <Label x:Name="LblLabelStatusUpdate" FontAttributes="Bold" />
+            <Label x:Name="LblStatusUpdate" />
+
+            <Label x:Name="LblLabelProgressUpdate" FontAttributes="Bold" Margin="0,10,0,0" />
+            <Label x:Name="LblProgressUpdate" />
+
+            <BoxView HeightRequest="1" BackgroundColor="#AAAAAA" Margin="0,10" />
+
+            <Label Text="Berekenmethode:" FontAttributes="Bold" />
+            <StackLayout Spacing="5">
+                <StackLayout Orientation="Horizontal" Spacing="8">
+                    <RadioButton x:Name="RdoNormal" IsChecked="True" CheckedChanged="OnRdoNormal" />
+                    <Label x:Name="LblRdoNormal" VerticalOptions="Center" />
+                </StackLayout>
+                <StackLayout Orientation="Horizontal" Spacing="8">
+                    <RadioButton x:Name="RdoFull" IsChecked="False" CheckedChanged="OnRdoFull" />
+                    <Label x:Name="LblRdoFull" VerticalOptions="Center" />
+                </StackLayout>
+            </StackLayout>
+
+            <StackLayout x:Name="PnlReload" Orientation="Horizontal" Spacing="8" IsVisible="False">
+                <CheckBox x:Name="ChkReload" IsEnabled="False" Color="Black" />
+                <Label x:Name="LblChkReload" VerticalOptions="Center" />
+            </StackLayout>
+
+            <StackLayout Orientation="Horizontal" Spacing="10" Margin="0,15,0,0">
+                <Button x:Name="BtnStartUpdate" WidthRequest="160" HeightRequest="45"
+                        Clicked="OnStartUpdate" BackgroundColor="#C6CACD" TextColor="Black" />
+                <Button x:Name="BtnSelectMultiSports" WidthRequest="200" HeightRequest="45"
+                        IsVisible="False" Clicked="OnSelectMultiSports" BackgroundColor="#C6CACD" TextColor="Black" />
+            </StackLayout>
+
+            <Button x:Name="BtnClose" WidthRequest="120" HeightRequest="40" Text="Sluiten"
+                    Clicked="OnClose" BackgroundColor="#C6CACD" TextColor="Black" HorizontalOptions="End" />
+
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

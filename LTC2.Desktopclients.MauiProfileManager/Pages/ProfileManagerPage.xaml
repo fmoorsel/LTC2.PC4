@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="LTC2.Desktopclients.MauiProfileManager.Pages.ProfileManagerPage"
+             BackgroundColor="#E6E8EA">
+    <ContentPage.Content>
+        <Grid RowDefinitions="Auto,*">
+
+            <!-- Tab header row -->
+            <HorizontalStackLayout Grid.Row="0" Spacing="0" BackgroundColor="#C6CACD">
+                <Button x:Name="BtnTabStrava" Text="Strava" Clicked="OnTabStrava" BackgroundColor="#9EA5AA" TextColor="Black" CornerRadius="0" WidthRequest="120" HeightRequest="35" />
+                <Button x:Name="BtnTabRwGps" Text="RideWithGPS" Clicked="OnTabRwGps" BackgroundColor="#C6CACD" TextColor="Black" CornerRadius="0" WidthRequest="140" HeightRequest="35" />
+            </HorizontalStackLayout>
+
+            <!-- Tab content -->
+            <Grid Grid.Row="1">
+
+                <!-- Strava panel -->
+                <StackLayout x:Name="PanelStrava" Margin="10" Spacing="10">
+                    <Border Padding="10" BackgroundColor="#E6E8EA" Stroke="#AAAAAA" StrokeShape="RoundRectangle 5">
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="175" />
+                            </Grid.ColumnDefinitions>
+                            <ListView x:Name="LstProfiles" Grid.Column="0" HeightRequest="160" BackgroundColor="WhiteSmoke" ItemSelected="OnProfileSelected" />
+                            <StackLayout Grid.Column="1" VerticalOptions="Center" Spacing="5">
+                                <Button x:Name="BtnEditProfile" WidthRequest="165" HeightRequest="40" IsEnabled="False" Clicked="OnEditProfile" BackgroundColor="#C6CACD" TextColor="Black" />
+                                <Button x:Name="BtnNewProfile" WidthRequest="165" HeightRequest="40" Clicked="OnNewProfile" BackgroundColor="#C6CACD" TextColor="Black" />
+                                <Button x:Name="BtnDeleteProfile" WidthRequest="165" HeightRequest="40" IsEnabled="False" Clicked="OnDeleteProfile" BackgroundColor="#C6CACD" TextColor="Black" />
+                            </StackLayout>
+                        </Grid>
+                    </Border>
+                    <Border x:Name="GrpDetails" Padding="15" BackgroundColor="#E6E8EA" IsEnabled="False" Stroke="#AAAAAA" StrokeShape="RoundRectangle 5">
+                        <Grid ColumnSpacing="10" RowSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="175" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="175" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="50" />
+                                <RowDefinition Height="50" />
+                                <RowDefinition Height="50" />
+                            </Grid.RowDefinitions>
+                            <Label x:Name="LblProfileName" Grid.Column="0" Grid.Row="0" VerticalOptions="Center" />
+                            <Entry x:Name="TxtProfileName" Grid.Column="1" Grid.Row="0" VerticalOptions="Center" BackgroundColor="WhiteSmoke" TextChanged="OnTextChanged" />
+                            <Button x:Name="BtnTestProfile" Grid.Column="2" Grid.Row="0" WidthRequest="165" HeightRequest="40" IsEnabled="False" Clicked="OnTestProfile" BackgroundColor="#C6CACD" TextColor="Black" />
+                            <Label x:Name="LblClientId" Grid.Column="0" Grid.Row="1" VerticalOptions="Center" />
+                            <Entry x:Name="TxtClientId" Grid.Column="1" Grid.Row="1" VerticalOptions="Center" BackgroundColor="WhiteSmoke" TextChanged="OnTextChanged" />
+                            <Label x:Name="LblError" Grid.Column="2" Grid.Row="1" VerticalOptions="Center" TextColor="Crimson" IsVisible="False" />
+                            <Label x:Name="LblClientSecret" Grid.Column="0" Grid.Row="2" VerticalOptions="Center" />
+                            <Entry x:Name="TxtClientSecret" Grid.Column="1" Grid.Row="2" VerticalOptions="Center" BackgroundColor="WhiteSmoke" IsPassword="True" TextChanged="OnTextChanged" />
+                            <Button x:Name="BtnShowSecret" Grid.Column="2" Grid.Row="2" WidthRequest="165" HeightRequest="40" Clicked="OnShowSecret" BackgroundColor="#C6CACD" TextColor="Black" />
+                        </Grid>
+                    </Border>
+                </StackLayout>
+
+                <!-- RwGPS panel -->
+                <StackLayout x:Name="PanelRwGps" Margin="10" Spacing="10" IsVisible="False">
+                    <Border Padding="10" BackgroundColor="#E6E8EA" Stroke="#AAAAAA" StrokeShape="RoundRectangle 5">
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="175" />
+                            </Grid.ColumnDefinitions>
+                            <ListView x:Name="LstProfilesRwg" Grid.Column="0" HeightRequest="160" BackgroundColor="WhiteSmoke" ItemSelected="OnProfileSelectedRwg" />
+                            <StackLayout Grid.Column="1" VerticalOptions="Center" Spacing="5">
+                                <Button x:Name="BtnEditProfileRwg" WidthRequest="165" HeightRequest="40" IsEnabled="False" Clicked="OnEditProfileRwg" BackgroundColor="#C6CACD" TextColor="Black" />
+                                <Button x:Name="BtnNewProfileRwg" WidthRequest="165" HeightRequest="40" Clicked="OnNewProfileRwg" BackgroundColor="#C6CACD" TextColor="Black" />
+                                <Button x:Name="BtnDeleteProfileRwg" WidthRequest="165" HeightRequest="40" IsEnabled="False" Clicked="OnDeleteProfileRwg" BackgroundColor="#C6CACD" TextColor="Black" />
+                            </StackLayout>
+                        </Grid>
+                    </Border>
+                    <Border x:Name="GrpDetailsRwg" Padding="15" BackgroundColor="#E6E8EA" IsEnabled="False" Stroke="#AAAAAA" StrokeShape="RoundRectangle 5">
+                        <Grid ColumnSpacing="10" RowSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="175" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="175" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="50" />
+                                <RowDefinition Height="50" />
+                                <RowDefinition Height="50" />
+                            </Grid.RowDefinitions>
+                            <Label x:Name="LblProfileNameRwg" Grid.Column="0" Grid.Row="0" VerticalOptions="Center" />
+                            <Entry x:Name="TxtProfileNameRwg" Grid.Column="1" Grid.Row="0" VerticalOptions="Center" BackgroundColor="WhiteSmoke" TextChanged="OnTextChangedRwg" />
+                            <Button x:Name="BtnTestProfileRwg" Grid.Column="2" Grid.Row="0" WidthRequest="165" HeightRequest="40" IsEnabled="False" Clicked="OnTestProfileRwg" BackgroundColor="#C6CACD" TextColor="Black" />
+                            <Label x:Name="LblRwGpsId" Grid.Column="0" Grid.Row="1" VerticalOptions="Center" />
+                            <Entry x:Name="TxtRwGpsId" Grid.Column="1" Grid.Row="1" VerticalOptions="Center" BackgroundColor="WhiteSmoke" TextChanged="OnTextChangedRwg" />
+                            <Label x:Name="LblRwGpsSecret" Grid.Column="0" Grid.Row="2" VerticalOptions="Center" />
+                            <Entry x:Name="TxtRwGpsSecret" Grid.Column="1" Grid.Row="2" VerticalOptions="Center" BackgroundColor="WhiteSmoke" IsPassword="True" TextChanged="OnTextChangedRwg" />
+                            <Button x:Name="BtnShowSecretRwg" Grid.Column="2" Grid.Row="2" WidthRequest="165" HeightRequest="40" Clicked="OnShowSecretRwg" BackgroundColor="#C6CACD" TextColor="Black" />
+                        </Grid>
+                    </Border>
+                </StackLayout>
+
+            </Grid>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

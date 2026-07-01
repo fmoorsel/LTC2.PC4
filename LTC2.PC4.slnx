@@ -8,6 +8,8 @@
   <Folder Name="/LTC2.Desktop/Generic/">
     <Project Path="LTC2.Desktopclients.AvaloniaClient/LTC2.Desktopclients.AvaloniaClient.csproj" />
     <Project Path="LTC2.Desktopclients.AvaloniaProfileManager/LTC2.Desktopclients.AvaloniaProfileManager.csproj" />
+    <Project Path="LTC2.Desktopclients.MauiClient/LTC2.Desktopclients.MauiClient.csproj" />
+    <Project Path="LTC2.Desktopclients.MauiProfileManager/LTC2.Desktopclients.MauiProfileManager.csproj" />
   </Folder>
   <Folder Name="/LTC2.Desktop/Windows/">
     <Project Path="LTC2.Desktopclients.ArchiveImporter/LTC2.Desktopclients.ArchiveImporter.csproj" />
