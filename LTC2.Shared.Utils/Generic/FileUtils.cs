@@ -86,8 +86,9 @@ namespace LTC2.Shared.Utils.Generic
         public static string GetConfigFileAddition()
         {
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            var isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
-            if (isWindows)
+            if (isWindows || isLinux)
             {
                 return string.Empty;
             }

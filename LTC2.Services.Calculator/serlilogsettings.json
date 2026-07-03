@@ -6,7 +6,7 @@
       {
         "Name": "File",
         "Args": {
-          "path": "%LOCALAPPDATA%\\LTC2\\PC4\\Logs\\Calculator\\Calculator.log",
+          "path": "%HOME%/LTC2/PC4/Logs/Calculator/Calculator.log",
           "rollOnFileSizeLimit": true,
           "fileSizeLimitBytes": 1048576
         }

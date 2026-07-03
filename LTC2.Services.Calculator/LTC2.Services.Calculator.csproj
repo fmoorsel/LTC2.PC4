@@ -24,6 +24,9 @@
     <Compile Remove="Processors\**" />
     <EmbeddedResource Remove="Processors\**" />
     <None Remove="Processors\**" />
+    <None Update="Master\PC4.sqlite">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

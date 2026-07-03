@@ -1,7 +1,10 @@
 {
   "profiles": {
     "LTC2.Services.Calculator": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "environmentVariables": {
+        "LD_LIBRARY_PATH": "/usr/lib/x86_64-linux-gnu/"
+      }
     }
   }
 }

@@ -123,6 +123,10 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
 
                 webView2.UserDataFolder = _appSettings.WebviewRoot;
             }
+            else if (args is LinuxWpeWebViewEnvironmentRequestedEventArgs wpe)
+            {
+                wpe.PreferWebKitGtkInstead = true;
+            }
         }
 
         private void OnAdapterCreated(object sender, EventArgs e)

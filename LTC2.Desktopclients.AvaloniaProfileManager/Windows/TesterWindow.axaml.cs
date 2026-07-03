@@ -91,6 +91,10 @@ namespace LTC2.Desktopclients.AvaloniaProfileManager.Windows
 
                 webView2.UserDataFolder = _appSettings.WebviewRoot;
             }
+            else if (args is LinuxWpeWebViewEnvironmentRequestedEventArgs wpe)
+            {
+                wpe.PreferWebKitGtkInstead = true;
+            }
         }
 
         private async void OnAdapterCreated(object sender, EventArgs e)
