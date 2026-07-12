@@ -10,6 +10,7 @@ using LTC2.Shared.Models.Interprocess;
 using LTC2.Shared.Repositories.Interfaces;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -195,6 +196,7 @@ namespace LTC2.Desktopclients.AvaloniaProfileManager.Windows
 
         private void OnLoad()
         {
+            Console.WriteLine("OnLoad");
             _statusNotifier.OnStatusNotification += OnStatusNotification;
 
             CheckValid();
@@ -209,7 +211,11 @@ namespace LTC2.Desktopclients.AvaloniaProfileManager.Windows
             {
                 args.Cancel = true;
                 _isClosing = true;
-                Dispatcher.UIThread.Post(() => Environment.Exit(0));
+                Dispatcher.UIThread.Post(() =>
+                {
+                    Log.CloseAndFlush();
+                    Environment.Exit(0);
+                });
             }
         }
 
@@ -243,6 +249,7 @@ namespace LTC2.Desktopclients.AvaloniaProfileManager.Windows
                 var box = MessageBoxManager.GetMessageBoxStandard(caption, text, ButtonEnum.Ok);
                 await box.ShowWindowDialogAsync(this);
 
+                Log.CloseAndFlush();
                 Environment.Exit(0);
             }
         }

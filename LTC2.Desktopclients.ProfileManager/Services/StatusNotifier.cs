@@ -47,7 +47,8 @@ namespace LTC2.Desktopclients.ProfileManager.Services
                         {
                             Origin = component,
                             Status = StatusMessage.STATUS_PING,
-                            Message = DateTime.UtcNow.ToString()
+                            Message = DateTime.UtcNow.ToString(),
+                            Ticks = Environment.TickCount64
                         }
                     };
 
@@ -73,13 +74,12 @@ namespace LTC2.Desktopclients.ProfileManager.Services
 
                     if (!status.Notified)
                     {
-                        var timeStamp = DateTime.Parse(status.LastPing.Message);
-                        timeStamp = DateTime.SpecifyKind(timeStamp, DateTimeKind.Utc);
+                        var lastPingTicks = status.LastPing.Ticks;
 
                         var seenAtLeastOnce = status.SeenAtLeastOnce;
                         var pingDelta = seenAtLeastOnce ? _pingDelta : _pingDelta * StatusMessage.PING_DELTA_STARTUP_SLACK;
 
-                        if ((DateTime.UtcNow - timeStamp).TotalSeconds > pingDelta)
+                        if ((Environment.TickCount64 - lastPingTicks) / 1000.0 > pingDelta)
                         {
                             var statusMessage = new StatusMessage()
                             {

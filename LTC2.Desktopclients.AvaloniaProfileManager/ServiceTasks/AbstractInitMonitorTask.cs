@@ -6,6 +6,7 @@ using LTC2.Shared.Utils.Utils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Diagnostics;
 using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -61,23 +62,32 @@ namespace LTC2.Desktopclients.AvaloniaProfileManager.ServiceTasks
             {
                 _logger.LogInformation($"Pipe server started: {pipeName} {GetType().Name}");
 
+                var connectStopwatch = Stopwatch.StartNew();
                 var connected = pipeServer.WaitForConnectionEx(waitTime, cancellationToken);
+                connectStopwatch.Stop();
 
                 if (pipeServer.IsConnected)
                 {
-                    _logger.LogInformation($"Pipe server client connected: {pipeName} {GetType().Name}");
+                    _logger.LogInformation("Pipe server client connected: {PipeName} {Type} after {ElapsedMs}ms (allowed {WaitTimeMs}ms)",
+                        pipeName, GetType().Name, connectStopwatch.ElapsedMilliseconds, waitTime);
 
                     var stream = new StreamString(pipeServer);
+                    var lastMessageStopwatch = Stopwatch.StartNew();
 
                     while (proceed)
                     {
                         try
                         {
                             var messageContent = stream.ReadString();
+                            var sinceLastMessageMs = lastMessageStopwatch.ElapsedMilliseconds;
+                            lastMessageStopwatch.Restart();
+
                             var statusMessage = JsonConvert.DeserializeObject<StatusMessage>(messageContent);
 
                             if (statusMessage != null)
                             {
+                                _logger.LogDebug("Pipe read ({Type}): raw message from {Origin}, {SinceLastMessageMs}ms since previous read", GetType().Name, statusMessage.Origin, sinceLastMessageMs);
+
                                 _statusNotifier.Notify(statusMessage);
                             }
 
@@ -89,7 +99,7 @@ namespace LTC2.Desktopclients.AvaloniaProfileManager.ServiceTasks
                         }
                         catch (Exception e)
                         {
-                            _logger.LogError(e, "Pipe error ({Type})", GetType().Name);
+                            _logger.LogError(e, "Pipe error ({Type}), {ElapsedMsSinceLastMessage}ms since last successful read", GetType().Name, lastMessageStopwatch.ElapsedMilliseconds);
 
                             _statusNotifier.Notify(new StatusMessage()
                             {
@@ -104,6 +114,9 @@ namespace LTC2.Desktopclients.AvaloniaProfileManager.ServiceTasks
                 }
                 else
                 {
+                    _logger.LogError("Pipe server ({Type}) got no connection on '{PipeName}' after {ElapsedMs}ms (allowed {WaitTimeMs}ms)",
+                        GetType().Name, pipeName, connectStopwatch.ElapsedMilliseconds, waitTime);
+
                     _statusNotifier.Notify(new StatusMessage()
                     {
                         Status = StatusMessage.STATUS_FATAL,

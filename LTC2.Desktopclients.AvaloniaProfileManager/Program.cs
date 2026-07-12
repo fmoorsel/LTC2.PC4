@@ -17,6 +17,7 @@ using LTC2.Shared.Utils.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -85,9 +86,28 @@ namespace LTC2.Desktopclients.AvaloniaProfileManager
                 services.AddSingleton<IServiceTask, StartWebappServiceTask>();
 
                 services.AddSingleton<IBaseTranslationService, BaseTranslationService>();
+
+                services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(GetSeriLogger(), dispose: true));
             });
 
             return hostBuilder;
+        }
+
+        private static ILogger GetSeriLogger()
+        {
+            var processModule = Process.GetCurrentProcess().MainModule;
+            var appSettingsFolder = Path.GetDirectoryName(processModule?.FileName) ?? string.Empty;
+
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(appSettingsFolder)
+                .AddJsonFile("serilogsettings.json")
+                .Build();
+
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .CreateLogger();
+
+            return Log.Logger;
         }
 
         private static void AddConfiguration(IServiceCollection services)
@@ -176,6 +196,5 @@ namespace LTC2.Desktopclients.AvaloniaProfileManager
                 Environment.SetEnvironmentVariable(envVar, appSettings.LibraryPath);
             }
         }
-
     }
 }

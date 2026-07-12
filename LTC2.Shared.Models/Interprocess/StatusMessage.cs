@@ -43,5 +43,10 @@
         public string Origin { get; set; }
 
         public string Message { get; set; }
+
+        // Environment.TickCount64 (ms since boot) at the moment of a PING. Used for keep-alive freshness
+        // comparisons instead of Message, since wall-clock time (DateTime.UtcNow) can jump due to NTP/VM
+        // clock corrections and falsely trip the keep-alive timeout. Message is kept for display purposes.
+        public long Ticks { get; set; }
     }
 }

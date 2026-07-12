@@ -63,7 +63,8 @@ namespace LTC2.Webapps.MainApp.ServiceTasks
                         {
                             Status = StatusMessage.STATUS_PING,
                             Origin = StatusMessage.ORG_WEBAPP,
-                            Message = DateTime.UtcNow.ToString()
+                            Message = DateTime.UtcNow.ToString(),
+                            Ticks = Environment.TickCount64
                         };
 
                         var messageContent = JsonConvert.SerializeObject(statusMessage);

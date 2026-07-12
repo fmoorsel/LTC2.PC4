@@ -96,7 +96,8 @@ namespace LTC2.Services.Calculator.ServiceTasks
                                 {
                                     Status = StatusMessage.STATUS_PING,
                                     Origin = StatusMessage.ORG_CALCULATOR,
-                                    Message = DateTime.UtcNow.ToString()
+                                    Message = DateTime.UtcNow.ToString(),
+                                    Ticks = Environment.TickCount64
                                 };
 
                                 var messageContent = JsonConvert.SerializeObject(statusMessage);

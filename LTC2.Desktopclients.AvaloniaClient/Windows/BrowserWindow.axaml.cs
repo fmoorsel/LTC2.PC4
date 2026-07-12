@@ -7,6 +7,7 @@ using LTC2.Desktopclients.AvaloniaClient.Models;
 using LTC2.Desktopclients.AvaloniaClient.Services;
 using LTC2.Shared.BaseMessages.Interfaces;
 using LTC2.Shared.Models.Interprocess;
+using LTC2.Shared.Utils.Generic;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using Newtonsoft.Json;
@@ -15,6 +16,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace LTC2.Desktopclients.AvaloniaClient.Windows
@@ -135,6 +137,18 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
             else if (args is LinuxWpeWebViewEnvironmentRequestedEventArgs wpe)
             {
                 wpe.PreferWebKitGtkInstead = true;
+                wpe.DataDirectory = _appSettings.WebviewRoot;
+                wpe.CacheDirectory = _appSettings.WebviewRoot;
+            }
+            else if (args is GtkWebViewEnvironmentRequestedEventArgs gtk)
+            {
+                if (!Directory.Exists(_appSettings.WebviewRoot))
+                {
+                    Directory.CreateDirectory(_appSettings.WebviewRoot);
+                }
+
+                gtk.BaseDataDirectory = _appSettings.WebviewRoot;
+                gtk.BaseCacheDirectory = _appSettings.WebviewRoot;
             }
         }
 
@@ -148,6 +162,11 @@ namespace LTC2.Desktopclients.AvaloniaClient.Windows
         {
             try
             {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && _webView.TryGetPlatformHandle() is IGtkWebViewPlatformHandle gtkHandle)
+                {
+                    GtkWebKitCookieManager.EnablePersistentStorage(gtkHandle.WebKitWebView, Path.Combine(_appSettings.WebviewRoot, "cookies.sqlite"));
+                }
+
                 if (!_isLoaded)
                 {
                     _isLoaded = true;

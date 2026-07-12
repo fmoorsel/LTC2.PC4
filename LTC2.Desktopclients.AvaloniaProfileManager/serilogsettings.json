@@ -1,0 +1,16 @@
+{
+  "Serilog": {
+    "Using": [ "Serilog.Sinks.File" ],
+    "MinimumLevel": "Debug",
+    "WriteTo": [
+      {
+        "Name": "File",
+        "Args": {
+          "path": "%HOME%/LTC2/PC4/Logs/AvaloniaProfileManager/AvaloniaProfileManager.log",
+          "rollOnFileSizeLimit": true,
+          "fileSizeLimitBytes": 1048576
+        }
+      }
+    ]
+  }
+}

@@ -5,8 +5,10 @@ using Avalonia.Threading;
 using AvaloniaProgressRing;
 using LTC2.Desktopclients.AvaloniaProfileManager.Models;
 using LTC2.Shared.BaseMessages.Interfaces;
+using LTC2.Shared.Utils.Generic;
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace LTC2.Desktopclients.AvaloniaProfileManager.Windows
@@ -90,10 +92,25 @@ namespace LTC2.Desktopclients.AvaloniaProfileManager.Windows
                 }
 
                 webView2.UserDataFolder = _appSettings.WebviewRoot;
+                webView2.EnableDevTools = true;
             }
             else if (args is LinuxWpeWebViewEnvironmentRequestedEventArgs wpe)
             {
                 wpe.PreferWebKitGtkInstead = true;
+                wpe.EnableDevTools = true;
+                wpe.DataDirectory = _appSettings.WebviewRoot;
+                wpe.CacheDirectory = _appSettings.WebviewRoot;
+            }
+            else if (args is GtkWebViewEnvironmentRequestedEventArgs gtk)
+            {
+                if (!Directory.Exists(_appSettings.WebviewRoot))
+                {
+                    Directory.CreateDirectory(_appSettings.WebviewRoot);
+                }
+
+                gtk.EnableDevTools = true;
+                gtk.BaseDataDirectory = _appSettings.WebviewRoot;
+                gtk.BaseCacheDirectory = _appSettings.WebviewRoot;
             }
         }
 
@@ -104,10 +121,21 @@ namespace LTC2.Desktopclients.AvaloniaProfileManager.Windows
 
             try
             {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && _webView.TryGetPlatformHandle() is IGtkWebViewPlatformHandle gtkHandle)
+                {
+                    GtkWebKitCookieManager.EnablePersistentStorage(gtkHandle.WebKitWebView, Path.Combine(_appSettings.WebviewRoot, "cookies.sqlite"));
+                }
+
                 await DeleteCookies();
 
                 _webView.Source = new Uri(GetUrl());
-
+                
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    _webView.InvalidateMeasure();
+                    _webView.InvalidateArrange();
+                }
+                
                 _timer.Start();
             }
             catch (Exception ex)

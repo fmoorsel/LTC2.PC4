@@ -1,5 +1,6 @@
 using LTC2.Desktopclients.AvaloniaProfileManager.Models;
 using LTC2.Shared.Models.Interprocess;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 
@@ -29,10 +30,12 @@ namespace LTC2.Desktopclients.AvaloniaProfileManager.Services
         private readonly int _pingDelta;
         private bool _initialized;
         private readonly AppSettings _appSettings;
+        private readonly ILogger<StatusNotifier> _logger;
 
-        public StatusNotifier(AppSettings appSettings)
+        public StatusNotifier(AppSettings appSettings, ILogger<StatusNotifier> logger)
         {
             _appSettings = appSettings;
+            _logger = logger;
             _keepAliveStatus = new Dictionary<string, KeepAliveStatus>();
             _pingDelta = _appSettings.PingDeltaInSeconds > 0 ? _appSettings.PingDeltaInSeconds : 10;
         }
@@ -55,7 +58,8 @@ namespace LTC2.Desktopclients.AvaloniaProfileManager.Services
                                 {
                                     Origin = component,
                                     Status = StatusMessage.STATUS_PING,
-                                    Message = DateTime.UtcNow.ToString()
+                                    Message = DateTime.UtcNow.ToString(),
+                                    Ticks = Environment.TickCount64
                                 }
                             };
 
@@ -85,12 +89,18 @@ namespace LTC2.Desktopclients.AvaloniaProfileManager.Services
 
                     if (!status.Notified)
                     {
-                        var timeStamp = DateTime.SpecifyKind(DateTime.Parse(status.LastPing.Message), DateTimeKind.Utc);
+                        var lastPingTicks = status.LastPing.Ticks;
                         var seenAtLeastOnce = status.SeenAtLeastOnce;
                         var pingDelta = seenAtLeastOnce ? _pingDelta : _pingDelta * StatusMessage.PING_DELTA_STARTUP_SLACK;
+                        var nowTicks = Environment.TickCount64;
+                        var elapsedSeconds = (nowTicks - lastPingTicks) / 1000.0;
 
-                        if ((DateTime.UtcNow - timeStamp).TotalSeconds > pingDelta)
+                        if (elapsedSeconds > pingDelta)
                         {
+                            _logger.LogWarning(
+                                "CheckKeepAliveStatuses: {Origin} declared FATAL (missing ping). elapsed={ElapsedSeconds:F1}s threshold={PingDelta}s seenAtLeastOnce={SeenAtLeastOnce} lastPingTicks={LastPingTicks} nowTicks={NowTicks} lastPingRaw='{RawMessage}'",
+                                key, elapsedSeconds, pingDelta, seenAtLeastOnce, lastPingTicks, nowTicks, status.LastPing.Message);
+
                             fatals.Add(new StatusMessage()
                             {
                                 Origin = status.LastPing.Origin,
@@ -126,17 +136,29 @@ namespace LTC2.Desktopclients.AvaloniaProfileManager.Services
                     {
                         if (_keepAliveStatus.ContainsKey(statusMessage.Origin))
                         {
+                            var previousPing = _keepAliveStatus[statusMessage.Origin].LastPing;
+
+                            _logger.LogDebug(
+                                "Notify: ping received for {Origin}. previousRaw='{PreviousRaw}' newRaw='{NewRaw}'",
+                                statusMessage.Origin, previousPing?.Message, statusMessage.Message);
+
                             _keepAliveStatus[statusMessage.Origin].FirstPingReceived = true;
                             _keepAliveStatus[statusMessage.Origin].LastPing = statusMessage;
                         }
                         else
                         {
+                            _logger.LogDebug("Notify: first-ever ping received for new origin {Origin}. raw='{NewRaw}'", statusMessage.Origin, statusMessage.Message);
+
                             _keepAliveStatus.Add(statusMessage.Origin, new KeepAliveStatus()
                             {
                                 LastPing = statusMessage,
                                 FirstPingReceived = true
                             });
                         }
+                    }
+                    else if (statusMessage.Status == StatusMessage.STATUS_FATAL)
+                    {
+                        _logger.LogError("Notify: STATUS_FATAL raised for {Origin}: {Message}", statusMessage.Origin, statusMessage.Message);
                     }
 
                     handler(this, args);
